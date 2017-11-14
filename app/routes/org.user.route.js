@@ -5,9 +5,8 @@
  */
 import express from 'express';
 import orgCtrl from '../controllers/organization.ctrl';
-import orgValidator from '../validators/organization.validator';
-import orgUserRolesValidator from '../validators/organization.user.role.validator';
-
+import orgValidator from '../validators/org.user.validator';
+import orgUserRolesValidator from '../validators/org';
 const router = express.Router();
 
 export default function (app) {
@@ -25,5 +24,6 @@ export default function (app) {
     orgValidator.updateReqValidator,
     orgUserRolesValidator.userRoleIdValidator,
     orgCtrl.update]);
-  app.use('/api/admin/private/organization', router);
+
+  app.use('/api/admin/private/org/user', router);
 }

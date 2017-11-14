@@ -1,4 +1,5 @@
 # cm-api
+# Author Murali Yarra <murali.uideveloper@gmail.com>
 This is a care monitor restful APIs with node, express, sequelize and postgresql.
 ## frameworks
 * ES6 through babel
@@ -6,7 +7,7 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 * express
 * sequelize
 * postgresql
-*jsonwebtokens
+* jsonwebtokens
 
 ## folder structure
 

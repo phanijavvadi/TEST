@@ -27,10 +27,8 @@ models.sequelize.sync({
     });
 })/*.then(()=>{
   const adminService=require("./app/services/admin.service");
-  const orgUserRolesService=require("./app/services/organization.user.roles.service");
   return Promise.all([
-    adminService.create({userName:'admin',password:'admin'}),
-    orgUserRolesService.create({name:'Medical Practitioner'}),
+    adminService.create({userName:'admin',password:'admin'})
     ]);
 })*/.catch((e)=>{
     logger.error('Failed to start the server', e);

@@ -18,7 +18,12 @@ const errorMessages = {
   //Organization services start
   ORG_EMAIL_EXISTS: "Email already registered",
   INVALID_ORG_ID: "Invalid organization id",
-  //Organization services end
+  //Organization users services
+  ORG_USER_CREATED:"User created successfully",
+  ORG_USER_UPDATED:'User updated successfully',
+  ORG_USER_EMAIL_EXISTS:'User email already registered',
+  ORG_USER_NOT_FOUND:'User not found',
+
 
 
 };

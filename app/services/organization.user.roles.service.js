@@ -25,7 +25,7 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
 export function findById(id, options = {}) {
   return OrgUserRole.findOne({
     attributes: {
-      exclude: ['password'],
+      exclude: [...options.exclude || {}],
       include: [...options.include || {}],
     },
     where: {

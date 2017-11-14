@@ -5,52 +5,48 @@ import * as _ from 'lodash';
 import * as commonUtil from '../util/common.util';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as orgService from '../services/organization.service';
+import * as orgUserService from '../services/org.user.service';
 
 const operations = {
   list: (req, resp) => {
-    const id = req.params.id;
-    logger.info('About to get organization list');
-
-    return orgService
+    logger.info('About to get organization user list');
+    return orgUserService
       .findAll(req.query)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
-        } else {
-          resp.status(404).send(errorMessages.INVALID_ORG_ID);
         }
       })
   },
   get: (req, resp) => {
     const id = req.params.id;
-    logger.info('About to get organization ', id);
+    logger.info('About to get organization user ', id);
 
-    return orgService.findById(id)
+    return orgUserService.findById(id)
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
             return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
-          })
+          });
           resp.status(200).json(resultObj);
         } else {
-          resp.status(404).send(errorMessages.INVALID_ORG_ID);
+          resp.status(404).send(errorMessages.ORG_USER_NOT_FOUND);
         }
       })
   },
   create: (req, resp) => {
-    const organization = req.body;
-    logger.info('About to create organization ', organization);
-    return orgService
-      .create(organization)
+    const orgUser = req.body;
+    logger.info('About to create organization user', orgUser);
+    return orgUserService
+      .create(orgUser)
       .then((data) => {
         const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
           return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
-        })
+        });
         resp.json({
           success: true,
           data: resultObj,
-          message: successMessages.ADMIN_USER_CREATED_SCUCCESS
+          message: successMessages.ORG_USER_CREATED
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
@@ -61,14 +57,14 @@ const operations = {
       });
   },
   update: (req, resp) => {
-    const organization = req.body;
-    logger.info('About to update organization ', organization);
-    return orgService
-      .update(organization)
-      .then((data) => {
+    const orgUser = req.body;
+    logger.info('About to update organization user', orgUser);
+    return orgUserService
+      .update(orgUser)
+      .then(() => {
         resp.json({
           success: true,
-          message: successMessages.ADMIN_USER_UPDATED_SCUCCESS
+          message: successMessages.ORG_USER_UPDATED
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;

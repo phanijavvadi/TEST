@@ -10,6 +10,17 @@ const Organization = models.Organization;
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
   return Organization.findAll({
+    attributes: {
+      exclude: ['deletedAt'],
+      include: [...otherOptions.include || {}],
+    },
+    include:[{
+      model: models.OrgUserRole,
+      required: true,
+      attributes: {
+        exclude: ['deletedAt','createdAt','updatedAt']
+      },
+    }],
     limit: Number(limit),
     offset: Number(offset),
     where: {

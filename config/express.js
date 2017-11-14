@@ -31,7 +31,7 @@ export default (db) => {
 
     // Request body parsing middleware should be above methodOverride
 	app.use(bodyParser.json({ type: 'application/*', limit: '30mb' }));
-	app.use(bodyParser.urlencoded({ extended: true }));    
+	app.use(bodyParser.urlencoded({ extended: true }));
     app.use(methodOverride());
 
     // Use helmet to secure Express headers
@@ -55,7 +55,6 @@ export default (db) => {
 
     //NOTE: routes config should be defined after all configurations
     bootstrapRoutes();
-
 	app.use(function(err, req, res, next) {
 		let errorMsg;
 		if(err.name === 'SyntaxError' && err.message.indexOf('Unexpected') >= 0) {

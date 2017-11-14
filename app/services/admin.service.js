@@ -42,7 +42,7 @@ export function findByUserName(userName, options = {}) {
 
   return Admin.find({
     attributes: {
-      exclude: ['password'],
+      exclude: ['password',...options.exclude || ''],
       include: [...options.include || {}],
     },
     where: {
