@@ -13,11 +13,11 @@ const validators = {
       firstName: Joi.string().min(3).required(),
       lastName: Joi.string().min(1).required(),
       email: Joi.string().email().required(),
-      password: Joi.string().required(),
       phoneNumber: Joi.string().required(),
-      OrgUserTypeId: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
       AHPRANumber: Joi.string(),
       isAdmin: Joi.boolean().required(),
+      orgId: Joi.string().required(),
       status: Joi.number().valid([1, 2]).label('Status'),
     };
     let result = Joi.validate(body, schema);
@@ -59,10 +59,33 @@ const validators = {
       firstName: Joi.string().min(3).required(),
       lastName: Joi.string().min(1).required(),
       phoneNumber: Joi.string().required(),
-      OrgUserTypeId: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
+      orgId: Joi.string().required(),
       AHPRANumber: Joi.string(),
       isAdmin: Joi.boolean().required(),
       status: Joi.number().valid([1, 2]).label('Status'),
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  changePasswordReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
+      orgId: Joi.string().required(),
+      password:Joi.string().required(),
+      confirmPassword:Joi.string().required().valid(Joi.ref('password')).options({
+        language: {
+          any: {
+            allowOnly: '!!Passwords do not match',
+          }
+        }
+      })
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

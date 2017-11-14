@@ -25,12 +25,7 @@ models.sequelize.sync({
     return server.listenAsync(config.port).then(()=>{
         logger.info('Application started on port ', config.port);
     });
-})/*.then(()=>{
-  const adminService=require("./app/services/admin.service");
-  return Promise.all([
-    adminService.create({userName:'admin',password:'admin'})
-    ]);
-})*/.catch((e)=>{
+}).catch((e)=>{
     logger.error('Failed to start the server', e);
 });
 

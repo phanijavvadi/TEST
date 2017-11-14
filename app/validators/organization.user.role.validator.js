@@ -6,8 +6,8 @@ import * as orgUserRolesService from '../services/organization.user.roles.servic
 
 const validators = {
   userRoleIdValidator: (req, resp, next) => {
-    const {OrgUserRoleId} = req.body;
-    orgUserRolesService.findById(OrgUserRoleId)
+    const {orgUserRoleId} = req.body;
+    orgUserRolesService.findById(orgUserRoleId)
       .then((data) => {
         if (data) {
           next();

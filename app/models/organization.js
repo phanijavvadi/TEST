@@ -28,7 +28,9 @@ export default function (sequelize, DataTypes) {
     paranoid: true
   });
   Organization.associate = function (models) {
-    Organization.belongsTo(models.OrgUserRole, {foreignKey: 'OrgUserRoleId'})
+    Organization.belongsTo(models.OrgUserRole, {
+      foreignKey: {name: 'orgUserRoleId', allowNull: false}
+    })
   }
   return Organization;
 };

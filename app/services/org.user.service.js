@@ -1,7 +1,7 @@
 'use strict';
 
 import models from '../models';
-
+import errorMessages from '../../config/error.messages';
 const OrgUser = models.OrgUser;
 
 /**
@@ -11,14 +11,14 @@ const OrgUser = models.OrgUser;
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
   return OrgUser.findAll({
     attributes: {
-      exclude: ['deletedAt','password'],
+      exclude: ['deletedAt', 'password'],
       include: [...otherOptions.include || {}],
     },
-    include:[{
+    include: [{
       model: models.OrgUserType,
       required: true,
       attributes: {
-        exclude: ['deletedAt','createdAt','updatedAt']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
       },
     }],
     limit: Number(limit),
@@ -77,7 +77,14 @@ export function create(orgUser) {
 export function update(orgUser) {
   return OrgUser.findById(orgUser.id)
     .then((p) => {
-      return p.update(orgUser);
+      if (p) {
+        return p.update(orgUser);
+      } else {
+        return new Promise((resolve,reject)=>{
+          reject({message:errorMessages.ORG_USER_NOT_FOUND,code:'ORG_USER_NOT_FOUND'})
+        })
+      }
+
     });
 };
 

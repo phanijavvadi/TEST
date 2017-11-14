@@ -1,4 +1,5 @@
 "use strict";
+import commonUtil from "../util/common.util";
 export default function (sequelize, DataTypes) {
   const OrgUser = sequelize.define("OrgUser", {
     id: {
@@ -17,9 +18,9 @@ export default function (sequelize, DataTypes) {
     phoneNumber: DataTypes.STRING,
     AHPRANumber: DataTypes.STRING,
     isAdmin: {
-      type:DataTypes.BOOLEAN,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue:true
+      defaultValue: true
     },
     status: {
       type: DataTypes.INTEGER,
@@ -31,8 +32,27 @@ export default function (sequelize, DataTypes) {
     paranoid: true
   });
   OrgUser.associate = function (models) {
-    OrgUser.belongsTo(models.OrgUserType, {foreignKey: 'OrgUserTypeId'})
-    OrgUser.belongsTo(models.Organization, {foreignKey: 'OrgId'})
+    OrgUser.belongsTo(models.OrgUserType, {
+      foreignKey: {
+        name: 'orgUserTypeId',
+        allowNull:false
+      }
+    })
+    OrgUser.belongsTo(models.Organization, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      }
+    })
   }
+
+  OrgUser.beforeCreate((orgUser, options) => {
+    orgUser.password = commonUtil.getHash(orgUser.password);
+  });
+  OrgUser.beforeUpdate((orgUser, options) => {
+    if(orgUser.password){
+      orgUser.password = commonUtil.getHash(orgUser.password);
+    }
+  });
   return OrgUser;
 };

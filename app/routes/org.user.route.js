@@ -4,26 +4,35 @@
  * Module dependencies.
  */
 import express from 'express';
-import orgCtrl from '../controllers/organization.ctrl';
-import orgValidator from '../validators/org.user.validator';
-import orgUserRolesValidator from '../validators/org';
+import orgUserCtrl from '../controllers/org.user.ctrl';
+import orgUserValidator from '../validators/org.user.validator';
+import orgUserTypeValidator from '../validators/org.user.type.validator';
+import orgValidator from '../validators/organization.validator';
 const router = express.Router();
 
 export default function (app) {
 
   router.route('/list').get([
-    orgCtrl.list]);
+    orgUserCtrl.list]);
   router.route('/:id').get([
-    orgCtrl.get]);
+    orgUserCtrl.get]);
   router.route('/create').post([
-    orgValidator.createReqValidator,
-    orgValidator.validateEmailUniqueValidation,
-    orgUserRolesValidator.userRoleIdValidator,
-    orgCtrl.create]);
+    orgUserValidator.createReqValidator,
+    orgUserValidator.emailUniqueValidation,
+    orgUserTypeValidator.userTypeIdValidator,
+    orgValidator.validateOrgId,
+    orgUserCtrl.create
+  ]);
   router.route('/update').put([
-    orgValidator.updateReqValidator,
-    orgUserRolesValidator.userRoleIdValidator,
-    orgCtrl.update]);
+    orgUserValidator.updateReqValidator,
+    orgUserTypeValidator.userTypeIdValidator,
+    orgValidator.validateOrgId,
+    orgUserCtrl.update]);
 
+  router.route('/change-password').put([
+    orgUserValidator.changePasswordReqValidator,
+    orgUserTypeValidator.userTypeIdValidator,
+    orgValidator.validateOrgId,
+    orgUserCtrl.changePassword]);
   app.use('/api/admin/private/org/user', router);
 }

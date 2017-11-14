@@ -1,6 +1,7 @@
 'use strict';
 import * as Joi from 'joi';
 import logger from '../util/logger';
+
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
@@ -17,7 +18,7 @@ const validators = {
       organizationAddress: Joi.string().min(3).required(),
       phoneNumber: Joi.string().required(),
       fax: Joi.string(),
-      OrgUserRoleId: Joi.string().required(),
+      orgUserRoleId: Joi.string().required(),
       AHPRANumber: Joi.string(),
     };
     let result = Joi.validate(body, schema);
@@ -62,7 +63,7 @@ const validators = {
       organizationAddress: Joi.string().min(3).required(),
       phoneNumber: Joi.string().required(),
       fax: Joi.string(),
-      OrgUserRoleId: Joi.string().required(),
+      orgUserRoleId: Joi.string().required(),
       AHPRANumber: Joi.string(),
     };
     let result = Joi.validate(body, schema);
@@ -72,6 +73,25 @@ const validators = {
       next();
     }
   },
+  validateOrgId: (req, resp, next) => {
+    const {orgId} = req.body;
+    orgService.findById(orgId)
+      .then((data) => {
+        if (data) {
+          next();
+          return null;
+        } else {
+          return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+        }
+      })
+      .catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  }
 
 }
 export default validators;

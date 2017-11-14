@@ -55,3 +55,4 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 ## commands
 * start in development mode: **npm run start:dev**
 * build the code to es5: **npm run build**
+* node_modules/.bin/sequelize db:seed
