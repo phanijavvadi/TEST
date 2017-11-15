@@ -2,7 +2,7 @@ module.exports = {
   development: {
     username: 'postgres',
     password: 'Test@123',
-    database: 'cm-api',
+    database: 'cmdev',
     host: '127.0.0.1',
     dialect: 'postgres'
   },
