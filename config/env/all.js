@@ -1,7 +1,7 @@
 'use strict';
 
 const config =  {
-	port: process.env.PORT || 5003,
+	port: process.env.PORT || 3000,
 	log: {
 		//morgan options: 'combined', 'common', 'dev', 'short', 'tiny'
 		format: 'combined',
