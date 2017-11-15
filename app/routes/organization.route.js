@@ -6,7 +6,7 @@
 import express from 'express';
 import orgCtrl from '../controllers/organization.ctrl';
 import orgValidator from '../validators/organization.validator';
-import orgUserRolesValidator from '../validators/organization.user.role.validator';
+import orgUserTypeValidator from '../validators/org.user.type.validator';
 
 const router = express.Router();
 
@@ -19,11 +19,11 @@ export default function (app) {
   router.route('/create').post([
     orgValidator.createReqValidator,
     orgValidator.validateEmailUniqueValidation,
-    orgUserRolesValidator.userRoleIdValidator,
+    orgUserTypeValidator.userTypeIdValidator,
     orgCtrl.create]);
   router.route('/update').put([
     orgValidator.updateReqValidator,
-    orgUserRolesValidator.userRoleIdValidator,
+    orgUserTypeValidator.userTypeIdValidator,
     orgCtrl.update]);
   app.use('/api/admin/private/organization', router);
 }

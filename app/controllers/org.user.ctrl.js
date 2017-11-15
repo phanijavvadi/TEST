@@ -18,7 +18,13 @@ const operations = {
         if (data) {
           resp.status(200).json(data);
         }
-      })
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   },
   get: (req, resp) => {
     const id = req.params.id;
@@ -34,7 +40,13 @@ const operations = {
         } else {
           resp.status(404).send(errorMessages.ORG_USER_NOT_FOUND);
         }
-      })
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   },
   create: (req, resp) => {
     const orgUser = req.body;
@@ -45,7 +57,7 @@ const operations = {
       .then((data) => {
         let contentObj = adminMailTemplate.orgUserCreation(orgUser);
         mailNotificationUtil.sendMail({
-          to:[{email:orgUser.email,name:orgUser.firstName}],
+          to: [{email: orgUser.email, name: orgUser.firstName}],
           body: contentObj.body,
           subject: contentObj.subject
         });
@@ -93,6 +105,30 @@ const operations = {
         resp.json({
           success: true,
           message: successMessages.ORG_USER_PASSWORD_UPDATED
+        });
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        if (err && err.code == 'ORG_USER_NOT_FOUND') {
+          resp.status(404).send({
+            message
+          });
+          return;
+        }
+        resp.status(500).send({
+          message
+        });
+      });
+  },
+  verifyUserRegNo: (req, resp) => {
+    const data = req.body;
+    logger.info('About to verify user');
+    return orgUserService
+      .update(data)
+      .then(() => {
+        resp.json({
+          success: true,
+          message: successMessages.ORG_USER_REG_NO_VERIFICATION_STATUS_UPDATED_SUCCESSFULLY
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;

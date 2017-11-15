@@ -14,11 +14,11 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
       exclude: ['deletedAt'],
       include: [...otherOptions.include || {}],
     },
-    include:[{
-      model: models.OrgUserRole,
+    include: [{
+      model: models.OrgUserType,
       required: true,
       attributes: {
-        exclude: ['deletedAt','createdAt','updatedAt']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
       },
     }],
     limit: Number(limit),
@@ -34,11 +34,21 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
  * @param organizationId
  **/
 export function findById(id, options = {}) {
+  let includeTables = [];
+  if (options.includeOrgUserType) {
+    includeTables.push({
+      model: models.OrgUserType,
+      attributes: {
+        exclude: ['updatedAt', 'createdAt', 'deletedAt']
+      }
+    });
+  }
   return Organization.findOne({
     attributes: {
       exclude: ['password'],
       include: [...options.include || {}],
     },
+    include: includeTables,
     where: {
       id: id
     }

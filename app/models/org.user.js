@@ -22,6 +22,10 @@ export default function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: true
     },
+    isRegNoVerified:{
+      type:DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     status: {
       type: DataTypes.INTEGER,
       defaultValue: 2,
@@ -47,7 +51,9 @@ export default function (sequelize, DataTypes) {
   }
 
   OrgUser.beforeCreate((orgUser, options) => {
-    orgUser.password = commonUtil.getHash(orgUser.password);
+    if(orgUser.password) {
+      orgUser.password = commonUtil.getHash(orgUser.password);
+    }
   });
   OrgUser.beforeUpdate((orgUser, options) => {
     if(orgUser.password){

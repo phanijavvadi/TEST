@@ -18,7 +18,7 @@ const validators = {
       organizationAddress: Joi.string().min(3).required(),
       phoneNumber: Joi.string().required(),
       fax: Joi.string(),
-      orgUserRoleId: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
       AHPRANumber: Joi.string(),
     };
     let result = Joi.validate(body, schema);
@@ -63,7 +63,7 @@ const validators = {
       organizationAddress: Joi.string().min(3).required(),
       phoneNumber: Joi.string().required(),
       fax: Joi.string(),
-      orgUserRoleId: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
       AHPRANumber: Joi.string(),
     };
     let result = Joi.validate(body, schema);

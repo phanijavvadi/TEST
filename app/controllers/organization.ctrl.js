@@ -20,13 +20,19 @@ const operations = {
         } else {
           resp.status(404).send(errorMessages.INVALID_ORG_ID);
         }
-      })
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   },
   get: (req, resp) => {
     const id = req.params.id;
     logger.info('About to get organization ', id);
 
-    return orgService.findById(id)
+    return orgService.findById(id,{includeOrgUserType:true})
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
@@ -36,7 +42,13 @@ const operations = {
         } else {
           resp.status(404).send(errorMessages.INVALID_ORG_ID);
         }
-      })
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   },
   create: (req, resp) => {
     const organization = req.body;

@@ -11,6 +11,7 @@ const successMessage = {
   ORG_USER_CREATED: "User created successfully",
   ORG_USER_UPDATED: "User updated successfully",
   ORG_USER_PASSWORD_UPDATED: "User password updated successfully",
+  ORG_USER_REG_NO_VERIFICATION_STATUS_UPDATED_SUCCESSFULLY: "User AHPRA Number verification status updated successfully",
 
 };
 export default successMessage;

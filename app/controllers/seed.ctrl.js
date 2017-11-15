@@ -35,10 +35,7 @@ const operations = {
           name: 'Chiropractor',
           value: 'Chiropractor',
           isRegNoRequired: true,
-        }]),
-      models.OrgUserRole.bulkCreate([{
-        name:'Medical Practitioner'
-      }])
+        }])
     ]).then(()=>{
       resp.send('seed completed successfully');
 

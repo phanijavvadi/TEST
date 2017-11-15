@@ -1,6 +1,7 @@
 'use strict';
 import * as Joi from 'joi';
 import logger from '../util/logger';
+
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
@@ -78,14 +79,29 @@ const validators = {
       id: Joi.string().required(),
       orgUserTypeId: Joi.string().required(),
       orgId: Joi.string().required(),
-      password:Joi.string().required(),
-      confirmPassword:Joi.string().required().valid(Joi.ref('password')).options({
+      password: Joi.string().required(),
+      confirmPassword: Joi.string().required().valid(Joi.ref('password')).options({
         language: {
           any: {
             allowOnly: '!!Passwords do not match',
           }
         }
       })
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  verifyRegNoReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      orgUserTypeId: Joi.string().required(),
+      orgId: Joi.string().required(),
+      isRegNoVerified: Joi.boolean().required()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

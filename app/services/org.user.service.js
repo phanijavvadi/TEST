@@ -12,7 +12,6 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
   return OrgUser.findAll({
     attributes: {
       exclude: ['deletedAt', 'password'],
-      include: [...otherOptions.include || {}],
     },
     include: [{
       model: models.OrgUserType,
@@ -75,7 +74,11 @@ export function create(orgUser) {
  * @param orgUser object literal containing info about a orgUser
  **/
 export function update(orgUser) {
-  return OrgUser.findById(orgUser.id)
+  return OrgUser.findById(orgUser.id,{
+    attributes:{
+      exclude: ['password'],
+    }
+  })
     .then((p) => {
       if (p) {
         return p.update(orgUser);
