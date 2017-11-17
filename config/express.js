@@ -6,6 +6,7 @@
 import fs from 'fs';
 import https from 'https';
 import express from 'express';
+import cors from 'cors';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import methodOverride from 'method-override';
@@ -22,6 +23,7 @@ export default (db) => {
 	var app = express();
 	app.listenAsync = Promise.promisify(app.listen).bind(app);
 	app.use(morgan(config.log.format, {stream: logger.stream}));
+  app.use(cors());
 
 	// Showing stack errors
 	app.set('showStackError', true);
