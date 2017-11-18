@@ -14,6 +14,8 @@ export default function (app) {
 
   router.route('/list').get([
     orgCtrl.list]);
+  router.route('/options').get([
+    orgCtrl.getOptions]);
   router.route('/:id').get([
     orgCtrl.get]);
   router.route('/create').post([

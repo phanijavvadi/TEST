@@ -28,6 +28,20 @@ const operations = {
         });
       });
   },
+  getOptions: (req, resp) => {
+    logger.info('About to get organization options');
+    return orgService
+      .getOptions(req.query)
+      .then((data) => {
+        resp.status(200).json(data);
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  },
   get: (req, resp) => {
     const id = req.params.id;
     logger.info('About to get organization ', id);

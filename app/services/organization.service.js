@@ -28,6 +28,15 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
     }
   });
 };
+/**
+ * get organization options list
+ *
+ **/
+export function getOptions() {
+  return Organization.findAll({
+    attributes: ['id','organizationName']
+  });
+};
 
 /**
  * Find a organization by organization id
