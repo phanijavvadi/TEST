@@ -20,7 +20,7 @@ export default function (sequelize, DataTypes) {
     AHPRANumber: DataTypes.STRING,
     status: {
       type: DataTypes.INTEGER,
-      defaultValue: 1,
+      defaultValue: 2,
       allowNull: false,
       comment: "1=>Active,2=>In Active"
     }

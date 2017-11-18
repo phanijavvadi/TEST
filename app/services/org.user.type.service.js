@@ -9,7 +9,7 @@ const OrgUserType = models.OrgUserType;
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return OrgUserType.findAll({
+  return OrgUserType.findAndCountAll({
     limit: Number(limit),
     offset: Number(offset),
     where: {

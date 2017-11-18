@@ -6,6 +6,8 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
 import * as orgService from '../services/organization.service';
+import * as orgUserService from '../services/org.user.service';
+
 
 const validators = {
   createReqValidator: (req, resp, next) => {
@@ -65,6 +67,48 @@ const validators = {
       fax: Joi.string(),
       orgUserTypeId: Joi.string().required(),
       AHPRANumber: Joi.string(),
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  orgActivateReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      // check atleast one active AHPRARegNo User exists
+      const {id} = req.body;
+      let whereOptions = {orgId: id, status: 1};
+      orgUserService.findOne(whereOptions)
+        .then((data) => {
+          if (data) {
+            next();
+            return null;
+          } else {
+            resp.status(403).send({success: false, message: errorMessages.ORG_ACTIVE_AHPRANO_REQUIRED_TO_ACTIVATE});
+          }
+        })
+        .catch((err) => {
+          let message = err.message || errorMessages.SERVER_ERROR;
+          logger.info(err);
+          resp.status(500).send({
+            message
+          });
+        });
+    }
+  },
+  orgInActivateReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

@@ -23,9 +23,17 @@ export default function (app) {
     orgValidator.validateEmailUniqueValidation,
     orgUserTypeValidator.userTypeIdValidator,
     orgCtrl.create]);
+
   router.route('/update').put([
     orgValidator.updateReqValidator,
     orgUserTypeValidator.userTypeIdValidator,
     orgCtrl.update]);
+  router.route('/activate').post([
+    orgValidator.orgActivateReqValidator,
+    orgCtrl.activate]);
+  router.route('/in-activate').post([
+    orgValidator.orgInActivateReqValidator,
+    orgCtrl.inActivate]);
+
   app.use('/api/admin/private/organization', router);
 }

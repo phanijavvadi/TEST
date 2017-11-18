@@ -33,7 +33,6 @@ export default function (app) {
 
   router.route('/change-password').put([
     orgUserValidator.changePasswordReqValidator,
-    orgUserTypeValidator.userTypeIdValidator,
     orgValidator.validateOrgId,
     orgUserCtrl.changePassword]);
 

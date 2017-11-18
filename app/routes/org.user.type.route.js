@@ -12,5 +12,7 @@ export default function (app) {
 
   router.route('/get-options').get([
     orgUserTypeCtrl.getOptions]);
+  router.route('/list').get([
+    orgUserTypeCtrl.list]);
   app.use('/api/admin/private/org-user-type', router);
 }

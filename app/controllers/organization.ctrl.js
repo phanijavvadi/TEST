@@ -46,7 +46,7 @@ const operations = {
     const id = req.params.id;
     logger.info('About to get organization ', id);
 
-    return orgService.findById(id,{includeOrgUserType:true})
+    return orgService.findById(id, {includeOrgUserType: true})
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
@@ -92,6 +92,48 @@ const operations = {
     return orgService
       .update(organization)
       .then((data) => {
+        resp.json({
+          success: true,
+          message: successMessages.ORG_UPDATED
+        });
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  },
+  activate: (req, resp) => {
+    const data = {
+      id: req.body.id,
+      status: 1
+    }
+    logger.info('About to activate organization ', data);
+    return orgService
+      .update(data)
+      .then((res) => {
+        resp.json({
+          success: true,
+          message: successMessages.ORG_UPDATED
+        });
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  },
+  inActivate: (req, resp) => {
+    const data = {
+      id: req.body.id,
+      status: 2
+    }
+    logger.info('About to in activate organization ', data);
+    return orgService
+      .update(data)
+      .then((res) => {
         resp.json({
           success: true,
           message: successMessages.ORG_UPDATED

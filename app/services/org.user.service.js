@@ -9,12 +9,18 @@ const OrgUser = models.OrgUser;
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return OrgUser.findAll({
+  return OrgUser.findAndCountAll({
     attributes: {
       exclude: ['deletedAt', 'password'],
     },
     include: [{
       model: models.OrgUserType,
+      required: true,
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
+      },
+    },{
+      model: models.Organization,
       required: true,
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
