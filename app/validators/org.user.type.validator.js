@@ -4,6 +4,7 @@ import errorMessages from '../../config/error.messages';
 import * as orgUserTypeService from '../services/org.user.type.service'
 
 const validators = {
+
   userTypeIdValidator: (req, resp, next) => {
     const {orgUserTypeId} = req.body;
     orgUserTypeService.findById(orgUserTypeId)

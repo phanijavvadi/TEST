@@ -62,7 +62,7 @@ const operations = {
         resp.json({
           success: true,
           data: resultObj,
-          message: successMessages.ORG_USER_CREATED
+          message: successMessages.ORG_CREATED
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
@@ -80,7 +80,7 @@ const operations = {
       .then((data) => {
         resp.json({
           success: true,
-          message: successMessages.ORG_USER_UPDATED
+          message: successMessages.ORG_UPDATED
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;

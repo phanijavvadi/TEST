@@ -17,6 +17,17 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
     }
   });
 };
+/**
+ * Find all OrgUserTypes in the db
+ *
+ **/
+export function getOptions() {
+  return OrgUserType.findAll({
+    attributes:{
+      exclude:['createdAt','updatedAt','deletedAt'],
+    }
+  });
+};
 
 /**
  * Find a OrgUserType by OrgUserType id

@@ -35,7 +35,11 @@ const validators = {
         adminService.findById(payload.id)
           .then((adminRecord) => {
             if (!adminRecord) {
-              resp.status(404).send(errorMessages.TOKEN_IS_INVALID);
+              resp.status(403).send({
+                success: false,
+                message: errorMessages.TOKEN_IS_INVALID,
+                code: 'TOKEN_IS_INVALID'
+              });
             } else {
               req.locals.adminRecord = adminRecord;
               next();
@@ -52,7 +56,8 @@ const validators = {
     } else {
       resp.status(403).send({
         success: false,
-        message: errorMessages.TOKEN_IS_REQUIRED
+        message: errorMessages.TOKEN_IS_INVALID,
+        code: 'TOKEN_IS_INVALID'
       });
     }
   },

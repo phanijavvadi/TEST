@@ -9,7 +9,7 @@ const Organization = models.Organization;
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return Organization.findAll({
+  return Organization.findAndCountAll({
     attributes: {
       exclude: ['deletedAt'],
       include: [...otherOptions.include || {}],
