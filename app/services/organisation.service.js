@@ -2,14 +2,14 @@
 
 import models from '../models';
 
-const Organization = models.Organization;
+const Organisation = models.Organisation;
 
 /**
- * Find all organizations in the db
+ * Find all organisations in the db
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return Organization.findAndCountAll({
+  return Organisation.findAndCountAll({
     attributes: {
       exclude: ['deletedAt'],
       include: [...otherOptions.include || {}],
@@ -29,18 +29,18 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
   });
 };
 /**
- * get organization options list
+ * get organisation options list
  *
  **/
 export function getOptions() {
-  return Organization.findAll({
-    attributes: ['id','organizationName']
+  return Organisation.findAll({
+    attributes: ['id','orgName']
   });
 };
 
 /**
- * Find a organization by organization id
- * @param organizationId
+ * Find a organisation by organisation id
+ * @param organisationId
  **/
 export function findById(id, options = {}) {
   let includeTables = [];
@@ -52,7 +52,7 @@ export function findById(id, options = {}) {
       }
     });
   }
-  return Organization.findOne({
+  return Organisation.findOne({
     attributes: {
       exclude: ['password'],
       include: [...options.include || {}],
@@ -65,11 +65,11 @@ export function findById(id, options = {}) {
 };
 
 /**
- * Find a organization by organization id
- * @param organizationId
+ * Find a organisation by organisation id
+ * @param organisationId
  **/
 export function findOne(options = {}) {
-  return Organization.findOne({
+  return Organisation.findOne({
     attributes: {
       exclude: ['password'],
       include: [...options.include || {}],
@@ -82,32 +82,32 @@ export function findOne(options = {}) {
 
 
 /**
- * Create a new organization
- * @param organization object literal containing info about a organization
+ * Create a new organisation
+ * @param organisation object literal containing info about a organisation
  **/
-export function create(organization) {
-  return Organization.create(organization);
+export function create(organisation) {
+  return Organisation.create(organisation);
 };
 
 /**
- * Update a organization
- * @param organization object literal containing info about a organization
+ * Update a organisation
+ * @param organisation object literal containing info about a organisation
  **/
-export function update(organization) {
-  return Organization.findById(organization.id)
+export function update(organisation) {
+  return Organisation.findById(organisation.id)
     .then((p) => {
-      return p.update(organization);
+      return p.update(organisation);
     });
 };
 
 /**
- * Delete organization(s) based on input criteria
- * @param organization object literal containing info about a organization
+ * Delete organisation(s) based on input criteria
+ * @param organisation object literal containing info about a organisation
  **/
-export function deleteOrganization(organization) {
-  return Organization.destroy({
+export function deleteOrganisation(organisation) {
+  return Organisation.destroy({
     where: {
-      ...organization
+      ...organisation
     }
   });
 };

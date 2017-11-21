@@ -7,7 +7,7 @@ import express from 'express';
 import orgUserCtrl from '../controllers/org.user.ctrl';
 import orgUserValidator from '../validators/org.user.validator';
 import orgUserTypeValidator from '../validators/org.user.type.validator';
-import orgValidator from '../validators/organization.validator';
+import orgValidator from '../validators/organisation.validator';
 
 const router = express.Router();
 const adminRoutes = express.Router();

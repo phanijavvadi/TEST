@@ -7,7 +7,7 @@ import * as orgUserTypeService from '../services/org.user.type.service';
 
 const operations = {
   list: (req, resp) => {
-    logger.info('About to get organization user type options');
+    logger.info('About to get organisation user type options');
     return orgUserTypeService
       .findAll(req.query)
       .then((data) => {
@@ -23,7 +23,7 @@ const operations = {
       });
   },
   getOptions: (req, resp) => {
-    logger.info('About to get organization user type options');
+    logger.info('About to get organisation user type options');
     return orgUserTypeService
       .getOptions(req.query)
       .then((data) => {

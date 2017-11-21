@@ -42,7 +42,7 @@ export default function (sequelize, DataTypes) {
         allowNull:false
       }
     })
-    OrgUser.belongsTo(models.Organization, {
+    OrgUser.belongsTo(models.Organisation, {
       foreignKey: {
         name: 'orgId',
         allowNull: false

@@ -38,8 +38,6 @@ export function findById(id, options = {}) {
  * @param userName
  **/
 export function findByUserName(userName, options = {}) {
-
-
   return Admin.find({
     attributes: {
       exclude: ['password',...options.exclude || ''],

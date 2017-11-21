@@ -11,7 +11,7 @@ import * as adminMailTemplate from "../templates/admin.mail.template";
 
 const operations = {
   list: (req, resp) => {
-    logger.info('About to get organization user list');
+    logger.info('About to get organisation user list');
     return orgUserService
       .findAll(req.query)
       .then((data) => {
@@ -28,7 +28,7 @@ const operations = {
   },
   get: (req, resp) => {
     const id = req.params.id;
-    logger.info('About to get organization user ', id);
+    logger.info('About to get organisation user ', id);
 
     return orgUserService.findById(id)
       .then((data) => {
@@ -51,7 +51,7 @@ const operations = {
   create: (req, resp) => {
     const orgUser = req.body;
     orgUser.password = Math.random().toString(36).slice(-8);
-    logger.info('About to create organization user', orgUser);
+    logger.info('About to create organisation user', orgUser);
     return orgUserService
       .create(orgUser)
       .then((data) => {
@@ -79,7 +79,7 @@ const operations = {
   },
   update: (req, resp) => {
     const orgUser = req.body;
-    logger.info('About to update organization user', orgUser);
+    logger.info('About to update organisation user', orgUser);
     return orgUserService
       .update(orgUser)
       .then(() => {

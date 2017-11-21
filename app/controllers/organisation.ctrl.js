@@ -5,12 +5,12 @@ import * as _ from 'lodash';
 import * as commonUtil from '../util/common.util';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as orgService from '../services/organization.service';
+import * as orgService from '../services/organisation.service';
 
 const operations = {
   list: (req, resp) => {
     const id = req.params.id;
-    logger.info('About to get organization list');
+    logger.info('About to get organisation list');
 
     return orgService
       .findAll(req.query)
@@ -29,7 +29,7 @@ const operations = {
       });
   },
   getOptions: (req, resp) => {
-    logger.info('About to get organization options');
+    logger.info('About to get organisation options');
     return orgService
       .getOptions(req.query)
       .then((data) => {
@@ -44,7 +44,7 @@ const operations = {
   },
   get: (req, resp) => {
     const id = req.params.id;
-    logger.info('About to get organization ', id);
+    logger.info('About to get organisation ', id);
 
     return orgService.findById(id, {includeOrgUserType: true})
       .then((data) => {
@@ -65,10 +65,10 @@ const operations = {
       });
   },
   create: (req, resp) => {
-    const organization = req.body;
-    logger.info('About to create organization ', organization);
+    const organisation = req.body;
+    logger.info('About to create organisation ', organisation);
     return orgService
-      .create(organization)
+      .create(organisation)
       .then((data) => {
         const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
           return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
@@ -87,10 +87,10 @@ const operations = {
       });
   },
   update: (req, resp) => {
-    const organization = req.body;
-    logger.info('About to update organization ', organization);
+    const organisation = req.body;
+    logger.info('About to update organisation ', organisation);
     return orgService
-      .update(organization)
+      .update(organisation)
       .then((data) => {
         resp.json({
           success: true,
@@ -109,7 +109,7 @@ const operations = {
       id: req.body.id,
       status: 1
     }
-    logger.info('About to activate organization ', data);
+    logger.info('About to activate organisation ', data);
     return orgService
       .update(data)
       .then((res) => {
@@ -130,7 +130,7 @@ const operations = {
       id: req.body.id,
       status: 2
     }
-    logger.info('About to in activate organization ', data);
+    logger.info('About to in activate organisation ', data);
     return orgService
       .update(data)
       .then((res) => {

@@ -5,34 +5,59 @@ import logger from '../util/logger';
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
-import * as orgService from '../services/organization.service';
+import * as orgService from '../services/organisation.service';
 import * as orgUserService from '../services/org.user.service';
-
+import * as attachmentService from '../services/attachment.service';
 
 const validators = {
   createReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      firstName: Joi.string().min(3).required(),
-      lastName: Joi.string().min(1).required(),
-      email: Joi.string().email().required(),
-      organizationName: Joi.string().min(3).required(),
-      organizationAddress: Joi.string().min(3).required(),
-      phoneNumber: Joi.string().required(),
-      fax: Joi.string(),
+      contPerFname: Joi.string().min(3).required(),
+      contPerLname: Joi.string().min(1).required(),
+      contPerEmail: Joi.string().email().required(),
+      orgName: Joi.string().min(3).required(),
+      contPerAHPRANo: Joi.string().allow(null),
+      orgAdd1: Joi.string().min(3).required(),
+      orgAdd2: Joi.string().min(3),
+      phoneNo: Joi.string().required(),
+      fax: Joi.string().allow(null),
       orgUserTypeId: Joi.string().required(),
-      AHPRANumber: Joi.string(),
+      orgLogo: Joi.string().allow(null)
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
+       next();
+    }
+  },
+  validateOrgLogo: (req, resp, next) => {
+    const body = req.body;
+    if (!body.orgLogo) {
       next();
+    } else {
+      attachmentService.findById(body.orgLogo)
+        .then((data) => {
+          if (data) {
+            next();
+            return null;
+          } else {
+            return resp.status(403).send({success: false, message: errorMessages.INVALID_ATTACHMENT_ID});
+          }
+        })
+        .catch((err) => {
+          let message = err.message || errorMessages.SERVER_ERROR;
+          logger.info(err);
+          resp.status(500).send({
+            message
+          });
+        });
     }
   },
   validateEmailUniqueValidation: (req, resp, next) => {
-    const {email} = req.body;
-    let whereOptions = {email};
+    const {contPerEmail} = req.body;
+    let whereOptions = {contPerEmail};
     if (req.body && req.body.id) {
       whereOptions.id = {
         [Op.ne]: req.body.id
@@ -59,14 +84,16 @@ const validators = {
     const body = req.body;
     let schema = {
       id: Joi.string().required(),
-      firstName: Joi.string().min(3).required(),
-      lastName: Joi.string().min(1).required(),
-      organizationName: Joi.string().min(3).required(),
-      organizationAddress: Joi.string().min(3).required(),
-      phoneNumber: Joi.string().required(),
-      fax: Joi.string(),
+      contPerFname: Joi.string().min(3).required(),
+      contPerLname: Joi.string().min(1).required(),
+      orgName: Joi.string().min(3).required(),
+      contPerAHPRANo: Joi.string().allow(null),
+      orgAdd1: Joi.string().min(3).required(),
+      orgAdd2: Joi.string().min(3),
+      phoneNo: Joi.string().required(),
+      fax: Joi.string().allow(null),
       orgUserTypeId: Joi.string().required(),
-      AHPRANumber: Joi.string(),
+      orgLogo: Joi.string().allow(null)
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

@@ -20,18 +20,18 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 		+-- app
 		¦	 +-- controllers
 		¦	 ¦   +-- admin.ctrl.js
-		¦	 ¦   +-- organization.ctrl.js
+		¦	 ¦   +-- organisation.ctrl.js
 		¦	 +-- models
 		¦	 ¦   +-- admin.js
 		¦	 ¦   +-- index.js
-		¦	 ¦   +-- organization.js
+		¦	 ¦   +-- organisation.js
 		¦	 ¦   +-- organization.user.roles.js
 		¦	 +-- routes
 		¦	 ¦   +-- admin.route.js
-		¦	 ¦   +-- organization.route.js
+		¦	 ¦   +-- organisation.route.js
 		¦	 +-- services
 		¦	 ¦   +-- admin.service.js
-		¦	 ¦   +-- organization.service.js
+		¦	 ¦   +-- organisation.service.js
 		¦	 ¦   +-- organization.user.roles.service.js
 		¦	 +-- utils
 		¦	 ¦   +-- common.util.js
@@ -39,7 +39,7 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 		¦	 +-- validators
 		¦	     +-- admin.jwt.validator.js
 		¦	     +-- admin.validator.js
-		¦	     +-- organization.validator.js
+		¦	     +-- organisation.validator.js
 		¦	     +-- organization.user.role.validator.js
 		+-- config
 			 +-- express.js

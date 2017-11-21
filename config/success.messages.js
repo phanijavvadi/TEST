@@ -16,5 +16,8 @@ const successMessage = {
   ORG_USER_PASSWORD_UPDATED: "User password updated successfully",
   ORG_USER_REG_NO_VERIFICATION_STATUS_UPDATED_SUCCESSFULLY: "User AHPRA Number verification status updated successfully",
 
+  // File uploads
+  FILE_UPLOADED_SUCCESS:'File uploaded successfully',
+
 };
 export default successMessage;

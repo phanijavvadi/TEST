@@ -26,7 +26,12 @@ const errorMessages = {
   ORG_USER_UPDATED:'User updated successfully',
   ORG_USER_EMAIL_EXISTS:'User email already registered',
   ORG_USER_NOT_FOUND:'User not found',
-
+  // File uploads
+  FILE_EXT_NOT_ALLOWED:'Invalid file type',
+  UNABLE_TO_UPLOAD_FILE:'Server error unable to upload file',
+  ATTACHMENT_REQUIRED:"Attachment required",
+  FILE_INVALID_IMAGE_EXT:'Invalid file type. Only images are allowed (.png,.jpg,.gif,.jpeg)',
+  INVALID_ATTACHMENT_ID:'Invalid attachment id'
 
 
 };

@@ -20,7 +20,7 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
       },
     },{
-      model: models.Organization,
+      model: models.Organisation,
       required: true,
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
