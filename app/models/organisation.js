@@ -35,6 +35,7 @@ export default function (sequelize, DataTypes) {
     Organisation.belongsTo(models.Attachment,{
       foreignKey: {name: 'orgLogo', allowNull: true}
     });
+    Organisation.hasMany(models.OrgSubscription,{as: 'Subscriptions',foreignKey:'orgId'});
   }
   return Organisation;
 };

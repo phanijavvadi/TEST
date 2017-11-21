@@ -19,5 +19,9 @@ const successMessage = {
   // File uploads
   FILE_UPLOADED_SUCCESS:'File uploaded successfully',
 
+  //Subscription types
+  SUBSCRIPTION_CREATEED:'Subscription created successfully',
+  SUBSCRIPTION_UPDATED:'Subscription updated successfully'
+
 };
 export default successMessage;

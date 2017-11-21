@@ -31,7 +31,10 @@ const errorMessages = {
   UNABLE_TO_UPLOAD_FILE:'Server error unable to upload file',
   ATTACHMENT_REQUIRED:"Attachment required",
   FILE_INVALID_IMAGE_EXT:'Invalid file type. Only images are allowed (.png,.jpg,.gif,.jpeg)',
-  INVALID_ATTACHMENT_ID:'Invalid attachment id'
+  INVALID_ATTACHMENT_ID:'Invalid attachment id',
+
+  // Subscriptions
+  SUBSCRIPTION_TYPE_NOT_FOUND:'Subscription type is not found'
 
 
 };

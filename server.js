@@ -4,6 +4,7 @@
  */
 
 require('./config/init')();
+
 const logger = require('./app/util/logger');
 const config = require('./config/config');
 const express = require('./config/express');
@@ -18,15 +19,15 @@ const models = require('./app/models');
 const server = express(models.sequelize);
 
 models.sequelize.sync({
-  force:false,
+  force: false,
   alter: false,
   logging: console.log
-}).then(()=>{
-    return server.listenAsync(config.port).then(()=>{
-        logger.info('Application started on port ', config.port);
-    });
-}).catch((e)=>{
-    logger.error('Failed to start the server', e);
+}).then(() => {
+  return server.listenAsync(config.port).then(() => {
+    logger.info('Application started on port ', config.port);
+  });
+}).catch((e) => {
+  logger.error('Failed to start the server', e);
 });
 
 export default server;
