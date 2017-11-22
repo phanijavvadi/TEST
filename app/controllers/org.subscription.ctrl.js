@@ -2,14 +2,16 @@
 
 import logger from '../util/logger';
 import * as _ from 'lodash';
+import moment from 'moment';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as subscriptionTypeService from '../services/subscription.type.service';
+import * as orgSubscriptionService from '../services/org.subscription.service';
+
 
 const operations = {
   list: (req, resp) => {
-    logger.info('About to get subscription type list');
-    return subscriptionTypeService
+    logger.info('About to get org subscription list');
+    return orgSubscriptionService
       .findAll(req.query)
       .then((data) => {
         if (data) {
@@ -23,11 +25,12 @@ const operations = {
         });
       });
   },
+
   get: (req, resp) => {
     const id = req.params.id;
-    logger.info('About to get subscription type by id', id);
+    logger.info('About to get org subscription by id', id);
 
-    return subscriptionTypeService.findById(id)
+    return orgSubscriptionService.findById(id)
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
@@ -35,7 +38,7 @@ const operations = {
           });
           resp.status(200).json(resultObj);
         } else {
-          resp.status(404).send(errorMessages.SUBSCRIPTION_TYPE_NOT_FOUND);
+          resp.status(404).send(errorMessages.INVALID_ORG_SUBSCRIPTION_ID);
         }
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
@@ -45,10 +48,14 @@ const operations = {
         });
       });
   },
-  create: (req, resp) => {
+  subscribe: (req, resp) => {
     const subscriptionType = req.body;
-    logger.info('About to create subscription type', subscriptionType);
-    return subscriptionTypeService
+    subscriptionType.price = req.locals.subscriptionType.price;
+    subscriptionType.validUpTo = moment().add(req.locals.subscriptionType.validity, 'days').format('YYYY-MM-DD');
+    subscriptionType.name = req.locals.subscriptionType.name;
+    subscriptionType.status = 1;
+    logger.info('About to create org subscription', subscriptionType);
+    return orgSubscriptionService
       .create(subscriptionType)
       .then((data) => {
         const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
@@ -57,7 +64,7 @@ const operations = {
         resp.json({
           success: true,
           data: resultObj,
-          message: successMessages.SUBSCRIPTION_CREATEED
+          message: successMessages.ORG_SUBSCRIPTION_CREATEED
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
@@ -67,15 +74,16 @@ const operations = {
         });
       });
   },
-  update: (req, resp) => {
+  unSubscribe: (req, resp) => {
     const subscriptionType = req.body;
-    logger.info('About to update subscription type', subscriptionType);
-    return subscriptionTypeService
+    subscriptionType.status = 2;
+    logger.info('About to create org subscription', subscriptionType);
+    return orgSubscriptionService
       .update(subscriptionType)
-      .then(() => {
+      .then((data) => {
         resp.json({
           success: true,
-          message: successMessages.SUBSCRIPTION_UPDATED
+          message: successMessages.ORG_UN_SUBSCRIBED_SUCCESS
         });
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
@@ -84,7 +92,7 @@ const operations = {
           message
         });
       });
-  }
+  },
 }
 
 export default operations;

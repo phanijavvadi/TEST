@@ -32,10 +32,10 @@ export default function (sequelize, DataTypes) {
     Organisation.belongsTo(models.OrgUserType, {
       foreignKey: {name: 'orgUserTypeId', allowNull: false}
     });
-    Organisation.belongsTo(models.Attachment,{
+    Organisation.belongsTo(models.Attachment, {
       foreignKey: {name: 'orgLogo', allowNull: true}
     });
-    Organisation.hasMany(models.OrgSubscription,{as: 'Subscriptions',foreignKey:'orgId'});
+    Organisation.hasMany(models.OrgSubscription, {as: 'subscriptions', foreignKey: 'orgId', allowNull: false});
   }
   return Organisation;
 };

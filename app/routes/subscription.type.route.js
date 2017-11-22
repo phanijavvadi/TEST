@@ -14,6 +14,8 @@ export default function (app) {
 
   router.route('/list').get([
     subscriptionTypeCtrl.list]);
+  router.route('/options').get([
+    subscriptionTypeCtrl.getOptions]);
   router.route('/:id').get([
     subscriptionTypeCtrl.get]);
   router.route('/create').post([

@@ -7,9 +7,13 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    name: DataTypes.STRING,
-    validUpTo: DataTypes.DATE(6),
-    price: DataTypes.DECIMAL(10, 2)
+    validUpTo: {type: DataTypes.DATEONLY, comment: 'Validity date upto'},
+    price: DataTypes.DECIMAL(10, 2),
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "1=>Active,2=>In Active"
+    }
   }, {
     paranoid: true
   });
@@ -19,12 +23,6 @@ export default function (sequelize, DataTypes) {
       foreignKey: 'subscriptionId',
       allowNull: false
     });
-   /* OrgSubscription.belongsTo(models.Organisation, {
-      foreignKey: 'orgId',
-      allowNull: false
-    });*/
   }
-
-
   return OrgSubscription;
 };

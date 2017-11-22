@@ -8,7 +8,7 @@ export default function (sequelize, DataTypes) {
     },
     name: DataTypes.STRING,
     desc: DataTypes.TEXT,
-    validity: DataTypes.INTEGER,
+    validity: {type:DataTypes.INTEGER, comment:'Validity in days'},
     price: DataTypes.DECIMAL(10, 2)
   }, {
     paranoid: true

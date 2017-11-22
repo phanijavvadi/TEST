@@ -16,6 +16,16 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
       ...otherOptions
     }
   });
+};/**
+ * Find all subscriptionTypes in the db
+ *
+ **/
+export function getOptions() {
+  return SubscriptionType.findAll({
+    attributes:{
+      exclude:['createdAt', 'updatedAt', 'deletedAt']
+    }
+  });
 };
 
 /**
@@ -24,9 +34,9 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
  **/
 export function findById(id, options = {}) {
   return SubscriptionType.findOne({
-
     where: {
-      id: id
+      id: id,
+      ...options.where || {}
     }
   });
 };

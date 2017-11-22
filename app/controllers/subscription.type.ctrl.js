@@ -23,6 +23,22 @@ const operations = {
         });
       });
   },
+  getOptions: (req, resp) => {
+    logger.info('About to get subscription type options');
+    return subscriptionTypeService
+      .getOptions()
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  },
   get: (req, resp) => {
     const id = req.params.id;
     logger.info('About to get subscription type by id', id);

@@ -29,7 +29,7 @@ const validators = {
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-       next();
+      next();
     }
   },
   validateOrgLogo: (req, resp, next) => {
@@ -149,6 +149,8 @@ const validators = {
     orgService.findById(orgId)
       .then((data) => {
         if (data) {
+          req.locals = req.locals || {};
+          req.locals.organization = data.get({plain: true});
           next();
           return null;
         } else {

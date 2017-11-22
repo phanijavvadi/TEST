@@ -34,7 +34,12 @@ const errorMessages = {
   INVALID_ATTACHMENT_ID:'Invalid attachment id',
 
   // Subscriptions
-  SUBSCRIPTION_TYPE_NOT_FOUND:'Subscription type is not found'
+  SUBSCRIPTION_TYPE_NOT_FOUND:'Subscription type is not found',
+
+  //Org subscriptions
+
+  INVALID_ORG_SUBSCRIPTION_ID:'Invalid Subscription id',
+  ORG_SUBSCRIPTION_ALREADY_EXIST_PLEASE_UNSUBSCRIBE:'Subscription already exists. Please un subscribe existing one to upgrade new one ',
 
 
 };

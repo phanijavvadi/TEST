@@ -20,6 +20,15 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
       },
+    }, {
+      model: models.OrgSubscription,
+      as: 'subscriptions',
+      required: false,
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
+      }, where: {
+        status: 1
+      }
     }],
     limit: Number(limit),
     offset: Number(offset),
@@ -28,13 +37,14 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
     }
   });
 };
+
 /**
  * get organisation options list
  *
  **/
 export function getOptions() {
   return Organisation.findAll({
-    attributes: ['id','orgName']
+    attributes: ['id', 'orgName']
   });
 };
 

@@ -19,9 +19,14 @@ const successMessage = {
   // File uploads
   FILE_UPLOADED_SUCCESS:'File uploaded successfully',
 
-  //Subscription types
+  // Subscription types
   SUBSCRIPTION_CREATEED:'Subscription created successfully',
-  SUBSCRIPTION_UPDATED:'Subscription updated successfully'
+  SUBSCRIPTION_UPDATED:'Subscription updated successfully',
+
+  // Org Subscription
+  ORG_SUBSCRIPTION_CREATEED:'Subscription created successfully',
+  ORG_SUBSCRIPTION_UPDATED:'Subscription updated successfully',
+  ORG_UN_SUBSCRIBED_SUCCESS:'Un Subscribed successfully'
 
 };
 export default successMessage;

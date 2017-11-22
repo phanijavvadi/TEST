@@ -2,14 +2,14 @@
 
 import models from '../models';
 
-const OrgUserType = models.OrgUserType;
+const OrgSubscription = models.OrgSubscription;
 
 /**
- * Find all OrgUserTypes in the db
+ * Find all OrgSubscriptions in the db
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return OrgUserType.findAndCountAll({
+  return OrgSubscription.findAndCountAll({
     limit: Number(limit),
     offset: Number(offset),
     where: {
@@ -17,51 +17,89 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
     }
   });
 };
+
 /**
- * Find all OrgUserTypes in the db
+ * Find all OrgSubscriptions in the db
  *
  **/
 export function getOptions() {
-  return OrgUserType.findAll({
-    attributes:{
-      exclude:['createdAt','updatedAt','deletedAt'],
+  return OrgSubscription.findAll({
+    attributes: {
+      exclude: ['createdAt', 'updatedAt', 'deletedAt'],
     }
   });
 };
 
 /**
- * Find a OrgUserType by OrgUserType id
+ * Find a OrgSubscription by OrgSubscription id
  * @param id
  **/
 export function findById(id, options = {}) {
-  return OrgUserType.findOne({
+  return OrgSubscription.findOne({
     attributes: {
       exclude: [...options.exclude || {}],
       include: [...options.include || {}],
     },
     where: {
-      id: id
+      id: id,
+      ...options.where || {}
+    }
+  });
+};
+/**
+ * Find a OrgSubscription by OrgSubscription id
+ * @param id
+ **/
+export function findOne(options = {}) {
+  return OrgSubscription.findOne({
+    attributes: {
+      exclude: [...options.exclude || {}],
+      include: [...options.include || {}],
+    },
+    where: {
+      ...options.where || {}
     }
   });
 };
 
 
 /**
- * Create a new OrgUserType
- * @param data object literal containing info about a OrgUserType
+ * Create a new OrgSubscription
+ * @param data object literal containing info about a OrgSubscription
  **/
 export function create(data) {
-  return OrgUserType.create(data);
+  return OrgSubscription.create(data);
+};
+
+
+/**
+ * Update a orgSubscription
+ * @param orgSubscription object literal containing info about a orgSubscription
+ **/
+export function update(orgSubscription) {
+  return OrgSubscription.findById(orgSubscription.id, {
+    attributes: {
+    }
+  }).then((p) => {
+      if (p) {
+        return p.update(orgSubscription);
+      } else {
+        return new Promise((resolve, reject) => {
+          reject({message: errorMessages.INVALID_ORG_SUBSCRIPTION_ID, code: 'INVALID_ORG_SUBSCRIPTION_ID'})
+        })
+      }
+
+    });
 };
 
 /**
- * Delete OrgUserType(s) based on input criteria
- * @param orgUserType object literal containing info about a OrgUserType
-  **/
-export function deleteOrgUserType(orgUserType) {
-  return OrgUserType.destroy({
+ * Delete OrgSubscription(s) based on input criteria
+ * @param orgSubscriptionType object literal containing info about a OrgSubscription
+ **/
+export function deleteOrgSubscription(orgSubscriptionType) {
+  return OrgSubscription.destroy({
     where: {
-      ...orgUserType
+      ...orgSubscriptionType
     }
   });
 };

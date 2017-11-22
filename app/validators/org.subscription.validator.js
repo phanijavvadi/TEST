@@ -1,33 +1,18 @@
 'use strict';
 import * as Joi from 'joi';
 import logger from '../util/logger';
+import errorMessages from '../../config/error.messages';
+import * as subscriptionTypeService from '../services/subscription.type.service';
+import * as orgSubscriptionService from '../services/org.subscription.service';
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const validators = {
-  createReqValidator: (req, resp, next) => {
+  subscribeReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      name: Joi.string().min(3).required(),
-      desc: Joi.string().required(),
-      validity: Joi.number().required(),
-      price: Joi.number().required()
-    };
-    let result = Joi.validate(body, schema);
-    if (result && result.error) {
-      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
-    } else {
-       next();
-    }
-  },
-   updateReqValidator: (req, resp, next) => {
-    const body = req.body;
-    let schema = {
-      id: Joi.string().required(),
-      name: Joi.string().min(3).required(),
-      desc: Joi.string().required(),
-      validity: Joi.number().required(),
-      price: Joi.number().required()
+      subscriptionId: Joi.string().required(),
+      orgId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
@@ -35,6 +20,70 @@ const validators = {
     } else {
       next();
     }
+  },
+  unSubscribeReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      subscriptionId: Joi.string().required(),
+      orgId: Joi.string().required(),
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  validateSubscriptionId: (req, resp, next) => {
+    const {subscriptionId} = req.body;
+    subscriptionTypeService.findById(subscriptionId)
+      .then((data) => {
+        if (data) {
+          req.locals = req.locals || {};
+          req.locals.subscriptionType = data.get({plain: true});
+          next();
+          return '';
+        } else {
+          return resp.status(403).send({success: false, message: errorMessages.SUBSCRIPTION_TYPE_NOT_FOUND});
+        }
+      })
+      .catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
+  },
+
+  validateSubscriptionAlreadyExist: (req, resp, next) => {
+    const {subscriptionId} = req.body;
+    orgSubscriptionService.findOne({
+      where: {
+        status: 1,
+        orgId: req.body.orgId
+      }
+    })
+      .then((data) => {
+        if (data) {
+          return resp.status(403).send({
+            success: false,
+            message: errorMessages.ORG_SUBSCRIPTION_ALREADY_EXIST_PLEASE_UNSUBSCRIBE
+          });
+        } else {
+          next();
+          return '';
+        }
+      })
+      .catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   }
+
 }
 export default validators;
