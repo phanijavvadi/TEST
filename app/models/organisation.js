@@ -23,31 +23,39 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_organisations'
+    tableName: 'cm_organisations'
   });
   Organisation.associate = function (models) {
     Organisation.belongsToMany(models.Organisation, {
-      through:'cm_sub_organisations',
+      through: 'cm_sub_organisations',
       as: 'subOrganisations',
-      foreignKey:'orgId',
-      otherKey:'subOrgId'
+      foreignKey: 'orgId',
+      otherKey: 'subOrgId'
     });
     Organisation.belongsTo(models.Attachment, {
-      foreignKey:'orgLogo',
-      allowNull: true,
+      foreignKey: {
+        name:'orgLogo',
+        allowNull: true,
+      }
     });
     Organisation.hasMany(models.OrgSubscription, {
       as: 'subscriptions',
-      foreignKey:'orgId',
-      allowNull: false
+      foreignKey: {
+        name:'orgId',
+        allowNull: false
+      }
     });
     Organisation.belongsTo(models.User, {
-      foreignKey:'createdBy',
-      allowNull: true
+      foreignKey: {
+        name:'createdBy',
+        allowNull: false
+      }
     });
     Organisation.belongsTo(models.User, {
-      foreignKey:'approvedBy',
-      allowNull: true
+      foreignKey: {
+        name:'approvedBy',
+        allowNull: true
+      }
     });
   };
   return Organisation;

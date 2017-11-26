@@ -1,11 +1,13 @@
 'use strict';
-
-import logger from '../util/logger';
 import * as _ from 'lodash';
-import * as commonUtil from '../util/common.util';
+
+const Sequelize = models.sequelize;
+import logger from '../util/logger';
+import models from '../models';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
 import * as orgService from '../services/organisation.service';
+import * as orgContactDetailService from '../services/org.contact.details.service';
 
 const operations = {
   list: (req, resp) => {
@@ -65,43 +67,99 @@ const operations = {
       });
   },
   create: (req, resp) => {
-    const organisation = req.body;
     logger.info('About to create organisation ', organisation);
-    return orgService
-      .create(organisation)
-      .then((data) => {
-        const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
-          return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
-        })
-        resp.json({
-          success: true,
-          data: resultObj,
-          message: successMessages.ORG_CREATED
-        });
-      }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
-          message
-        });
+    const organisation = req.body;
+    const {authenticatedUser} = req.locals;
+    const orgDetails = {
+      name: organisation.name,
+      address: organisation.address,
+      suburb: organisation.suburb,
+      postcode: organisation.postcode,
+      state: organisation.state,
+      country: organisation.country,
+      phoneNo: organisation.phoneNo,
+      fax: organisation.fax,
+      orgLogo: organisation.orgLogo || null,
+      createdBy: authenticatedUser.id
+    }
+    const orgContPerDetails = {
+      firstName: organisation.contPerFname,
+      lastName: organisation.contPerLname,
+      email: organisation.contPerEmail,
+      phoneNo: organisation.contPerPhoneNo,
+      createdBy: authenticatedUser.id
+    }
+    return Sequelize.transaction()
+      .then((t) => {
+        return orgService
+          .create(orgDetails, {transaction: t})
+          .then((org) => {
+            orgContPerDetails.orgId = org.get('id');
+            return orgContactDetailService.create(orgContPerDetails, {transaction: t});
+          })
+          .then((contDetails) => {
+          t.commit();
+            return resp.json({
+              success: true,
+              // data: resultObj,
+              message: successMessages.ORG_CREATED
+            });
+          })
+          .catch((err) => {
+          t.rollback();
+            let message = err.message || errorMessages.SERVER_ERROR;
+            logger.info(err);
+            resp.status(500).send({
+              message
+            });
+          });
       });
   },
   update: (req, resp) => {
-    const organisation = req.body;
     logger.info('About to update organisation ', organisation);
-    return orgService
-      .update(organisation)
-      .then((data) => {
-        resp.json({
-          success: true,
-          message: successMessages.ORG_UPDATED
-        });
-      }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
-          message
-        });
+    const organisation = req.body;
+    const orgDetails = {
+      id: organisation.id,
+      name: organisation.name,
+      address: organisation.address,
+      suburb: organisation.suburb,
+      postcode: organisation.postcode,
+      state: organisation.state,
+      country: organisation.country,
+      phoneNo: organisation.phoneNo,
+      fax: organisation.fax,
+      orgLogo: organisation.orgLogo || null
+    }
+    const orgContPerDetails = {
+      id: organisation.contPerId,
+      firstName: organisation.contPerFname,
+      lastName: organisation.contPerLname,
+      email: organisation.contPerEmail,
+      phoneNo: organisation.contPerPhoneNo
+    }
+    return Sequelize.transaction()
+      .then((t) => {
+        return orgService
+          .update(orgDetails, {transaction: t})
+          .then((data) => {
+            return orgContactDetailService.update(orgContPerDetails, {transaction: t});
+          })
+          .then((data) => {
+            t.commit();
+            return resp.json({
+              success: true,
+              message: successMessages.ORG_UPDATED
+            });
+          }).catch(function (err) {
+            t.rollback();
+            let message = err.message || errorMessages.SERVER_ERROR;
+            logger.info(err);
+
+            resp.status(500).send({
+              success: false,
+              message
+            });
+          });
       });
   },
   activate: (req, resp) => {

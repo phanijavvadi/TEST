@@ -21,6 +21,7 @@ const errorMessages = {
   ORG_EMAIL_EXISTS: "Email already registered",
   INVALID_ORG_ID: "Invalid organization id",
   ORG_ACTIVE_AHPRANO_REQUIRED_TO_ACTIVATE:'Atleast one active AHPRA regnumber user required to activate',
+  INVALID_ORG_CONTCT_ID:'Invalid organisation contact id',
   //User Types
   ORG_USER_TYPE_NOT_FOUND:'Invalid User type',
   //Organization users services

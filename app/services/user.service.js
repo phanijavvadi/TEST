@@ -88,7 +88,6 @@ export function update(user) {
           reject({message: errorMessages.INVALID_USER_ID, code: 'INVALID_USER_ID'})
         })
       }
-
     });
 };
 

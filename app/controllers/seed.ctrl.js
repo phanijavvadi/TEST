@@ -25,40 +25,39 @@ const operations = {
             return models.UserType.bulkCreate([
               {
                 name: 'Super Admin',
+                value:'SUPER_ADMIN',
                 regNoVerificationRequired: false,
                 userCategoryId: userCats[0].id,
                 userSubCategoryId: userSubCats[0].id
               },
               {
                 name: 'Org Admin',
+                value:'ORG_ADMIN',
                 regNoVerificationRequired: false,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[1].id
               },
               {
                 name: 'Aboriginal and Torres Strait Islander Health Practitioner',
+                value:'ABORIGINAL_AND_TORRES_STRAIT_ISLANDER_HEALTH_PRACTITIONER',
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
               },
               {
                 name: 'Chinese Medicine Practitioner',
+                value:'CHINESE_MEDICINE_PRACTITIONER',
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
               },
               {
                 name: 'Chiropractor',
+                value:'CHIROPRACTOR',
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
-              },
-              {
-                name: 'Chiropractor',
-                regNoVerificationRequired: true,
-                userCategoryId: userCats[1].id,
-                userSubCategoryId: userSubCats[2].id
-              },
+              }
             ], {individualHooks: true});
       })
       .then(res => {

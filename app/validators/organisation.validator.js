@@ -13,17 +13,20 @@ const validators = {
   createReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
+      name: Joi.string().min(3).required(),
+      address: Joi.string().min(3).required(),
+      suburb: Joi.string().min(3).required(),
+      postcode: Joi.string().required(),
+      state: Joi.string().required(),
+      country: Joi.string().required(),
+      phoneNo: Joi.string().required(),
+      fax: Joi.string().allow(''),
+      orgLogo: Joi.string().allow(''),
+      // parentOrgId: Joi.string().allow(null),//need to work sub organisations
       contPerFname: Joi.string().min(3).required(),
       contPerLname: Joi.string().min(1).required(),
       contPerEmail: Joi.string().email().required(),
-      orgName: Joi.string().min(3).required(),
-      contPerAHPRANo: Joi.string().allow(null),
-      orgAdd1: Joi.string().min(3).required(),
-      orgAdd2: Joi.string().min(3),
-      phoneNo: Joi.string().required(),
-      fax: Joi.string().allow(null),
-      orgUserTypeId: Joi.string().required(),
-      orgLogo: Joi.string().allow(null)
+      contPerPhoneNo: Joi.string().required()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
@@ -55,7 +58,7 @@ const validators = {
         });
     }
   },
-  validateEmailUniqueValidation: (req, resp, next) => {
+  /*validateEmailUniqueValidation: (req, resp, next) => {
     const {contPerEmail} = req.body;
     let whereOptions = {contPerEmail};
     if (req.body && req.body.id) {
@@ -79,21 +82,26 @@ const validators = {
           message
         });
       });
-  },
+  },*/
   updateReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
       id: Joi.string().required(),
+      name: Joi.string().min(3).required(),
+      address: Joi.string().min(3).required(),
+      suburb: Joi.string().min(3).required(),
+      postcode: Joi.string().required(),
+      state: Joi.string().required(),
+      country: Joi.string().required(),
+      phoneNo: Joi.string().required(),
+      fax: Joi.string().allow(''),
+      orgLogo: Joi.string().allow(''),
+      // parentOrgId: Joi.string().allow(null),//need to work sub organisations
       contPerFname: Joi.string().min(3).required(),
       contPerLname: Joi.string().min(1).required(),
-      orgName: Joi.string().min(3).required(),
-      contPerAHPRANo: Joi.string().allow(null),
-      orgAdd1: Joi.string().min(3).required(),
-      orgAdd2: Joi.string().min(3),
-      phoneNo: Joi.string().required(),
-      fax: Joi.string().allow(null),
-      orgUserTypeId: Joi.string().required(),
-      orgLogo: Joi.string().allow(null)
+      contPerEmail: Joi.string().email().required(),
+      contPerPhoneNo: Joi.string().required(),
+      contPerId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

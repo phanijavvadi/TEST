@@ -11,28 +11,34 @@ export default function (sequelize, DataTypes) {
     },
     regNo: {
       type: DataTypes.STRING,
-      allowNull:false
+      allowNull: false
     }
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_user_verifications'
+    tableName: 'cm_user_verifications'
   });
   UserVerification.associate = function (models) {
-   UserVerification.belongsTo(models.User,{
-     foreignKey:'userId',
-     as:'user',
-     allowNull:false
-   });
-   UserVerification.belongsTo(models.UserRole,{
-     foreignKey:'userRoleId',
-     as:'organisation',
-     allowNull:false,
-   });
-    UserVerification.belongsTo(models.User,{
-      foreignKey:'verifiedUserId',
-      as:'verifiedBy',
-      allowNull:true
+    UserVerification.belongsTo(models.User, {
+      as: 'user',
+      foreignKey: {
+        name: 'userId',
+        allowNull: false
+      }
+    });
+    UserVerification.belongsTo(models.UserRole, {
+      as: 'organisation',
+      foreignKey: {
+        name: 'userRoleId',
+        allowNull: false,
+      }
+    });
+    UserVerification.belongsTo(models.User, {
+      as: 'verifiedBy',
+      foreignKey: {
+        name: 'verifiedUserId',
+        allowNull: true
+      }
     });
   };
   return UserVerification;

@@ -6,9 +6,9 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    contPerFname: DataTypes.STRING,
-    contPerLname: DataTypes.STRING,
-    contPerEmail: {
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -16,11 +16,20 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_organisation_contact_details'
+    tableName: 'cm_org_contact_details'
   });
   OrgContactDetails.associate = function (models) {
     OrgContactDetails.belongsTo(models.Organisation, {
-      foreignKey: {name: 'orgId', allowNull: false}
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      }
+    });
+    OrgContactDetails.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
     });
   }
   return OrgContactDetails;
