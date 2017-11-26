@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
 import * as orgService from '../services/organisation.service';
-import * as orgUserService from '../services/org.user.service';
+import * as orgUserService from '../services/user.service';
 import * as attachmentService from '../services/attachment.service';
 
 const validators = {

@@ -37,7 +37,7 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 		¦	 ¦   +-- common.util.js
 		¦	 ¦   +-- logger.js
 		¦	 +-- validators
-		¦	     +-- admin.jwt.validator.js
+		¦	     +-- user.jwt.validator.js
 		¦	     +-- admin.validator.js
 		¦	     +-- organisation.validator.js
 		¦	     +-- organization.user.role.validator.js

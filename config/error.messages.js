@@ -9,11 +9,13 @@ const errorMessages = {
   TOKEN_IS_INVALID: 'Invalid Token. Please login again',
 
   ///admin table service start
-  ADMIN_USER_NAME_NOT_FOUND: 'Invalid Username/password',
+
   ADMIN_USER_NAME_ALREADY_EXIST: 'User name already exist',
   ORG_USER_ROLE_ID_NOT_FOUND: 'Invalid User role id',
 
-  ///admin table service end
+  // User Service
+  INVALID_USER_ID:'User not found',
+  INVALID_USERNAME_OR_PASSWORD: 'Invalid Username/password',
 
   //Organization services start
   ORG_EMAIL_EXISTS: "Email already registered",

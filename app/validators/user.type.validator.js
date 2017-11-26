@@ -1,7 +1,7 @@
 'use strict';
 import logger from '../util/logger';
 import errorMessages from '../../config/error.messages';
-import * as orgUserTypeService from '../services/org.user.type.service'
+import * as orgUserTypeService from '../services/user.type.service'
 
 const validators = {
 

@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 import express from 'express';
-import orgUserCtrl from '../controllers/org.user.ctrl';
-import orgUserValidator from '../validators/org.user.validator';
-import orgUserTypeValidator from '../validators/org.user.type.validator';
+import orgUserCtrl from '../controllers/user.ctrl';
+import orgUserValidator from '../validators/user.validator';
+import orgUserTypeValidator from '../validators/user.type.validator';
 import orgValidator from '../validators/organisation.validator';
 
 const router = express.Router();

@@ -5,7 +5,7 @@ import logger from '../util/logger';
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
-import * as orgUserService from '../services/org.user.service';
+import * as orgUserService from '../services/user.service';
 
 const validators = {
   createReqValidator: (req, resp, next) => {

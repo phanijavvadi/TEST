@@ -13,7 +13,8 @@ export default function (sequelize, DataTypes) {
     },
   }, {
     paranoid: true,
-    underscored: false,
+    freezeTableName: true,
+    tableName:'cm_attachments'
   });
   return Attachment;
 };

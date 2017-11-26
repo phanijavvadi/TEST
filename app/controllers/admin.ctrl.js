@@ -4,24 +4,26 @@ import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as adminService from '../services/admin.service';
+import * as userService from '../services/user.service';
 
 const operations = {
 
   login: (req, resp) => {
     const {
-      userName,
+      email,
       password
     } = req.body;
-    return adminService
-      .findByUserName(userName, {
-        include: ['password']
+    return userService
+      .findOne({
+        where: {email, status: 1}, attributes: {
+          include: ['password']
+        }
       })
       .then((data) => {
         if (!data) {
           resp.status(400).send({
             errors: [],
-            message: errorMessages.ADMIN_USER_NAME_NOT_FOUND
+            message: errorMessages.INVALID_USERNAME_OR_PASSWORD
           });
           return;
         }
@@ -29,18 +31,18 @@ const operations = {
         if (hashedPassword != data.get('password')) {
           resp.status(400).send({
             errors: [],
-            message: errorMessages.ADMIN_USER_NAME_NOT_FOUND
+            message: errorMessages.INVALID_USERNAME_OR_PASSWORD
           });
           return;
         } else {
           const payload = {
             id: data.id,
-            userName: data.userName
+            email: data.email
           };
           var token = commonUtil.jwtSign(payload);
           resp.status(200).json({
             success: true,
-            message: successMessages.ADMIN_LOGIN_SUCCESS,
+            message: successMessages.USER_LOGIN_SUCCESS,
             token: token,
             data: payload
           });
@@ -52,32 +54,7 @@ const operations = {
           message
         });
       });
-  },
-  create: (req, resp) => {
-    const admin = req.body;
-    logger.info('About to create admin ', admin);
-    return adminService
-      .create(admin)
-      .then((data) => {
-        const {userName,id,status}=data;
-        resp.json({
-          success:true,
-          data:{
-            id:data.get('id'),
-            userName:data.get('userName'),
-            status:data.get('status')
-          },
-          message:successMessages.ADMIN_USER_CREATED_SCUCCESS
-        });
-      }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
-          message
-        });
-      });
   }
-
 }
 
 export default operations;

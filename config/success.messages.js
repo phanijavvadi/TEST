@@ -2,10 +2,10 @@
 
 const successMessage = {
 
-  ///admin table service start
-  ADMIN_LOGIN_SUCCESS: 'Login Successfully',
-  ADMIN_USER_CREATED_SCUCCESS: 'Admin User created successfully',
-  ADMIN_USER_UPDATED_SCUCCESS: 'Admin User updated successfully',
+  // users table service start
+  USER_LOGIN_SUCCESS: 'Login Successfully',
+  USER_USER_CREATED_SCUCCESS: 'Admin User created successfully',
+  USER_USER_UPDATED_SCUCCESS: 'Admin User updated successfully',
   ///admin table service end
   //Organization services start
   ORG_CREATED:'Organization created successfully',

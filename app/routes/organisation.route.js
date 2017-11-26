@@ -6,7 +6,7 @@
 import express from 'express';
 import orgCtrl from '../controllers/organisation.ctrl';
 import orgValidator from '../validators/organisation.validator';
-import orgUserTypeValidator from '../validators/org.user.type.validator';
+import orgUserTypeValidator from '../validators/user.type.validator';
 
 const router = express.Router();
 

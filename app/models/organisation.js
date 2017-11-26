@@ -6,17 +6,12 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    contPerFname: DataTypes.STRING,
-    contPerLname: DataTypes.STRING,
-    contPerEmail: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-    },
-    contPerAHPRANo: DataTypes.STRING,
-    orgName: DataTypes.STRING,
-    orgAdd1: DataTypes.TEXT,
-    orgAdd2: DataTypes.TEXT,
+    name: DataTypes.STRING,
+    address: DataTypes.TEXT,
+    suburb: DataTypes.TEXT,
+    postcode: DataTypes.STRING,
+    state: DataTypes.STRING,
+    country: DataTypes.STRING,
     phoneNo: DataTypes.STRING,
     fax: DataTypes.STRING,
     status: {
@@ -26,16 +21,34 @@ export default function (sequelize, DataTypes) {
       comment: "1=>Active,2=>In Active"
     }
   }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true,
+    tableName:'cm_organisations'
   });
   Organisation.associate = function (models) {
-    Organisation.belongsTo(models.OrgUserType, {
-      foreignKey: {name: 'orgUserTypeId', allowNull: false}
+    Organisation.belongsToMany(models.Organisation, {
+      through:'cm_sub_organisations',
+      as: 'subOrganisations',
+      foreignKey:'orgId',
+      otherKey:'subOrgId'
     });
     Organisation.belongsTo(models.Attachment, {
-      foreignKey: {name: 'orgLogo', allowNull: true}
+      foreignKey:'orgLogo',
+      allowNull: true,
     });
-    Organisation.hasMany(models.OrgSubscription, {as: 'subscriptions', foreignKey: 'orgId', allowNull: false});
-  }
+    Organisation.hasMany(models.OrgSubscription, {
+      as: 'subscriptions',
+      foreignKey:'orgId',
+      allowNull: false
+    });
+    Organisation.belongsTo(models.User, {
+      foreignKey:'createdBy',
+      allowNull: true
+    });
+    Organisation.belongsTo(models.User, {
+      foreignKey:'approvedBy',
+      allowNull: true
+    });
+  };
   return Organisation;
 };

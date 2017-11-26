@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as commonUtil from '../util/common.util';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as orgUserService from '../services/org.user.service';
+import * as orgUserService from '../services/user.service';
 import * as mailNotificationUtil from "../util/mail.notification.util";
 import * as adminMailTemplate from "../templates/admin.mail.template";
 

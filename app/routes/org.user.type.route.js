@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 import express from 'express';
-import orgUserTypeCtrl from '../controllers/org.user.type.ctrl';
+import orgUserTypeCtrl from '../controllers/user.type.ctrl';
 
 const router = express.Router();
 

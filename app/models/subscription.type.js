@@ -11,11 +11,13 @@ export default function (sequelize, DataTypes) {
     validity: {type:DataTypes.INTEGER, comment:'Validity in days'},
     price: DataTypes.DECIMAL(10, 2)
   }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true,
+    tableName:'cm_org_subscription_types'
   });
   SubscriptionType.associate = function (models) {
 
-  }
+  };
 
 
   return SubscriptionType;

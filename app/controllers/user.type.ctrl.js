@@ -3,7 +3,7 @@
 import logger from '../util/logger';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
-import * as orgUserTypeService from '../services/org.user.type.service';
+import * as orgUserTypeService from '../services/user.type.service';
 
 const operations = {
   list: (req, resp) => {

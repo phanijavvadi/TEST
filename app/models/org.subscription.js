@@ -8,6 +8,7 @@ export default function (sequelize, DataTypes) {
       defaultValue: DataTypes.UUIDV4
     },
     validUpTo: {type: DataTypes.DATEONLY, comment: 'Validity date upto'},
+    validUpFrom: {type: DataTypes.DATEONLY, comment: 'Validity from date'},
     price: DataTypes.DECIMAL(10, 2),
     status: {
       type: DataTypes.INTEGER,
@@ -15,13 +16,18 @@ export default function (sequelize, DataTypes) {
       comment: "1=>Active,2=>In Active"
     }
   }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true,
+    tableName:'cm_org_subscriptions'
   });
   OrgSubscription.associate = function (models) {
 
     OrgSubscription.belongsTo(models.SubscriptionType, {
-      foreignKey: 'subscriptionId',
-      allowNull: false
+      foreignKey: {
+        name:'subscriptionTypeId',
+        allowNull: false
+      },
+
     });
   }
   return OrgSubscription;
