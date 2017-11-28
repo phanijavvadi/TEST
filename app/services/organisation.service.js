@@ -11,9 +11,33 @@ const Organisation = models.Organisation;
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return Organisation.findAndCountAll({
-    attributes: options.attributes || {exclude: ['deletedAt']},
+    attributes: options.attributes || {exclude: ['deletedAt','createdAt','updatedAt']},
+    include:[{
+      attributes: {exclude: ['deletedAt','createdAt','updatedAt']},
+      model:models.OrgContactDetails,
+      required: false,
+      as:'contactDetails'
+    },{
+      attributes: {exclude: ['deletedAt','createdAt','updatedAt']},
+      model:models.OrgSubscription,
+      required: false,
+      as:'subscriptions'
+    }],
     limit: Number(limit),
     offset: Number(offset),
+    where: {
+      ...(options.where || {})
+    }
+  });
+};
+/**
+ * Find all organisations in the db
+ *
+ **/
+export function getOptions(options = {}) {
+  return Organisation.findAll({
+    attributes: options.attributes || ['name','id'],
+    include:[],
     where: {
       ...(options.where || {})
     }
@@ -25,8 +49,8 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}, options 
  * @param organisationId
  **/
 export function findById(id, options = {}) {
-  return Organisation.findById({
-    attributes: options.attributes || {exclude: ['password']},
+  return Organisation.findById(id,{
+    attributes: options.attributes || {exclude: ['deletedAt','createdAt','updatedAt','createdBy','approvedBy']},
     where: {
       id: id,
       ...(options.where || {})

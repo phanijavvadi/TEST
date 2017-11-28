@@ -5,35 +5,53 @@ import errorMessages from '../../config/error.messages';
 
 const User = models.User;
 
-/*/!**
+/**
  * Find all user in the db
  *
- **!/
-export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
+ **/
+export function getOrgUserList({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return User.findAndCountAll({
     attributes: {
-      exclude: ['deletedAt', 'password'],
+      exclude: ['createdBy', 'deletedAt', 'password'],
     },
     include: [{
-      model: models.UserType,
+      model: models.UserCategory,
+      as: 'userCategory',
       required: true,
-      attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt']
-      },
+      attributes: []
     }, {
-      model: models.Organisation,
+      model: models.UserRole,
+      as: 'userRoles',
       required: true,
-      attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt']
-      },
+      attributes: [['id', 'userRoleId']],
+      include: [{
+        model: models.UserType,
+        as: 'userType',
+        attributes: [['id', 'userTypeId'], ['name', 'userTypeName'], ['value', 'userTypeValue']],
+
+      }, {
+        model: models.UserVerification,
+        as: 'userVerification',
+        attributes: [['id', 'verificationId'], 'regNo', 'verifiedOn']
+      }, {
+        model: models.Organisation,
+        as: 'organisation',
+        attributes: ['name', ['id', 'orgId']]
+      }],
+      where: {
+        ...(options.userRoles.where || {})
+      }
     }],
     limit: Number(limit),
     offset: Number(offset),
+    distinct: true,
     where: {
-      ...otherOptions
+      '$userCategory.value$': 'ORG_USER',
+      ...(options.where || {})
     }
-  });
-};*/
+  })
+    ;
+};
 
 /**
  * Find a user by user id
@@ -42,6 +60,14 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
 export function findById(id, options = {}) {
   return User.findOne({
     attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt']},
+    include: [{
+      model: models.UserCategory,
+      as: 'userCategory',
+      required: true,
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
+      }
+    }],
     where: {
       id: id,
       ...(options.where || {})
@@ -67,28 +93,28 @@ export function findOne(options = {}) {
  * Create a new user
  * @param user object literal containing info about a user
  **/
-export function create(user) {
-  return User.create(user);
+export function create(user, {transaction = null, ...options} = {}) {
+  return User.create(user, {transaction});
 };
 
 /**
  * Update a user
  * @param user object literal containing info about a user
  **/
-export function update(user) {
+export function update(user, {transaction = null, ...options} = {}) {
   return User.findById(user.id, {
     attributes: {
       exclude: ['password'],
     }
   }).then((p) => {
-      if (p) {
-        return p.update(user);
-      } else {
-        return new Promise((resolve, reject) => {
-          reject({message: errorMessages.INVALID_USER_ID, code: 'INVALID_USER_ID'})
-        })
-      }
-    });
+    if (p) {
+      return p.update(user, {transaction});
+    } else {
+      return new Promise((resolve, reject) => {
+        reject({message: errorMessages.INVALID_USER_ID, code: 'INVALID_USER_ID'})
+      })
+    }
+  });
 };
 
 /**

@@ -7,15 +7,13 @@ const errorMessages = {
   TOKEN_IS_REQUIRED: 'No token provided',
   TOKEN_IS_EXPIRED: 'Token is expired. Please login again',
   TOKEN_IS_INVALID: 'Invalid Token. Please login again',
+  INVALID_INPUT:'Invalid input',
 
   ///admin table service start
 
   ADMIN_USER_NAME_ALREADY_EXIST: 'User name already exist',
   ORG_USER_ROLE_ID_NOT_FOUND: 'Invalid User role id',
 
-  // User Service
-  INVALID_USER_ID:'User not found',
-  INVALID_USERNAME_OR_PASSWORD: 'Invalid Username/password',
 
   //Organization services start
   ORG_EMAIL_EXISTS: "Email already registered",
@@ -23,12 +21,27 @@ const errorMessages = {
   ORG_ACTIVE_AHPRANO_REQUIRED_TO_ACTIVATE:'Atleast one active AHPRA regnumber user required to activate',
   INVALID_ORG_CONTCT_ID:'Invalid organisation contact id',
   //User Types
-  ORG_USER_TYPE_NOT_FOUND:'Invalid User type',
-  //Organization users services
-  ORG_USER_CREATED:"User created successfully",
-  ORG_USER_UPDATED:'User updated successfully',
-  ORG_USER_EMAIL_EXISTS:'User email already registered',
-  ORG_USER_NOT_FOUND:'User not found',
+  INVALID_USER_TYPE:'Invalid User type',
+  // users services
+  USER_CREATED:"User created successfully",
+
+  USER_UPDATED:'User updated successfully',
+  USER_EMAIL_EXISTS:'User email already registered',
+  USER_NOT_FOUND:'User not found',
+  USER_CREATION_SAME_CATEGORY_USERTYPES_REQUIRED:'For User creation same category user types required',
+  USER_ALREADY_VERIFIED:'User already verified',
+  INVALID_USER_ID:'User not found',
+  INVALID_USERNAME_OR_PASSWORD: 'Invalid Username/password',
+  INVALID_PRACTITIONER_ID:'Invalid practitioner',
+  INVALID_ORG_USER_ROLE_ID:'Invalid user role id',
+
+  // User role
+
+  INVALID_USER_ROLE_ID:'Invalid user role id',
+  // user verification
+
+  INVALID_VERIFICATION_ID:'Invalid verification id',
+
   // File uploads
   FILE_EXT_NOT_ALLOWED:'Invalid file type',
   UNABLE_TO_UPLOAD_FILE:'Server error unable to upload file',

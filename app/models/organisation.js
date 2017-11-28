@@ -45,6 +45,13 @@ export default function (sequelize, DataTypes) {
         allowNull: false
       }
     });
+    Organisation.hasMany(models.OrgContactDetails, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      },
+      as:'contactDetails'
+    });
     Organisation.belongsTo(models.User, {
       foreignKey: {
         name:'createdBy',

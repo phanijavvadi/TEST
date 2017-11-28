@@ -19,16 +19,16 @@ export default function (sequelize, DataTypes) {
     tableName: 'cm_org_contact_details'
   });
   OrgContactDetails.associate = function (models) {
-    OrgContactDetails.belongsTo(models.Organisation, {
-      foreignKey: {
-        name: 'orgId',
-        allowNull: false
-      }
-    });
     OrgContactDetails.belongsTo(models.User, {
       foreignKey: {
         name: 'createdBy',
         allowNull: false
+      }
+    });
+    OrgContactDetails.belongsTo(models.UserType, {
+      foreignKey: {
+        name: 'userTypeId',
+        allowNull: true
       }
     });
   }

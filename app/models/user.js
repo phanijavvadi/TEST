@@ -10,6 +10,7 @@ export default function (sequelize, DataTypes) {
     },
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
+    phoneNo: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -29,13 +30,26 @@ export default function (sequelize, DataTypes) {
   });
   User.associate = function (models) {
     User.belongsTo(models.UserCategory, {
-      foreignKey: 'userCategoryId',
-      allowNull: false,
+      foreignKey: {
+        name: 'userCategoryId',
+        allowNull: false
+      },
       as: 'userCategory'
     });
+    User.hasMany(models.UserRole, {
+      foreignKey: {
+        name: 'userId',
+        allowNull: false
+      },
+      as: 'userRoles'
+    });
+
     User.belongsTo(models.User, {
-      foreignKey: 'createdBy',
-      allowNull: true,
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: true
+      },
+      as: 'createdUser'
     });
   }
 

@@ -26,7 +26,8 @@ const validators = {
       contPerFname: Joi.string().min(3).required(),
       contPerLname: Joi.string().min(1).required(),
       contPerEmail: Joi.string().email().required(),
-      contPerPhoneNo: Joi.string().required()
+      contPerPhoneNo: Joi.string().required(),
+      contPerTypeId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
@@ -99,9 +100,10 @@ const validators = {
       // parentOrgId: Joi.string().allow(null),//need to work sub organisations
       contPerFname: Joi.string().min(3).required(),
       contPerLname: Joi.string().min(1).required(),
-      contPerEmail: Joi.string().email().required(),
+      // contPerEmail: Joi.string().email().required(),
       contPerPhoneNo: Joi.string().required(),
       contPerId: Joi.string().required(),
+      contPerTypeId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

@@ -3,7 +3,7 @@ import errorMessages from '../../config/error.messages';
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
 import * as userService from '../services/user.service';
-import * as userRoleService from '../services/user.roles.service';
+import * as userRoleService from '../services/user.role.service';
 
 const validators = {
   validateJwtToken: (req, resp, next) => {
@@ -15,7 +15,7 @@ const validators = {
           return resp.status(403).send({
             success: false,
             message: errorMessages.TOKEN_IS_EXPIRED,
-            code: 'TOKEN_IS_EXPIRED'
+            code: 'TOKEN_IS_INVALID'
           });
         }
         if (err && err.name == 'JsonWebTokenError') {

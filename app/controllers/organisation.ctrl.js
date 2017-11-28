@@ -1,9 +1,10 @@
 'use strict';
 import * as _ from 'lodash';
-
-const Sequelize = models.sequelize;
-import logger from '../util/logger';
 import models from '../models';
+const sequelize = models.sequelize;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+import logger from '../util/logger';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
 import * as orgService from '../services/organisation.service';
@@ -14,14 +15,20 @@ const operations = {
     const id = req.params.id;
     logger.info('About to get organisation list');
 
+    const options = {};
+    options.where = {};
+    if (req.query.status) {
+      options.where.status = +req.query.status;
+    }
+    if (req.query.like && req.query.likeVal) {
+      options.where[req.query.like] = {
+        [Op.iLike]: req.query.likeVal
+      }
+    }
     return orgService
-      .findAll(req.query)
+      .findAll(req.query, options)
       .then((data) => {
-        if (data) {
-          resp.status(200).json(data);
-        } else {
-          resp.status(404).send(errorMessages.INVALID_ORG_ID);
-        }
+        resp.status(200).json(data);
       }).catch((err) => {
         let message = err.message || errorMessages.SERVER_ERROR;
         logger.info(err);
@@ -47,18 +54,42 @@ const operations = {
   get: (req, resp) => {
     const id = req.params.id;
     logger.info('About to get organisation ', id);
-
-    return orgService.findById(id, {includeOrgUserType: true})
+    let record = null;
+    return orgService.findById(id)
       .then((data) => {
         if (data) {
-          const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
-            return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
-          })
-          resp.status(200).json(resultObj);
+          /* const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
+             return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
+           })*/
+          record = data;
+          return record.getContactDetails({
+            attributes: {
+              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy'],
+            },
+            limit: 1,
+          });
+
         } else {
-          resp.status(404).send(errorMessages.INVALID_ORG_ID);
+          throw new Error('INVALID_ORG_ID');
         }
+      }).then(contactDetails => {
+        record = record.get({plain: true});
+
+        record = _.extend(record, {
+          contPerId: contactDetails[0].id,
+          contPerFname: contactDetails[0].firstName,
+          contPerLname: contactDetails[0].lastName,
+          contPerEmail: contactDetails[0].email,
+          contPerPhoneNo: contactDetails[0].phoneNo,
+          contPerTypeId: contactDetails[0].userTypeId
+        });
+
+        resp.status(200).json(record);
       }).catch((err) => {
+        if (err && err.message === 'INVALID_ORG_ID') {
+          return resp.status(404).send(errorMessages.INVALID_ORG_ID);
+        }
+
         let message = err.message || errorMessages.SERVER_ERROR;
         logger.info(err);
         resp.status(500).send({
@@ -87,9 +118,10 @@ const operations = {
       lastName: organisation.contPerLname,
       email: organisation.contPerEmail,
       phoneNo: organisation.contPerPhoneNo,
-      createdBy: authenticatedUser.id
+      createdBy: authenticatedUser.id,
+      userTypeId: organisation.contPerTypeId,
     }
-    return Sequelize.transaction()
+    return sequelize.transaction()
       .then((t) => {
         return orgService
           .create(orgDetails, {transaction: t})
@@ -98,7 +130,7 @@ const operations = {
             return orgContactDetailService.create(orgContPerDetails, {transaction: t});
           })
           .then((contDetails) => {
-          t.commit();
+            t.commit();
             return resp.json({
               success: true,
               // data: resultObj,
@@ -106,7 +138,7 @@ const operations = {
             });
           })
           .catch((err) => {
-          t.rollback();
+            t.rollback();
             let message = err.message || errorMessages.SERVER_ERROR;
             logger.info(err);
             resp.status(500).send({
@@ -134,10 +166,12 @@ const operations = {
       id: organisation.contPerId,
       firstName: organisation.contPerFname,
       lastName: organisation.contPerLname,
-      email: organisation.contPerEmail,
-      phoneNo: organisation.contPerPhoneNo
+      // email: organisation.contPerEmail,
+      phoneNo: organisation.contPerPhoneNo,
+      userTypeId: organisation.contPerTypeId,
+
     }
-    return Sequelize.transaction()
+    return sequelize.transaction()
       .then((t) => {
         return orgService
           .update(orgDetails, {transaction: t})

@@ -10,12 +10,12 @@ const operations = {
 
   login: (req, resp) => {
     const {
-      email,
+      userName,
       password
     } = req.body;
     return userService
       .findOne({
-        where: {email, status: 1}, attributes: {
+        where: {email:userName, status: 1}, attributes: {
           include: ['password']
         }
       })

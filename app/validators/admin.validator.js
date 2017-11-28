@@ -6,7 +6,7 @@ const validators = {
   loginReqValidator: (req, resp, next)=>{
     const body = req.body;
     let schema = {
-      email: Joi.string().required().email(),
+      userName: Joi.string().required().email().label('User Name'),
       password: Joi.string().min(5).required()
     };
     let result = Joi.validate(body, schema);

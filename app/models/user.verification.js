@@ -7,7 +7,7 @@ export default function (sequelize, DataTypes) {
       defaultValue: DataTypes.UUIDV4
     },
     verifiedOn: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
     },
     regNo: {
       type: DataTypes.STRING,
@@ -20,17 +20,10 @@ export default function (sequelize, DataTypes) {
   });
   UserVerification.associate = function (models) {
     UserVerification.belongsTo(models.User, {
-      as: 'user',
       foreignKey: {
         name: 'userId',
+        as: 'user',
         allowNull: false
-      }
-    });
-    UserVerification.belongsTo(models.UserRole, {
-      as: 'organisation',
-      foreignKey: {
-        name: 'userRoleId',
-        allowNull: false,
       }
     });
     UserVerification.belongsTo(models.User, {

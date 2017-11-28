@@ -2,14 +2,14 @@
 
 import models from '../models';
 
-const OrgUserType = models.OrgUserType;
+const UserType = models.UserType;
 
 /**
- * Find all OrgUserTypes in the db
+ * Find all UserTypes in the db
  *
  **/
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
-  return OrgUserType.findAndCountAll({
+  return UserType.findAndCountAll({
     limit: Number(limit),
     offset: Number(offset),
     where: {
@@ -17,51 +17,56 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
     }
   });
 };
+
 /**
- * Find all OrgUserTypes in the db
+ * Find all UserTypes in the db
  *
  **/
-export function getOptions() {
-  return OrgUserType.findAll({
-    attributes:{
-      exclude:['createdAt','updatedAt','deletedAt'],
+export function getOrgUserTypeOptions(options={}) {
+  return UserType.findAll({
+    include: [
+      {
+        model: models.UserCategory,
+        attributes: [],
+        require: true,
+        where: {
+          value: "ORG_USER",
+        },
+        as: 'userCategory'
+      },{
+        model: models.UserSubCategory,
+        attributes: [],
+        require: true,
+        as: 'userSubCategory'
+      }
+    ],
+    attributes: {
+      exclude: ['createdAt', 'updatedAt', 'deletedAt'],
+    },
+    where:{
+      ...(options.where || {})
     }
   });
 };
 
 /**
- * Find a OrgUserType by OrgUserType id
+ * Find a UserType by UserType id
  * @param id
  **/
-export function findById(id, options = {}) {
-  return OrgUserType.findOne({
-    attributes: {
-      exclude: [...options.exclude || {}],
-      include: [...options.include || {}],
-    },
+export function findById(id, {includeAssos = false, ...options}) {
+  return UserType.findById(id,{
+    attributes: options.attributes,
+    include: (includeAssos) ? [{
+      model: models.UserCategory,
+      as: 'userCategory',
+      required: true,
+    }, {
+      model: models.UserSubCategory,
+      as: 'userSubCategory',
+      required: true,
+    }] : [],
     where: {
-      id: id
-    }
-  });
-};
-
-
-/**
- * Create a new OrgUserType
- * @param data object literal containing info about a OrgUserType
- **/
-export function create(data) {
-  return OrgUserType.create(data);
-};
-
-/**
- * Delete OrgUserType(s) based on input criteria
- * @param orgUserType object literal containing info about a OrgUserType
-  **/
-export function deleteOrgUserType(orgUserType) {
-  return OrgUserType.destroy({
-    where: {
-      ...orgUserType
+      ...(options.where || {})
     }
   });
 };

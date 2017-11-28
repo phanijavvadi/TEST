@@ -22,10 +22,14 @@ const operations = {
         });
       });
   },
-  getOptions: (req, resp) => {
+  getOrgUserTypeOptions: (req, resp) => {
     logger.info('About to get organisation user type options');
+    const options={where:{}};
+    if(req.query.type){
+      options.where['$userSubCategory.value$']=req.query.type;
+    }
     return orgUserTypeService
-      .getOptions(req.query)
+      .getOrgUserTypeOptions(options)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
