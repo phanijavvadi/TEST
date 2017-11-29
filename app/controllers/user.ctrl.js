@@ -25,7 +25,7 @@ const operations = {
     options.where = {};
     options.userRoles = {where:{}};
     if (req.query.status) {
-      // options.where.status = +req.query.status;
+      options.where.status = +req.query.status;
     }
     if (req.query.userTypeId) {
       options.userRoles.where['userTypeId'] = req.query.userTypeId;

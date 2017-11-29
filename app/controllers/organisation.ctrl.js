@@ -20,9 +20,11 @@ const operations = {
     if (req.query.status) {
       options.where.status = +req.query.status;
     }
-    if (req.query.like && req.query.likeVal) {
-      options.where[req.query.like] = {
-        [Op.iLike]: req.query.likeVal
+
+    if (req.query.searchText) {
+      options.where = {
+        [Op.or]:[{name:{[Op.iLike]: `%${req.query.searchText}%`}},
+          {phoneNo:{[Op.iLike]: `%${req.query.searchText}%`}}]
       }
     }
     return orgService

@@ -8,6 +8,8 @@ export default function (sequelize, DataTypes) {
     },
     name: DataTypes.STRING,
     address: DataTypes.TEXT,
+    address1: DataTypes.TEXT,
+    address2: DataTypes.TEXT,
     suburb: DataTypes.TEXT,
     postcode: DataTypes.STRING,
     state: DataTypes.STRING,

@@ -16,6 +16,8 @@ const validators = {
     let schema = {
       name: Joi.string().min(3).required(),
       address: Joi.string().min(3).required(),
+      address1: Joi.string().min(3).allow(''),
+      address2: Joi.string().min(3).allow(''),
       suburb: Joi.string().min(3).required(),
       postcode: Joi.string().required(),
       state: Joi.string().required(),
@@ -91,6 +93,8 @@ const validators = {
       id: Joi.string().required(),
       name: Joi.string().min(3).required(),
       address: Joi.string().min(3).required(),
+      address1: Joi.string().min(3).allow(''),
+      address2: Joi.string().min(3).allow(''),
       suburb: Joi.string().min(3).required(),
       postcode: Joi.string().required(),
       state: Joi.string().required(),
