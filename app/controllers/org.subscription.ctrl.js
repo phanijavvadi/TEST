@@ -52,6 +52,7 @@ const operations = {
     const subscriptionType = req.body;
     subscriptionType.price = req.locals.subscriptionType.price;
     subscriptionType.validUpTo = moment().add(req.locals.subscriptionType.validity, 'days').format('YYYY-MM-DD');
+    subscriptionType.validUpFrom = new Date();
     subscriptionType.name = req.locals.subscriptionType.name;
     subscriptionType.status = 1;
     logger.info('About to create org subscription', subscriptionType);
@@ -75,17 +76,20 @@ const operations = {
       });
   },
   unSubscribe: (req, resp) => {
-    const subscriptionType = req.body;
-    subscriptionType.status = 2;
-    logger.info('About to create org subscription', subscriptionType);
+    const body = req.body;
+    // subscriptionType.status = 2;
+    logger.info('About to unsubscribe org ', body);
     return orgSubscriptionService
-      .update(subscriptionType)
+      .unSubscribe({status: 2}, {where: {orgId: body.orgId, status: 1}})
       .then((data) => {
         resp.json({
           success: true,
           message: successMessages.ORG_UN_SUBSCRIBED_SUCCESS
         });
       }).catch((err) => {
+        if (err && err.message === 'INVALID_ORG_SUBSCRIPTION_ID') {
+          return resp.status(403).send({message: errorMessages.INVALID_ORG_SUBSCRIPTION_ID, success: false});
+        }
         let message = err.message || errorMessages.SERVER_ERROR;
         logger.info(err);
         resp.status(500).send({

@@ -6,10 +6,10 @@ import successMessages from '../../config/success.messages';
 import * as orgUserTypeService from '../services/user.type.service';
 
 const operations = {
-  list: (req, resp) => {
+  getOrgTypeslist: (req, resp) => {
     logger.info('About to get organisation user type options');
     return orgUserTypeService
-      .findAll(req.query)
+      .getOrgTypeslist(req.query)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);

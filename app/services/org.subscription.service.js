@@ -76,17 +76,30 @@ export function create(data) {
  * Update a orgSubscription
  * @param orgSubscription object literal containing info about a orgSubscription
  **/
-export function update(orgSubscription) {
+export function update(orgSubscription,options={}) {
   return OrgSubscription.findById(orgSubscription.id, {
-    attributes: {
-    }
+    where:{...(options.where || {})}
   }).then((p) => {
       if (p) {
         return p.update(orgSubscription);
       } else {
-        return new Promise((resolve, reject) => {
-          reject({message: errorMessages.INVALID_ORG_SUBSCRIPTION_ID, code: 'INVALID_ORG_SUBSCRIPTION_ID'})
-        })
+       throw new Error('INVALID_ORG_SUBSCRIPTION_ID');
+      }
+
+    });
+};
+/**
+ * Update a orgSubscription
+ * @param orgSubscription object literal containing info about a orgSubscription
+ **/
+export function unSubscribe(orgSubscription,options={}) {
+  return OrgSubscription.findOne({
+    where:{...options.where}
+  }).then((p) => {
+      if (p) {
+        return p.update(orgSubscription);
+      } else {
+       throw new Error('INVALID_ORG_SUBSCRIPTION_ID');
       }
 
     });

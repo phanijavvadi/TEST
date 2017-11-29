@@ -11,7 +11,7 @@ const validators = {
   subscribeReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      subscriptionId: Joi.string().required(),
+      subscriptionTypeId: Joi.string().required(),
       orgId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
@@ -24,8 +24,7 @@ const validators = {
   unSubscribeReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      id: Joi.string().required(),
-      subscriptionId: Joi.string().required(),
+      // id: Joi.string().required(),
       orgId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema);
@@ -35,9 +34,9 @@ const validators = {
       next();
     }
   },
-  validateSubscriptionId: (req, resp, next) => {
-    const {subscriptionId} = req.body;
-    subscriptionTypeService.findById(subscriptionId)
+  validateSubscriptionTypeId: (req, resp, next) => {
+    const {subscriptionTypeId} = req.body;
+    subscriptionTypeService.findById(subscriptionTypeId)
       .then((data) => {
         if (data) {
           req.locals = req.locals || {};
@@ -83,7 +82,6 @@ const validators = {
           message
         });
       });
-  }
-
+  },
 }
 export default validators;

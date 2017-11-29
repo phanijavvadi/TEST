@@ -8,10 +8,27 @@ const UserType = models.UserType;
  * Find all UserTypes in the db
  *
  **/
-export function findAll({limit = 50, offset = 0, ...otherOptions} = {}) {
+export function getOrgTypeslist({limit = 50, offset = 0, ...otherOptions} = {}) {
   return UserType.findAndCountAll({
+    include: [
+      {
+        model: models.UserCategory,
+        attributes: [],
+        require: true,
+        where: {
+          value: "ORG_USER",
+        },
+        as: 'userCategory'
+      },{
+        model: models.UserSubCategory,
+        attributes: [],
+        require: true,
+        as: 'userSubCategory'
+      }
+    ],
     limit: Number(limit),
     offset: Number(offset),
+    distinct: true,
     where: {
       ...otherOptions
     }

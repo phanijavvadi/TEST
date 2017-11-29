@@ -19,7 +19,7 @@ export default function (app) {
     orgSubscriptionCrl.get]);
   router.route('/subscribe').post([
     orgSubscriptionValidator.subscribeReqValidator,
-    orgSubscriptionValidator.validateSubscriptionId,
+    orgSubscriptionValidator.validateSubscriptionTypeId,
     organizationValidator.validateOrgId,
     orgSubscriptionValidator.validateSubscriptionAlreadyExist,
     orgSubscriptionCrl.subscribe
@@ -27,7 +27,6 @@ export default function (app) {
   router.route('/un-subscribe').put([
     orgSubscriptionValidator.unSubscribeReqValidator,
     organizationValidator.validateOrgId,
-    orgSubscriptionValidator.validateSubscriptionId,
     orgSubscriptionCrl.unSubscribe]);
 
   app.use('/api/admin/private/org-subscription', router);

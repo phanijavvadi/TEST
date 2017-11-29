@@ -18,16 +18,16 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_org_subscriptions'
+    tableName: 'cm_org_subscriptions'
   });
   OrgSubscription.associate = function (models) {
 
     OrgSubscription.belongsTo(models.SubscriptionType, {
       foreignKey: {
-        name:'subscriptionTypeId',
+        name: 'subscriptionTypeId',
         allowNull: false
       },
-
+      as: 'subscriptionType'
     });
   }
   return OrgSubscription;
