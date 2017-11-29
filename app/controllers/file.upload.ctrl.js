@@ -63,6 +63,25 @@ const operations = {
           });
         });
     });
+  },
+  getFile:(req, resp)=>{
+    const id = req.params.id;
+    logger.info('About to get user ', id);
+
+    return attachmentService.findById(id)
+      .then((data) => {
+        if (data) {
+          resp.status(200).sendFile(data.fileInfo.filename,{ root: path.join(__dirname, '../../public/uploads') });
+        } else {
+          resp.status(404).send(errorMessages.INVALID_ATTACHMENT_ID);
+        }
+      }).catch((err) => {
+        let message = err.message || errorMessages.SERVER_ERROR;
+        logger.info(err);
+        resp.status(500).send({
+          message
+        });
+      });
   }
 
 }

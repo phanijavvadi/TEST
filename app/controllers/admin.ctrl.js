@@ -15,7 +15,7 @@ const operations = {
     } = req.body;
     return userService
       .findOne({
-        where: {email:userName, status: 1}, attributes: {
+        where: {email: userName, status: 1}, attributes: {
           include: ['password']
         }
       })
@@ -37,7 +37,9 @@ const operations = {
         } else {
           const payload = {
             id: data.id,
-            email: data.email
+            email: data.email,
+            firstName: data.firstName,
+            lastName:  data.lastName
           };
           var token = commonUtil.jwtSign(payload);
           resp.status(200).json({

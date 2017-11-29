@@ -7,6 +7,7 @@ const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
 import * as orgService from '../services/organisation.service';
 import * as orgUserService from '../services/user.service';
+import * as userRoleService from '../services/user.role.service';
 import * as attachmentService from '../services/attachment.service';
 
 const validators = {
@@ -123,14 +124,14 @@ const validators = {
     } else {
       // check atleast one active AHPRARegNo User exists
       const {id} = req.body;
-      let whereOptions = {orgId: id, status: 1};
-      orgUserService.findOne(whereOptions)
+      let whereOptions = {orgId: id};
+      userRoleService.findActivePractitioner({where:whereOptions})
         .then((data) => {
           if (data) {
             next();
             return null;
           } else {
-            resp.status(403).send({success: false, message: errorMessages.ORG_ACTIVE_AHPRANO_REQUIRED_TO_ACTIVATE});
+            resp.status(403).send({success: false, message: errorMessages.ATLEAST_ONE_ACTIVE_PRACTITIONER_REQUIRED_TO_ACTIVATE_ORG});
           }
         })
         .catch((err) => {

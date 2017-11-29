@@ -41,6 +41,19 @@ export function findById(id, options={}) {
   });
 };
 
+/**
+ * Find a userVerification by userVerification id
+ * @param id
+ **/
+export function findOne(options={}) {
+  return UserVerification.findOne({
+    attributes: options.attributes || {},
+    where: {
+      ...(options.where || {})
+    }
+  });
+};
+
 
 /**
  * Delete userVerification(s) based on input criteria

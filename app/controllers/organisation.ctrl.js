@@ -203,7 +203,7 @@ const operations = {
     }
     logger.info('About to activate organisation ', data);
     return orgService
-      .update(data)
+      .update(data,{})
       .then((res) => {
         resp.json({
           success: true,
@@ -224,7 +224,7 @@ const operations = {
     }
     logger.info('About to in activate organisation ', data);
     return orgService
-      .update(data)
+      .update(data,{})
       .then((res) => {
         resp.json({
           success: true,

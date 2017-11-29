@@ -12,21 +12,21 @@ export function getUserRoles(userId, options = {}) {
     },
     include: [{
       model: models.UserCategory,
-      as:'userCategory',
+      as: 'userCategory',
       required: true,
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
       }
     }, {
       model: models.UserSubCategory,
-      as:'userSubCategory',
+      as: 'userSubCategory',
       required: true,
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
       }
     }, {
       model: models.UserType,
-      as:'userType',
+      as: 'userType',
       required: true,
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
@@ -54,6 +54,28 @@ export function bulkCreate(userRoles, {transaction = null, ...options} = {}) {
  **/
 export function create(userRole, {transaction = null, ...options} = {}) {
   return UserRole.create(userRole, {transaction});
+};
+
+/**
+ * find active practioner user
+ * @param orgId
+ **/
+export function findActivePractitioner(options = {}) {
+  return UserRole.findOne({
+    attributes: options.attributes || {},
+    include: [{
+      model: models.UserVerification,
+      as: 'userVerification',
+      where: {
+        verifiedOn: {
+          $ne: null
+        }
+      }
+    }],
+    where: {
+      ...(options.where || {})
+    }
+  });
 };
 
 /**

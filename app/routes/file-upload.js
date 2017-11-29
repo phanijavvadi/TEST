@@ -12,6 +12,7 @@ const router = express.Router();
 
 export default function (app) {
   router.route('/upload').post(fileUploadctrl.upload);
+  router.route('/:id').get(fileUploadctrl.getFile);
   app.use('/api/file', router);
 
 }
