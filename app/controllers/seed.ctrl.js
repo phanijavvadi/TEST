@@ -4,20 +4,22 @@ import logger from '../util/logger';
 import models from '../models';
 import user from "../models/user";
 
+import constants from '../../config/constants';
+
 const operations = {
   seed: (req, resp) => {
     logger.info('About to import seed data ');
     let userCats,userSubCats,userTypes,users,userroles;
     models.UserCategory.bulkCreate([
-      {name: 'CM Users', value: 'CM_USER'},
-      {name: 'Org Users', value: 'ORG_USER'},
+      {name: 'CM Users', value: constants.userCategoryTypes.CM_USER},
+      {name: 'Org Users', value: constants.userCategoryTypes.ORG_USER},
     ], {individualHooks: true})
       .then((res) => {
       userCats=res;
         return models.UserSubCategory.bulkCreate([
-          {name: 'Care Monitor Admin Users',value: 'CM_ADMIN_USERS', userCategoryId: userCats[0].id, multipleRolesAllowCount: 0},
-          {name: 'Org Admin users',value: 'ORG_ADMIN_USERS', userCategoryId: userCats[1].id, multipleRolesAllowCount: 0},
-          {name: 'Org Practitioners',value: 'ORG_PRACTITIONERS', userCategoryId: userCats[1].id, multipleRolesAllowCount: 1},
+          {name: 'Care Monitor Admin Users',value: constants.userSubCategory.CM_ADMIN_USERS, userCategoryId: userCats[0].id, multipleRolesAllowCount: 0},
+          {name: 'Org Admin users',value: constants.userSubCategory.ORG_ADMIN_USERS, userCategoryId: userCats[1].id, multipleRolesAllowCount: 0},
+          {name: 'Org Practitioners',value: constants.userSubCategory.ORG_PRACTITIONERS, userCategoryId: userCats[1].id, multipleRolesAllowCount: 1},
         ], {individualHooks: true})
       })
       .then(res => {
@@ -25,35 +27,35 @@ const operations = {
             return models.UserType.bulkCreate([
               {
                 name: 'Super Admin',
-                value:'SUPER_ADMIN',
+                value: constants.userTypes.SUPER_ADMIN,
                 regNoVerificationRequired: false,
                 userCategoryId: userCats[0].id,
                 userSubCategoryId: userSubCats[0].id
               },
               {
                 name: 'Org Admin',
-                value:'ORG_ADMIN',
+                value:constants.userTypes.ORG_ADMIN,
                 regNoVerificationRequired: false,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[1].id
               },
               {
                 name: 'Aboriginal and Torres Strait Islander Health Practitioner',
-                value:'ABORIGINAL_AND_TORRES_STRAIT_ISLANDER_HEALTH_PRACTITIONER',
+                value:constants.userTypes.ABORIGINAL_AND_TORRES_STRAIT_ISLANDER_HEALTH_PRACTITIONER,
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
               },
               {
                 name: 'Chinese Medicine Practitioner',
-                value:'CHINESE_MEDICINE_PRACTITIONER',
+                value:constants.userTypes.CHINESE_MEDICINE_PRACTITIONER,
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
               },
               {
                 name: 'Chiropractor',
-                value:'CHIROPRACTOR',
+                value:constants.userTypes.CHIROPRACTOR,
                 regNoVerificationRequired: true,
                 userCategoryId: userCats[1].id,
                 userSubCategoryId: userSubCats[2].id
@@ -66,7 +68,7 @@ const operations = {
               {
                 firstName: 'Super Admin',
                 lastName: 'Care monitor',
-                email: 'superadmin@cm.com',
+                email: 'admin@caremonitor.com.au',
                 password: 'password',
                 userCategoryId: userCats[0].id,
                 status:1

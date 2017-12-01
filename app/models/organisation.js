@@ -57,7 +57,7 @@ export default function (sequelize, DataTypes) {
     Organisation.belongsTo(models.User, {
       foreignKey: {
         name:'createdBy',
-        allowNull: false
+        allowNull: true
       }
     });
     Organisation.belongsTo(models.User, {

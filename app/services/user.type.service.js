@@ -1,7 +1,7 @@
 'use strict';
 
 import models from '../models';
-
+import constants from '../../config/constants';
 const UserType = models.UserType;
 
 /**
@@ -16,7 +16,7 @@ export function getOrgTypeslist({limit = 50, offset = 0, ...otherOptions} = {}) 
         attributes: [],
         require: true,
         where: {
-          value: "ORG_USER",
+          value: constants.userCategoryTypes.ORG_USER,
         },
         as: 'userCategory'
       },{
@@ -47,7 +47,7 @@ export function getOrgUserTypeOptions(options={}) {
         attributes: [],
         require: true,
         where: {
-          value: "ORG_USER",
+          value: constants.userCategoryTypes.ORG_USER,
         },
         as: 'userCategory'
       },{

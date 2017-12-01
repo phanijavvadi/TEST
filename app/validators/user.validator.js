@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import errorMessages from '../../config/error.messages';
+import constants from '../../config/constants';
 import * as orgService from '../services/organisation.service';
 import * as userService from '../services/user.service';
 import * as userTypeService from '../services/user.type.service';
@@ -59,7 +60,7 @@ const validators = {
            * Checking all user types category should be ORG_USER otherwise send bad request error
            * */
           const orgUserCategoryObjects = results.every(userType => {
-            return userType.userCategory.value === 'ORG_USER';
+            return userType.userCategory.value === constants.userCategoryTypes.ORG_USER;
           });
           req.locals.userCategory = results[0].userCategory;
           if (!orgUserCategoryObjects) {
@@ -67,7 +68,7 @@ const validators = {
           }
 
           if (body.practitionerTypeId) {
-            if (results[0].userSubCategory.value !== 'ORG_PRACTITIONERS') {
+            if (results[0].userSubCategory.value !== constants.userSubCategory.ORG_PRACTITIONERS) {
               throw new Error('INVALID_PRACTITIONER_ID');
             }
             req.locals.practitioner = results[0];
@@ -76,7 +77,7 @@ const validators = {
             req.locals.otherUserRoles = results;
           }
           req.locals.otherUserRoles.forEach(userRole => {
-            if (userRole.userSubCategory.value !== 'ORG_ADMIN_USERS') {
+            if (userRole.userSubCategory.value !== constants.userSubCategory.ORG_ADMIN_USERS) {
               throw new Error('INVALID_ORG_USER_ROLE_ID');
             }
           });
@@ -307,6 +308,7 @@ const validators = {
     const body = req.body;
     let schema = {
       userId: Joi.string().required(),
+      orgId: Joi.string().required(),
       status: Joi.string().required().valid([1,2])
     };
     let result = Joi.validate(body, schema);
@@ -328,7 +330,6 @@ const validators = {
     } else {
       next();
     }
-  },
-
+  }
 }
 export default validators;

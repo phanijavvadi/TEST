@@ -9,6 +9,8 @@ import orgValidator from '../validators/organisation.validator';
 import orgUserTypeValidator from '../validators/user.type.validator';
 
 const router = express.Router();
+const publicRouter = express.Router();
+const adminRouter = express.Router();
 
 export default function (app) {
 
@@ -24,23 +26,40 @@ export default function (app) {
   router.route('/:id').get([
     orgCtrl.get]);
 
-  router.route('/create').post([
-    orgValidator.createReqValidator,
-    orgValidator.validateOrgLogo,
-    orgCtrl.create]);
 
   router.route('/update').put([
     orgValidator.updateReqValidator,
     orgValidator.validateOrgLogo,
+    orgValidator.validateContPerTypeId,
     orgCtrl.update]);
 
-  router.route('/activate').post([
+  // admin specific routers
+  adminRouter.route('/create').post([
+    orgValidator.createReqValidator,
+    orgValidator.validateOrgLogo,
+    orgValidator.validateContPerTypeId,
+    orgCtrl.create]);
+
+  adminRouter.route('/activate').post([
     orgValidator.orgActivateReqValidator,
     orgCtrl.activate]);
 
-  router.route('/in-activate').post([
+  adminRouter.route('/in-activate').post([
     orgValidator.orgInActivateReqValidator,
     orgCtrl.inActivate]);
 
+  // Public Routers
+  publicRouter.route('/sign-up').post([
+    orgValidator.userSignupReqValidator,
+    orgValidator.validateOrgLogo,
+    orgValidator.validateContPerTypeId,
+    orgValidator.validateRegNoRequiredOrNot,
+    orgCtrl.signUp]);
+
   app.use('/api/admin/private/organisation', router);
+  app.use('/api/admin/private/organisation', adminRouter);
+
+  app.use('/api/org-user/private/organisation', router);
+
+  app.use('/api/org-user/public/organisation', publicRouter);
 }

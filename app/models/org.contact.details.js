@@ -22,7 +22,7 @@ export default function (sequelize, DataTypes) {
     OrgContactDetails.belongsTo(models.User, {
       foreignKey: {
         name: 'createdBy',
-        allowNull: false
+        allowNull: true
       }
     });
     OrgContactDetails.belongsTo(models.UserType, {

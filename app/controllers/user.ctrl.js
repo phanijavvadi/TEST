@@ -20,10 +20,10 @@ import * as adminMailTemplate from "../templates/admin.mail.template";
 const operations = {
   getOrgUserList: (req, resp) => {
     logger.info('About to get organisation user list');
-
+    const {authenticatedUserRoles, authenticatedUser} = req.locals;
     const options = {};
     options.where = {};
-    options.userRoles = {where:{}};
+    options.userRoles = {where: {}};
     if (req.query.status) {
       options.where.status = +req.query.status;
     }
@@ -31,23 +31,40 @@ const operations = {
       options.userRoles.where['userTypeId'] = req.query.userTypeId;
       // options.where['$userRoles.userTypeId$'] = req.query.userTypeId;
     }
+
+
+    /**
+     * check user has organisation access and add filter query
+     * Throw error if don't has access
+     * */
+    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+      let userOrgIds = _.map(authenticatedUserRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.userRoles.where['orgId'] = userOrgIds;
+    }
+
+
     if (req.query.orgId) {
       options.userRoles.where['orgId'] = req.query.orgId;
     }
     if (req.query.searchText) {
       options.where = {
-        [Op.or]:[{firstName:{[Op.iLike]: `%${req.query.searchText}%`}},
-          {lastName:{[Op.iLike]: `%${req.query.searchText}%`}},
-          {phoneNo:{[Op.iLike]: `%${req.query.searchText}%`}}]
+        [Op.or]: [{firstName: {[Op.iLike]: `%${req.query.searchText}%`}},
+          {lastName: {[Op.iLike]: `%${req.query.searchText}%`}},
+          {phoneNo: {[Op.iLike]: `%${req.query.searchText}%`}}]
       }
     }
     return userService
-      .getOrgUserList(req.query,options)
+      .getOrgUserList(req.query, options)
       .then((data) => {
         if (data) {
-          data.rows=_.map(data.rows,(row)=>{
-            row=row.get({plain:true});
-            row.createdAt=moment(row.createdAt).format('YYYY-MM-DD HH:ss:mm');
+          data.rows = _.map(data.rows, (row) => {
+            row = row.get({plain: true});
+            row.createdAt = moment(row.createdAt).format('YYYY-MM-DD HH:ss:mm');
             return row;
           })
           resp.status(200).json(data);
@@ -62,7 +79,19 @@ const operations = {
   },
   get: (req, resp) => {
     const id = req.params.id;
+    const {authenticatedUserRoles, authenticatedUser} = req.locals;
     logger.info('About to get user ', id);
+    const options={};
+    options.userRoles = {where: {}};
+    /**
+     * filter user by organisation id
+     * */
+    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+      let userOrgIds = _.map(authenticatedUserRoles, (role) => {
+        return role.orgId;
+      });
+      options.userRoles.where['orgId'] = userOrgIds;
+    }
 
     return userService.findById(id)
       .then((data) => {
@@ -165,24 +194,6 @@ const operations = {
         });
       });
   },
-  update: (req, resp) => {
-    const orgUser = req.body;
-    logger.info('About to update organisation user', orgUser);
-    return userService
-      .update(orgUser)
-      .then(() => {
-        resp.json({
-          success: true,
-          message: successMessages.ORG_USER_UPDATED
-        });
-      }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
-          message
-        });
-      });
-  },
   changePassword: (req, resp) => {
     const orgUser = req.body;
     let data = _.omit(orgUser, ['confirmPassword']);
@@ -223,7 +234,7 @@ const operations = {
       .then(() => {
         resp.json({
           success: true,
-          data:verificationData,
+          data: verificationData,
           message: successMessages.ORG_USER_REG_NO_VERIFICATION_STATUS_UPDATED_SUCCESSFULLY
         });
       }).catch((err) => {
@@ -231,7 +242,7 @@ const operations = {
         logger.info(err);
         if (err && err.code == 'INVALID_VERIFICATION_ID') {
           resp.status(404).send({
-            message:errorMessages.INVALID_VERIFICATION_ID
+            message: errorMessages.INVALID_VERIFICATION_ID
           });
           return;
         }
@@ -246,7 +257,7 @@ const operations = {
 
     const data = {
       id: req.body.userId,
-      status:req.body.status
+      status: req.body.status
     }
     return userService
       .update(data)
@@ -260,7 +271,7 @@ const operations = {
         logger.info(err);
         if (err && err.code == 'INVALID_VERIFICATION_ID') {
           resp.status(404).send({
-            message:errorMessages.INVALID_VERIFICATION_ID
+            message: errorMessages.INVALID_VERIFICATION_ID
           });
           return;
         }

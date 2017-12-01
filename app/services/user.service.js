@@ -67,6 +67,14 @@ export function findById(id, options = {}) {
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt']
       }
+    },{
+      model: models.UserRole,
+      as: 'userRoles',
+      required: true,
+      attributes: [],
+      where: {
+        ...(options.userRoles.where || {})
+      }
     }],
     where: {
       id: id,

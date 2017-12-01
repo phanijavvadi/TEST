@@ -20,6 +20,7 @@ const errorMessages = {
   INVALID_ORG_ID: "Invalid organization id",
   ATLEAST_ONE_ACTIVE_PRACTITIONER_REQUIRED_TO_ACTIVATE_ORG:'Atleast one active practitioner user required to activate organisation',
   INVALID_ORG_CONTCT_ID:'Invalid organisation contact id',
+  INVALID_ORG_USER_TYPE:'Invalid org user type',
   //User Types
   INVALID_USER_TYPE:'Invalid User type',
   // users services

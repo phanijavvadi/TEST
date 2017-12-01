@@ -9,6 +9,7 @@ const successMessage = {
   ///admin table service end
   //Organization services start
   ORG_CREATED:'Organization created successfully',
+  ORG_SIGN_UP_SUCCESS:'sign up successfully',
   ORG_UPDATED:'Organization updated successfully',
   //Organization users
   ORG_USER_CREATED: "User created successfully",
