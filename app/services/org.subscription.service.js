@@ -36,10 +36,7 @@ export function getOptions() {
  **/
 export function findById(id, options = {}) {
   return OrgSubscription.findOne({
-    attributes: {
-      exclude: [...options.exclude || {}],
-      include: [...options.include || {}],
-    },
+    attributes: options.attributes || {},
     where: {
       id: id,
       ...options.where || {}
@@ -52,10 +49,7 @@ export function findById(id, options = {}) {
  **/
 export function findOne(options = {}) {
   return OrgSubscription.findOne({
-    attributes: {
-      exclude: [...options.exclude || {}],
-      include: [...options.include || {}],
-    },
+    attributes: options.attributes || {},
     where: {
       ...options.where || {}
     }

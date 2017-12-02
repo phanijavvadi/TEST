@@ -20,7 +20,7 @@ import * as adminMailTemplate from "../templates/admin.mail.template";
 const operations = {
   getOrgUserList: (req, resp) => {
     logger.info('About to get organisation user list');
-    const {authenticatedUserRoles, authenticatedUser} = req.locals;
+    const {authenticatedUser} = req.locals;
     const options = {};
     options.where = {};
     options.userRoles = {where: {}};
@@ -38,7 +38,7 @@ const operations = {
      * Throw error if don't has access
      * */
     if (authenticatedUser.userCategory.value === 'ORG_USER') {
-      let userOrgIds = _.map(authenticatedUserRoles, (role) => {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
       if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
@@ -70,16 +70,24 @@ const operations = {
           resp.status(200).json(data);
         }
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
   },
   get: (req, resp) => {
     const id = req.params.id;
-    const {authenticatedUserRoles, authenticatedUser} = req.locals;
+    const {authenticatedUser} = req.locals;
     logger.info('About to get user ', id);
     const options={};
     options.userRoles = {where: {}};
@@ -87,7 +95,7 @@ const operations = {
      * filter user by organisation id
      * */
     if (authenticatedUser.userCategory.value === 'ORG_USER') {
-      let userOrgIds = _.map(authenticatedUserRoles, (role) => {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
       options.userRoles.where['orgId'] = userOrgIds;
@@ -104,9 +112,17 @@ const operations = {
           resp.status(404).send(errorMessages.ORG_USER_NOT_FOUND);
         }
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -187,9 +203,56 @@ const operations = {
       })
       .catch((err) => {
         transactionRef.rollback();
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  updateOrgUser: (req, resp) => {
+    const body = req.body;
+    const userData = {
+      id:body.id,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      phoneNo: body.phoneNo,
+    };
+    logger.info('About to update  user', userData);
+    let transactionRef;
+    return sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return userService.update(userData, {transaction: transactionRef});
+      })
+      .then(res => {
+        transactionRef.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.ORG_USER_UPDATED
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -206,15 +269,17 @@ const operations = {
           message: successMessages.ORG_USER_PASSWORD_UPDATED
         });
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        if (err && err.code == 'ORG_USER_NOT_FOUND') {
-          resp.status(404).send({
-            message
-          });
-          return;
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
         }
-        resp.status(500).send({
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -238,15 +303,17 @@ const operations = {
           message: successMessages.ORG_USER_REG_NO_VERIFICATION_STATUS_UPDATED_SUCCESSFULLY
         });
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        if (err && err.code == 'INVALID_VERIFICATION_ID') {
-          resp.status(404).send({
-            message: errorMessages.INVALID_VERIFICATION_ID
-          });
-          return;
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
         }
-        resp.status(500).send({
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -267,15 +334,17 @@ const operations = {
           message: successMessages.ORG_USER_UPDATED
         });
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        if (err && err.code == 'INVALID_VERIFICATION_ID') {
-          resp.status(404).send({
-            message: errorMessages.INVALID_VERIFICATION_ID
-          });
-          return;
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
         }
-        resp.status(500).send({
+        resp.status(status).send({
+          success: false,
           message
         });
       });

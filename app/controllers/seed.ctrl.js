@@ -90,7 +90,7 @@ const operations = {
       resp.send('seed completed successfully');
     }).catch((err)=>{
       logger.info(err);
-      resp.status(500).send(err);
+      resp.status(500).send('error');
     });
   }
 }

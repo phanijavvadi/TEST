@@ -18,6 +18,6 @@ export default function (app) {
     userTypeCtrl.getOrgTypeslist]);
 
   app.use('/api/admin/private/user-type', router);
-  app.use('/api/admin/private/user-type', publicRouter);
+  app.use('/api/admin/public/user-type', publicRouter);
   app.use('/api/org-user/public/user-type', publicRouter);
 }

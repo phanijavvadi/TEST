@@ -12,23 +12,6 @@ const Organisation = models.Organisation;
 export function findAll({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return Organisation.findAndCountAll({
     attributes: options.attributes || {exclude: ['deletedAt', 'createdAt', 'updatedAt']},
-    include: [{
-      attributes: {exclude: ['deletedAt', 'createdAt', 'updatedAt']},
-      model: models.OrgContactDetails,
-      required: false,
-      as: 'contactDetails'
-    }, {
-      attributes: {exclude: ['deletedAt', 'createdAt', 'updatedAt']},
-      model: models.OrgSubscription,
-      required: false,
-      as: 'subscriptions',
-      include: [
-        {
-          model: models.SubscriptionType,
-          as: 'subscriptionType'
-        }
-      ]
-    }],
     limit: Number(limit),
     offset: Number(offset),
     where: {
@@ -58,8 +41,9 @@ export function getOptions(options = {}) {
 export function findById(id, options = {}) {
   return Organisation.findById(id, {
     attributes: options.attributes || {exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'approvedBy']},
+    include: options.include || [],
+    order: options.order || [],
     where: {
-      id: id,
       ...(options.where || {})
     }
   });

@@ -1,172 +1,137 @@
 'use strict';
+import moment from 'moment';
 import errorMessages from '../../config/error.messages';
+import constants from '../../config/constants';
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
 import * as userService from '../services/user.service';
-import * as userRoleService from '../services/user.role.service';
+import * as orgSubscriptionService from '../services/org.subscription.service';
 
 const validators = {
   validateAdminJwtToken: (req, resp, next) => {
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if (token) {
-      commonUtil.jwtVerify(token, (err, decoded) => {
-
-        if (err && err.name == 'TokenExpiredError') {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.TOKEN_IS_EXPIRED,
-            code: 'TOKEN_IS_INVALID'
-          });
-        }
-        if (err && err.name == 'JsonWebTokenError') {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.TOKEN_IS_INVALID,
-            code: 'TOKEN_IS_INVALID'
-          });
-        }
-        if (err) {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.SERVER_ERROR
-          });
-        }
-
+    commonUtil.jwtVerify(token)
+      .then(decoded => {
         req.locals = req.locals || {};
         req.locals.tokenDecoded = decoded;
-        let payload = decoded;
-        userService.findById(payload.id)
-          .then((userRecord) => {
-            if (!userRecord) {
-              throw new Error('TOKEN_IS_INVALID');
-            }
-
-            /**
-             *
-             * Every jwt authenticating request setting authenticated user object into req local variable
-             * we can able to use this object into next middleware functions
-             */
-            const user = userRecord.get({plain: true});
-
-            if (user.userCategory.value !== 'CM_USER') {
-              throw new Error('TOKEN_IS_INVALID');
-            }
-            req.locals.authenticatedUser = user;
-
-            return userRoleService.getUserRoles(user.id);
-          })
-          .then((roles) => {
-            const userRoles = roles.map((role) => role.get({plain: true}));
-            /**
-             *
-             * Every jwt authenticating request setting authenticated user roles object into req local variable
-             * we can able to use this object into next middleware functions
-             */
-            req.locals.authenticatedUserRoles = userRoles || [];
-
-            next();
-            return '';
-          }).catch((err) => {
-          if (err && err.message === 'TOKEN_IS_INVALID') {
-            return resp.status(403).send({
-              success: false,
-              message: errorMessages.TOKEN_IS_INVALID,
-              code: 'TOKEN_IS_INVALID'
-            });
+        return userService.findOne({
+          includeAll: true,
+          where: {
+            status: 1,
+            id: decoded.id
           }
-          logger.error(err);
-          let message = errorMessages.SERVER_ERROR;
-          return resp.status(500).send({
-            message
-          });
-        })
+        });
       })
-    } else {
-      resp.status(403).send({
-        success: false,
-        message: errorMessages.TOKEN_IS_INVALID,
-        code: 'TOKEN_IS_INVALID'
-      });
-    }
+      .then((userRecord) => {
+        if (!userRecord) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        /**
+         *
+         * Every jwt authenticating request setting authenticated user object into req local variable
+         * we can able to use this object into next middleware functions
+         */
+        const user = userRecord.get({plain: true});
+        if (user.userCategory.value !== constants.userCategoryTypes.CM_USER) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        req.locals.authenticatedUser = user;
+        if (!user.userRoles || user.userRoles.length === 0) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        next();
+        return null;
+      })
+      .catch((err) => {
+        let message, status, code;
+        if (err && errorMessages[err.message]) {
+          code = err.message;
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          code = 'SERVER_ERROR';
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+
+        resp.status(status).send({
+          success: false,
+          message,
+          code
+        });
+      })
   },
   validateOrgUserJwtToken: (req, resp, next) => {
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if (token) {
-      commonUtil.jwtVerify(token, (err, decoded) => {
-
-        if (err && err.name == 'TokenExpiredError') {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.TOKEN_IS_EXPIRED,
-            code: 'TOKEN_IS_INVALID'
-          });
-        }
-        if (err && err.name == 'JsonWebTokenError') {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.TOKEN_IS_INVALID,
-            code: 'TOKEN_IS_INVALID'
-          });
-        }
-        if (err) {
-          return resp.status(403).send({
-            success: false,
-            message: errorMessages.SERVER_ERROR
-          });
-        }
-
+    commonUtil.jwtVerify(token)
+      .then(decoded => {
         req.locals = req.locals || {};
         req.locals.tokenDecoded = decoded;
-        let payload = decoded;
-        userService.findById(payload.id)
-          .then((userRecord) => {
-            if (!userRecord) {
-              throw new Error('TOKEN_IS_INVALID');
-            }
-            /**
-             *
-             * Every jwt authenticating request setting authenticated user object into req local variable
-             * we can able to use this object into next middleware functions
-             */
-            const user = userRecord.get({plain: true});
-            if (user.userCategory.value !== 'ORG_USER') {
-              throw new Error('TOKEN_IS_INVALID');
-            }
-            req.locals.authenticatedUser = user;
-            return userRoleService.getUserRoles(user.id);
-          })
-          .then((roles) => {
-            const userRoles = roles.map((role) => role.get({plain: true}));
-            /**
-             *
-             * Every jwt authenticating request setting authenticated user roles object into req local variable
-             * we can able to use this object into next middleware functions
-             */
-            req.locals.authenticatedUserRoles = userRoles || [];
-            next();
-            return '';
-          }).catch((err) => {
-          if (err && err.message === 'TOKEN_IS_INVALID') {
-            return resp.status(403).send({
-              success: false,
-              message: errorMessages.TOKEN_IS_INVALID,
-              code: 'TOKEN_IS_INVALID'
-            });
+        return userService.findOne({
+          includeAll: true,
+          where: {
+            status: 1,
+            id: decoded.id
           }
-          logger.error(err);
-          let message = errorMessages.SERVER_ERROR;
-          return resp.status(500).send({
-            message
-          });
-        })
+        });
       })
-    } else {
-      resp.status(403).send({
-        success: false,
-        message: errorMessages.TOKEN_IS_INVALID,
-        code: 'TOKEN_IS_INVALID'
-      });
-    }
+      .then((userRecord) => {
+        if (!userRecord) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        /**
+         *
+         * Every jwt authenticating request setting authenticated user object into req local variable
+         * we can able to use this object into next middleware functions
+         */
+        const user = userRecord.get({plain: true});
+        if (user.userCategory.value !== constants.userCategoryTypes.ORG_USER) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        req.locals.authenticatedUser = user;
+        if (!user.userRoles || user.userRoles.length === 0) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        logger.info('About to validate organisation has valid subscription', user.userRoles[0].orgId);
+        return orgSubscriptionService.findOne({
+          where: {
+            validUpTo: {
+              $gte: moment()
+            },
+            status: 1,
+            orgId: user.userRoles[0].orgId
+          }
+        });
+      })
+      .then(subscription => {
+        if (!subscription) {
+          throw new Error('ORG_NOT_HAS_VALID_SUBSCRIPTION');
+        }
+        req.locals.orgSubscription = subscription;
+        next();
+        return null;
+      })
+      .catch((err) => {
+        let message, status, code;
+        if (err && errorMessages[err.message]) {
+          code = err.message;
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          code = 'SERVER_ERROR';
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+
+        resp.status(status).send({
+          success: false,
+          message,
+          code
+        });
+      })
+
   }
 }
 export default validators;

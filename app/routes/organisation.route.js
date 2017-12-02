@@ -25,6 +25,8 @@ export default function (app) {
 
   router.route('/:id').get([
     orgCtrl.get]);
+  router.route('/:id/details').get([
+    orgCtrl.getDetails]);
 
 
   router.route('/update').put([

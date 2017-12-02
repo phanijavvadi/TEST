@@ -28,6 +28,12 @@ export default function (app) {
     userValidator.validateOrgId,
     userCtrl.createOrgUser
   ]);
+  router.route('/org/update').put([
+    userValidator.orgUserUpdateReqValidator,
+    userAccessValidator.validateUserHasOrgAccess,
+    userValidator.validateOrgId,
+    userCtrl.updateOrgUser
+  ]);
 
   router.route('/org/change-status').post([
     userValidator.changeUserStatusValidation,
@@ -48,13 +54,13 @@ export default function (app) {
     userAccessValidator.validateUserHasOrgAccess,
     orgValidator.validateOrgId,
     userCtrl.changePassword]);
-
-  //only for super admin
-  adminRoutes.route('/api/admin/private/user/org/verify-regno').post([
+  router.route('/org/verify-regno').post([
     userValidator.verifyRegNoReqValidator,
     userValidator.validateVerificationId,
     userCtrl.verifyUserRegNo])
-  app.use(adminRoutes);
+  //only for super admin
+
+  // app.use(adminRoutes);
 
   app.use('/api/admin/private/user', router);
   app.use('/api/org-user/private/user', router);

@@ -10,13 +10,23 @@ const commonUtil = {
   getHash: (password) => {
     return crypto.createHmac('sha256', config.cryptoHmacSecreteKey).update(password).digest('hex');
   },
-  jwtSign:(payload)=>{
+  jwtSign: (payload) => {
     return jwt.sign(payload, config.jsonwebtokenSecrete, {
       expiresIn: config.jsonwebtokenExpiresIn
     });
   },
-  jwtVerify:(token,callback)=>{
-    return jwt.verify(token, config.jsonwebtokenSecrete,callback);
+  jwtVerify: (token) => {
+    return new Promise((resolve) => {
+      if (!token) {
+        throw new Error('TOKEN_IS_REQUIRED');
+      }
+      jwt.verify(token, config.jsonwebtokenSecrete, (err, decoded) => {
+        if (err) {
+          throw new Error('TOKEN_IS_INVALID');
+        }
+        resolve(decoded);
+      });
+    });
   },
   isEmty: (str) => !str || str.length === 0,
   // recursively walk modules path and callback for each file

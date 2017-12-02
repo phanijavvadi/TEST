@@ -109,6 +109,22 @@ const validators = {
       })
     }
   },
+  orgUserUpdateReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      firstName: Joi.string().min(3).required(),
+      lastName: Joi.string().min(1).required(),
+      phoneNo: Joi.string().required(),
+      orgId: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
   /*createReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
@@ -195,6 +211,7 @@ const validators = {
   },*/
   validateOrgId: (req, resp, next) => {
     const {orgId} = req.body;
+    logger.info('About to validate orgid',orgId);
     orgService.findById(orgId)
       .then((data) => {
         if (data) {
@@ -263,26 +280,7 @@ const validators = {
         });
       });
   },
-  updateReqValidator: (req, resp, next) => {
-    const body = req.body;
-    let schema = {
-      id: Joi.string().required(),
-      firstName: Joi.string().min(3).required(),
-      lastName: Joi.string().min(1).required(),
-      phoneNumber: Joi.string().required(),
-      orgUserTypeId: Joi.string().required(),
-      orgId: Joi.string().required(),
-      AHPRANumber: Joi.string(),
-      isAdmin: Joi.boolean().required(),
-      status: Joi.number().valid([1, 2]).label('Status'),
-    };
-    let result = Joi.validate(body, schema);
-    if (result && result.error) {
-      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
-    } else {
-      next();
-    }
-  },
+
   changePasswordReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {

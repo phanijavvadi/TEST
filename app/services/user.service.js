@@ -57,27 +57,11 @@ export function getOrgUserList({limit = 50, offset = 0, ...otherOptions} = {}, o
  * Find a user by user id
  * @param userId
  **/
-export function findById(id, options = {userRoles:{}}) {
-  return User.findOne({
+export function findById(id, options = {includeAll: false}) {
+  return User.findById(id, {
     attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt']},
-    include: [{
-      model: models.UserCategory,
-      as: 'userCategory',
-      required: true,
-      attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt']
-      }
-    },{
-      model: models.UserRole,
-      as: 'userRoles',
-      required: true,
-      attributes: [],
-      where: {
-        ...(options.userRoles.where || {})
-      }
-    }],
+    include: options.includeAll ? [{all: true}] : [],
     where: {
-      id: id,
       ...(options.where || {})
     }
   });
@@ -86,10 +70,11 @@ export function findById(id, options = {userRoles:{}}) {
 /**
  * Find a user by options
  **/
-export function findOne(options = {}) {
+export function findOne(options = {includeAll: false}) {
 
   return User.findOne({
     attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt']},
+    include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     where: {
       ...(options.where || {})
     }

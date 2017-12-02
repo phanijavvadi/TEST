@@ -25,10 +25,12 @@ const Op = Sequelize.Op;
 
 const operations = {
   list: (req, resp) => {
-    const {authenticatedUserRoles, authenticatedUser} = req.locals;
+    const { authenticatedUser} = req.locals;
     logger.info('About to get organisation list');
 
-    const options = {};
+    const options = {
+      attributes: ['id', 'name', 'phoneNo', 'address', 'status', 'fax']
+    };
     options.where = {};
 
     if (req.query.searchText) {
@@ -44,7 +46,7 @@ const operations = {
      * Filter organisations if user category is ORG_USER
      * */
     if (authenticatedUser.userCategory.value === 'ORG_USER') {
-      options.where.id = _.map(authenticatedUserRoles, (role) => {
+      options.where.id = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       })
     }
@@ -53,9 +55,17 @@ const operations = {
       .then((data) => {
         resp.status(200).json(data);
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -65,9 +75,9 @@ const operations = {
     const options = {
       where: {}
     };
-    const {authenticatedUserRoles, authenticatedUser} = req.locals;
+    const { authenticatedUser} = req.locals;
     if (authenticatedUser.userCategory.value === 'ORG_USER') {
-      options.where.id = _.map(authenticatedUserRoles, (role) => {
+      options.where.id = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       })
     }
@@ -76,9 +86,66 @@ const operations = {
       .then((data) => {
         resp.status(200).json(data);
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  getDetails: (req, resp) => {
+
+    const id = req.params.id;
+    logger.info('About to get organisation details', id);
+    let record = null;
+    return userAccessValidator.isUserHasOrgAccess(req.locals, id)
+      .then(() => {
+        return orgService.findById(id, {
+          include: [{
+            attributes: {exclude: ['deletedAt', 'createdAt', 'updatedAt']},
+            model: models.OrgContactDetails,
+            required: false,
+            as: 'contactDetails'
+          }, {
+            attributes: {exclude: ['deletedAt', 'createdAt', 'updatedAt']},
+            model: models.OrgSubscription,
+            required: false,
+            as: 'subscriptions',
+            include: [
+              {
+                model: models.SubscriptionType,
+                as: 'subscriptionType'
+              }
+            ]
+          }],
+          order: [['subscriptions', 'createdAt', 'DESC']]
+        });
+      })
+      .then((data) => {
+        if (!data) {
+          throw new Error('INVALID_ORG_ID');
+        }
+        return resp.status(200).json(data);
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -118,13 +185,17 @@ const operations = {
 
         resp.status(200).json(record);
       }).catch((err) => {
-        if (err && err.message === 'INVALID_ORG_ID') {
-          return resp.status(404).send(errorMessages.INVALID_ORG_ID);
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
         }
-
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        resp.status(status).send({
+          success: false,
           message
         });
       });
@@ -172,9 +243,18 @@ const operations = {
           })
           .catch((err) => {
             t.rollback();
-            let message = err.message || errorMessages.SERVER_ERROR;
-            logger.info(err);
-            resp.status(500).send({
+
+            let message, status;
+            if (err && errorMessages[err.message]) {
+              status = 403;
+              message = errorMessages[err.message];
+            } else {
+              logger.error(err);
+              status = 500;
+              message = errorMessages.SERVER_ERROR;
+            }
+            resp.status(status).send({
+              success: false,
               message
             });
           });
@@ -270,9 +350,17 @@ const operations = {
           })
           .catch((err) => {
             t.rollback();
-            let message = err.message || errorMessages.SERVER_ERROR;
-            logger.info(err);
-            resp.status(500).send({
+            let message, status;
+            if (err && errorMessages[err.message]) {
+              status = 403;
+              message = errorMessages[err.message];
+            } else {
+              logger.error(err);
+              status = 500;
+              message = errorMessages.SERVER_ERROR;
+            }
+            resp.status(status).send({
+              success: false,
               message
             });
           });
@@ -320,10 +408,16 @@ const operations = {
             });
           }).catch(function (err) {
             t.rollback();
-            let message = err.message || errorMessages.SERVER_ERROR;
-            logger.info(err);
-
-            resp.status(500).send({
+            let message, status;
+            if (err && errorMessages[err.message]) {
+              status = 403;
+              message = errorMessages[err.message];
+            } else {
+              logger.error(err);
+              status = 500;
+              message = errorMessages.SERVER_ERROR;
+            }
+            resp.status(status).send({
               success: false,
               message
             });
@@ -331,28 +425,28 @@ const operations = {
       });
   },
   activate: (req, resp) => {
-    const data = {
-      orgId: req.body.orgId,
-      status: 1
-    }
-    // check at least one active AHPRARegNo User exists and should have valid subscription
-    return userRoleService
-      .findActivePractitioner({
-        where: {
-          orgId: data.orgId
-        }
+    const body = req.body;
+    // check at least one active practitioner User exists and should have valid subscription
+    return userAccessValidator.isUserHasOrgAccess(req.locals, req.body.orgId)
+      .then(() => {
+        return userRoleService.findActivePractitioner({
+          where: {
+            orgId: req.body.orgId
+          }
+        });
       })
       .then((userRole) => {
         if (!userRole) {
           throw new Error('ATLEAST_ONE_ACTIVE_PRACTITIONER_REQUIRED_TO_ACTIVATE_ORG');
         }
-        logger.info('About to validate organisation has valid subscription', data);
-        return orgSubscriptionService.findById(data.orgId, {
+        logger.info('About to validate organisation has valid subscription', body);
+        return orgSubscriptionService.findOne({
           where: {
             validUpTo: {
               $gte: moment()
             },
-            status: 1
+            status: 1,
+            orgId: body.orgId
           }
         });
       })
@@ -360,8 +454,11 @@ const operations = {
         if (!subscription) {
           throw new Error('ORG_NOT_HAS_VALID_SUBSCRIPTION');
         }
-        logger.info('About to activate organisation', data);
-        return orgService.update(data, {});
+        logger.info('About to activate organisation', body);
+        return orgService.update({
+          id: body.orgId,
+          status: 1
+        }, {});
       })
       .then((res) => {
         resp.json({
@@ -375,6 +472,7 @@ const operations = {
           status = 403;
           message = errorMessages[err.message];
         } else {
+          logger.error(err);
           status = 500;
           message = errorMessages.SERVER_ERROR;
         }
@@ -386,18 +484,21 @@ const operations = {
   },
   inActivate: (req, resp) => {
     const data = {
-      orgId: req.body.id,
+      id: req.body.orgId,
       status: 2
     }
     logger.info('About to in activate organisation ', data);
-    return orgService
-      .update(data, {})
+    return userAccessValidator.isUserHasOrgAccess(req.locals, req.body.orgId)
+      .then(() => {
+        return orgService.update(data, {})
+      })
       .then((res) => {
         resp.json({
           success: true,
           message: successMessages.ORG_UPDATED
         });
-      }).catch((err) => {
+      })
+      .catch((err) => {
         let message, status;
         if (err && errorMessages[err.message]) {
           status = 403;
