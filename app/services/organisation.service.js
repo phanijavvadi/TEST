@@ -25,7 +25,7 @@ export function findAll({limit = 50, offset = 0, ...otherOptions} = {}, options 
       include: [
         {
           model: models.SubscriptionType,
-          as:'subscriptionType'
+          as: 'subscriptionType'
         }
       ]
     }],
@@ -97,9 +97,7 @@ export function update(organisation, {transaction = null, ...otheroptions}) {
       if (p) {
         return p.update(organisation, {transaction});
       } else {
-        return new Promise((resolve, reject) => {
-          reject({message: errorMessages.INVALID_ORG_ID, code: 'INVALID_ORG_ID'})
-        });
+        throw new Error('INVALID_ORG_ID');
       }
     });
 };

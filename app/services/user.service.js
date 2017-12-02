@@ -57,7 +57,7 @@ export function getOrgUserList({limit = 50, offset = 0, ...otherOptions} = {}, o
  * Find a user by user id
  * @param userId
  **/
-export function findById(id, options = {}) {
+export function findById(id, options = {userRoles:{}}) {
   return User.findOne({
     attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt']},
     include: [{

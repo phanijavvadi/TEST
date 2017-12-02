@@ -113,7 +113,7 @@ const validators = {
         let message, status;
         if (err && constants.errorCodes[err.message]) {
           status = 403;
-          message = constants.errorCodes[err.message];
+          message = errorMessages[err.message];
         } else {
           status = 500;
           message = errorMessages.SERVER_ERROR;
@@ -173,40 +173,19 @@ const validators = {
   orgActivateReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      id: Joi.string().required()
+      orgId: Joi.string().required()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      // check atleast one active AHPRARegNo User exists
-      const {id} = req.body;
-      let whereOptions = {orgId: id};
-      userRoleService.findActivePractitioner({where: whereOptions})
-        .then((data) => {
-          if (data) {
-            next();
-            return null;
-          } else {
-            resp.status(403).send({
-              success: false,
-              message: errorMessages.ATLEAST_ONE_ACTIVE_PRACTITIONER_REQUIRED_TO_ACTIVATE_ORG
-            });
-          }
-        })
-        .catch((err) => {
-          let message = err.message || errorMessages.SERVER_ERROR;
-          logger.info(err);
-          resp.status(500).send({
-            message
-          });
-        });
+      next();
     }
   },
   orgInActivateReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      id: Joi.string().required()
+      orgId: Joi.string().required()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {

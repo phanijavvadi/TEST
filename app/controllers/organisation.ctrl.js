@@ -1,10 +1,7 @@
 'use strict';
 import * as _ from 'lodash';
+import moment from 'moment';
 import models from '../models';
-
-const sequelize = models.sequelize;
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 import logger from '../util/logger';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
@@ -14,11 +11,17 @@ import userAccessValidator from '../validators/user.access.validator';
 
 import * as userService from '../services/user.service';
 import * as userRoleService from '../services/user.role.service';
+import * as orgSubscriptionService from '../services/org.subscription.service';
 import * as userVerificationService from '../services/user.verification.service';
 import constants from "../../config/constants";
 import * as mailNotificationUtil from "../util/mail.notification.util";
 import * as adminMailTemplate from "../templates/admin.mail.template";
 import * as config from '../../config/config';
+
+const sequelize = models.sequelize;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 
 const operations = {
   list: (req, resp) => {
@@ -203,10 +206,10 @@ const operations = {
       userTypeId: organisation.contPerTypeId,
     }
     const userData = {
-      firstName: organisation.firstName,
-      lastName: organisation.lastName,
+      firstName: organisation.contPerFname,
+      lastName: organisation.contPerLname,
       email: organisation.contPerEmail,
-      phoneNo: organisation.phoneNo,
+      phoneNo: organisation.contPerPhoneNo,
       userCategoryId: contPerUserType.userCategory.id
     }
 
@@ -233,6 +236,7 @@ const operations = {
           .then((user) => {
             createdUser = user;
             userRole.userId = user.get('id');
+            userRole.orgId = createdOrg.get('id');
             return userRoleService.create(userRole, {transaction: t});
           })
           .then((userRole) => {
@@ -328,28 +332,61 @@ const operations = {
   },
   activate: (req, resp) => {
     const data = {
-      id: req.body.id,
+      orgId: req.body.orgId,
       status: 1
     }
-    logger.info('About to activate organisation ', data);
-    return orgService
-      .update(data, {})
+    // check at least one active AHPRARegNo User exists and should have valid subscription
+    return userRoleService
+      .findActivePractitioner({
+        where: {
+          orgId: data.orgId
+        }
+      })
+      .then((userRole) => {
+        if (!userRole) {
+          throw new Error('ATLEAST_ONE_ACTIVE_PRACTITIONER_REQUIRED_TO_ACTIVATE_ORG');
+        }
+        logger.info('About to validate organisation has valid subscription', data);
+        return orgSubscriptionService.findById(data.orgId, {
+          where: {
+            validUpTo: {
+              $gte: moment()
+            },
+            status: 1
+          }
+        });
+      })
+      .then((subscription) => {
+        if (!subscription) {
+          throw new Error('ORG_NOT_HAS_VALID_SUBSCRIPTION');
+        }
+        logger.info('About to activate organisation', data);
+        return orgService.update(data, {});
+      })
       .then((res) => {
         resp.json({
           success: true,
           message: successMessages.ORG_UPDATED
         });
-      }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+      })
+      .catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
   },
   inActivate: (req, resp) => {
     const data = {
-      id: req.body.id,
+      orgId: req.body.id,
       status: 2
     }
     logger.info('About to in activate organisation ', data);
@@ -361,9 +398,16 @@ const operations = {
           message: successMessages.ORG_UPDATED
         });
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
           message
         });
       });
