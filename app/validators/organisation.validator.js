@@ -199,7 +199,7 @@ const validators = {
 
     const {authenticatedUser} = req.locals;
 
-    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
@@ -208,12 +208,9 @@ const validators = {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
     }
-
-
     orgService.findById(orgId)
       .then((data) => {
         if (data) {
-          req.locals = req.locals || {};
           req.locals.organization = data.get({plain: true});
           next();
           return null;
@@ -233,11 +230,11 @@ const validators = {
     const {orgId} = req.body;
 
     const {authenticatedUser} = req.locals;
-    if (authenticatedUser.userCategory.value === 'CM_USER') {
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.CM_USER) {
       next();
       return null;
     }
-    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });

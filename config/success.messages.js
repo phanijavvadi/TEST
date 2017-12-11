@@ -27,7 +27,13 @@ const successMessage = {
   // Org Subscription
   ORG_SUBSCRIPTION_CREATEED:'Subscription created successfully',
   ORG_SUBSCRIPTION_UPDATED:'Subscription updated successfully',
-  ORG_UN_SUBSCRIBED_SUCCESS:'Un Subscribed successfully'
+  ORG_UN_SUBSCRIBED_SUCCESS:'Un Subscribed successfully',
+
+  //Patient services
+
+  PATIENT_CREATED_SUCCESS:'Created Successfully',
+  PATIENT_IMPORTED_SUCCESS:'Created Successfully',
+  PATIENT_UPDATED_SUCCESS:'Updated Successfully',
 
 };
 export default successMessage;

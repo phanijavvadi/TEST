@@ -59,6 +59,10 @@ const errorMessages = {
   INVALID_ORG_SUBSCRIPTION_ID:'Invalid Subscription id',
   ORG_SUBSCRIPTION_ALREADY_EXIST_PLEASE_UNSUBSCRIBE:'Subscription already exists. Please un subscribe existing one to upgrade new one ',
 
+  //Patients service
+  INVALID_PATIENT_ID:'Invalid patient id',
+  PATIENT_INTERNAL_ID_EXIST:'Duplicate patient internal id',
+
 
 };
 export default errorMessages;

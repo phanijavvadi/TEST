@@ -1,15 +1,16 @@
 'use strict';
 import _ from 'lodash';
 import errorMessages from '../../config/error.messages';
+import constants from '../../config/constants';
 
 const validators = {
   isUserHasOrgAccess: (locals,orgId) => {
     const {authenticatedUser} = locals;
     return new Promise((resolve, reject) => {
-      if (authenticatedUser.userCategory.value === 'CM_USER') {
+      if (authenticatedUser.userCategory.value === constants.userCategoryTypes.CM_USER) {
         resolve(true);
       }
-      if (authenticatedUser.userCategory.value === 'ORG_USER') {
+      if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
         let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
           return role.orgId;
         });
@@ -24,11 +25,11 @@ const validators = {
   validateUserHasOrgAccess: (req, resp, next) => {
     const {orgId} = req.body;
     const {authenticatedUser} = req.locals;
-    if (authenticatedUser.userCategory.value === 'CM_USER') {
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.CM_USER) {
       next();
       return null;
     }
-    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
