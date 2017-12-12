@@ -122,7 +122,7 @@ const validators = {
     let where = {patientNumber};
     const options = {
       where,
-      attributes: ['id', 'email', 'registered', 'status', 'patientNumber']
+      attributes: ['id', 'email', 'firstName','surName','middleName','registered', 'status', 'patientNumber','orgId']
     };
     patientService.findOne(options)
       .then((data) => {

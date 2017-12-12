@@ -23,7 +23,9 @@ const operations = {
     const {authenticatedUser} = req.locals;
     const options = {};
     options.where = {};
-
+    if (req.query.status) {
+      options.where.status = +req.query.status;
+    }
     if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
@@ -221,8 +223,20 @@ const operations = {
           .update(patientData, {transaction: t})
           .then(() => {
             t.commit();
+            const payload = {
+              id: patient.id,
+              orgId: patient.orgId,
+              context: constants.contexts.PATIENT,
+              email: patientData.email,
+              firstName: patient.firstName,
+              surName: patient.surName,
+              middleName: patient.middleName
+            };
+            const token = commonUtil.jwtSign(payload);
             return resp.json({
               success: true,
+              token: token,
+              data: payload,
               message: successMessages.PATIENT_SIGNUP_SUCCESS
             });
           })
@@ -239,7 +253,7 @@ const operations = {
             }
             resp.status(status).send({
               success: false,
-              message
+              message,
             });
           });
       });
