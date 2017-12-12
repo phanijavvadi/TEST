@@ -20,6 +20,7 @@ export default function (app) {
   });
   app.use('/api/admin', router);
   app.use('/api/admin/private', userJwtValidator.validateAdminJwtToken);
+  app.use('/api/patient/private', userJwtValidator.validatePatientJwtToken);
   app.use('/api/org-user/private', userJwtValidator.validateOrgUserJwtToken);
 
 }

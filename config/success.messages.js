@@ -34,6 +34,9 @@ const successMessage = {
   PATIENT_CREATED_SUCCESS:'Created Successfully',
   PATIENT_IMPORTED_SUCCESS:'Created Successfully',
   PATIENT_UPDATED_SUCCESS:'Updated Successfully',
+  PATIENT_SIGNUP_SUCCESS:'Registered Successfully',
+  PATIENT_LOGIN_SUCCESS:'Login Successfully',
+  PATIENT_INVALID_LOGIN_CREDENTIALS:'Login Successfully',
 
 };
 export default successMessage;

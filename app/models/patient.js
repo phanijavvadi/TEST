@@ -38,6 +38,12 @@ export default function (sequelize, DataTypes) {
       unique: true
     },
     password: DataTypes.STRING,
+    registered: {
+      type:DataTypes.INTEGER,
+      defaultValue: 2,
+      allowNull: false,
+      comment: "1=>Registered,2=>Not registered"
+    },
     status: {
       type: DataTypes.INTEGER,
       defaultValue: 2,
@@ -82,7 +88,7 @@ export default function (sequelize, DataTypes) {
       },
       as: 'patientImportData'
     });
-    Patient.hasOne(models.PatientMedicalHistory, {
+    Patient.hasMany(models.PatientMedicalHistory, {
       foreignKey: {
         name: 'patientId',
         allowNull: false

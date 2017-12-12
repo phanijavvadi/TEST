@@ -2,7 +2,7 @@
 import commonUtil from "../util/common.util";
 
 export default function (sequelize, DataTypes) {
-  const PatientHealthInsurance = sequelize.define("Patient", {
+  const PatientHealthInsurance = sequelize.define("PatientHealthInsurance", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,

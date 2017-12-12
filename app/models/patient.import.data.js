@@ -1,7 +1,7 @@
 "use strict";
 
 export default function (sequelize, DataTypes) {
-  const PatientImportData = sequelize.define("Patient", {
+  const PatientImportData = sequelize.define("PatientImportData", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,

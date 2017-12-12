@@ -2,6 +2,7 @@
 
 const errorMessages = {
   SERVER_ERROR: "Oops..Server error!!! Please conctact the system admin",
+  UNIQUE_CONSTRAINT_ERROR: "Fields unique key validation error",
   NOT_FOUND: "The submitted request can not be understood",
   UNPARSABLE_REQUEST: "Can not parse the request. Please try again with correct format",
   TOKEN_IS_REQUIRED: 'No token provided',
@@ -62,6 +63,10 @@ const errorMessages = {
   //Patients service
   INVALID_PATIENT_ID:'Invalid patient id',
   PATIENT_INTERNAL_ID_EXIST:'Duplicate patient internal id',
+  PATIENT_EMAIL_EXISTS:'Email already registered',
+  INVALID_PATIENT_NUMBER:'Invalid patient number',
+  ALREADY_REGISTERED_WITH_PATIENT_NUMBER:'Already registered with patient number',
+  PATIENT_INVALID_LOGIN_CREDENTIALS:'Invalid email/password',
 
 
 };

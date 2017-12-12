@@ -1,6 +1,9 @@
 'use strict';
 
 export default  {
+  contexts:{
+    PATIENT:'PATIENT'
+  },
   userCategoryTypes: {
     CM_USER: 'CM_USER',
     ORG_USER: 'ORG_USER',

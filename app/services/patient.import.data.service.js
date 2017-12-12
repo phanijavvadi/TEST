@@ -26,3 +26,10 @@ export function findOne(options = {includeAll: false}) {
 export function create(patient, {transaction = null, ...options} = {}) {
   return PatientImportData.create(patient, {transaction});
 };
+
+/**
+ * Create a new patients import data
+ **/
+export function bulkCreate(patients, {transaction = null, ...options} = {}) {
+  return PatientImportData.bulkCreate(patients, {transaction});
+};

@@ -53,7 +53,8 @@ const operations = {
           id: userResult.id,
           email: userResult.email,
           firstName: userResult.firstName,
-          lastName: userResult.lastName
+          lastName: userResult.lastName,
+          context:req.headers['context']
         }
         if (userResult.userCategory.value === constants.userCategoryTypes.ORG_USER) {
 

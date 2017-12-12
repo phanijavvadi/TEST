@@ -12,11 +12,10 @@ const Patient = models.Patient;
 export function getOrgPatientList({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return Patient.findAndCountAll({
     attributes: {
-      exclude: ['createdBy', 'deletedAt', 'password'],
+      exclude: ['createdBy', 'deletedAt', 'password','registered'],
     },
     limit: Number(limit),
     offset: Number(offset),
-    distinct: true,
     where: {
       ...(options.where || {})
     }
@@ -30,7 +29,7 @@ export function getOrgPatientList({limit = 50, offset = 0, ...otherOptions} = {}
  **/
 export function findById(id, options = {includeAll: false}) {
   return Patient.findById(id, {
-    attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt']},
+    attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt','registered']},
     include: options.includeAll ? [{all: true}] : [],
     where: {
       ...(options.where || {})
@@ -60,23 +59,23 @@ export function findOne(options = {includeAll: false}) {
 export function create(patient, {transaction = null, ...options} = {}) {
   return Patient.create(patient, {transaction});
 };
+/**
+ * Create a new patients
+ **/
+export function bulkCreate(patients, {transaction = null, ...options} = {}) {
+  return Patient.bulkCreate(patients, {transaction});
+};
 
 /**
  * Update a patient
  * @param patient object literal containing info about a patient
  **/
 export function update(patient, {transaction = null, ...options} = {}) {
-  return Patient.findById(patient.id, {
-    attributes: {
-      exclude: ['password'],
-    }
-  }).then((p) => {
+  return Patient.findById(patient.id).then((p) => {
     if (p) {
       return p.update(patient, {transaction});
     } else {
-      return new Promise((resolve, reject) => {
-        reject({message: errorMessages.INVALID_PATIENT_ID, code: 'INVALID_PATIENT_ID'})
-      })
+      throw new Error('INVALID_PATIENT_ID');
     }
   });
 };
