@@ -103,6 +103,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'familyHistory'
     });
+    Patient.hasMany(models.PatientMedication, {
+      foreignKey: {
+        name: 'patientId',
+        allowNull: false
+      },
+      as: 'medications'
+    });
   }
 
   Patient.beforeCreate((user, options) => {

@@ -7,10 +7,10 @@ const PatientMedicalHistory = models.PatientMedicalHistory;
  * Find all patientMedicalHistory in the db
  *
  **/
-export function getOrgPatientMedicalHistoryList({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
+export function getMedicalHistoryList({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return PatientMedicalHistory.findAndCountAll({
     attributes: {
-      exclude: ['createdBy', 'deletedAt', 'password','registered'],
+      exclude: ['createdAt', 'updatedAt','deletedAt', 'importedDataId','orgId'],
     },
     limit: Number(limit),
     offset: Number(offset),
@@ -27,7 +27,7 @@ export function getOrgPatientMedicalHistoryList({limit = 50, offset = 0, ...othe
 export function getPatientMedicalHistory(options = {}) {
   return PatientMedicalHistory.findAndCountAll({
     attributes:options.attributes ||  {
-      exclude: ['createdBy', 'deletedAt', 'password','registered'],
+      exclude: ['createdAt', 'updatedAt','deletedAt', 'importedDataId','orgId'],
     },
     where: {
       ...(options.where || {})

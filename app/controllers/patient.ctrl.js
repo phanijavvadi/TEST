@@ -15,6 +15,8 @@ import * as commonUtil from '../util/common.util';
 
 import * as patientService from '../services/patient.service';
 import * as patientMedicalHistoryService from '../services/patient.medical.history.service';
+import * as patientFamilyHistoryService from '../services/patient.family.history.service';
+import * as patientMedicationsService from '../services/patient.medications.service';
 import * as importDataService from '../services/import.data.service';
 
 const operations = {
@@ -91,13 +93,136 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
-    return patientService.findById(id)
+    return patientService.findById(id,options)
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
             return ['deletedAt', 'updatedAt', 'createdAt'].indexOf(key) === -1;
           });
           resp.status(200).json(resultObj);
+        } else {
+          resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
+        }
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  getMedicalHistory: (req, resp) => {
+    const id = req.params.id;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    logger.info('About to get patient medical history ', id);
+    const options = {where: {
+      patientId:id
+    }};
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      options.where['orgId'] = tokenDecoded.orgId;
+    } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.where['orgId'] = userOrgIds;
+    }
+    return patientMedicalHistoryService.getMedicalHistoryList(req.query,options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        } else {
+          resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
+        }
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  getFamilyHistoryList: (req, resp) => {
+    const id = req.params.id;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    logger.info('About to get patient medical history ', id);
+    const options = {where: {
+      patientId:id
+    }};
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      options.where['orgId'] = tokenDecoded.orgId;
+    } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.where['orgId'] = userOrgIds;
+    }
+    return patientFamilyHistoryService.getFamilyHistoryList(req.query,options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        } else {
+          resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
+        }
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  getMedicationList: (req, resp) => {
+    const id = req.params.id;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    logger.info('About to get patient medical history ', id);
+    const options = {where: {
+      patientId:id
+    }};
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      options.where['orgId'] = tokenDecoded.orgId;
+    } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.where['orgId'] = userOrgIds;
+    }
+    return patientMedicationsService.getMedicationList(req.query,options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
         } else {
           resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
         }
@@ -244,11 +369,11 @@ const operations = {
       .then((t) => {
         transactionRef = t;
         return importDataService.create({
-          importedData:body,
-          orgApiKeyId:privateKeyDetails.id
+          importedData: body,
+          orgApiKeyId: privateKeyDetails.id
         }, {transaction: transactionRef});
       }).then((importedObj) => {
-        body.patients.forEach((patient) => {
+        body.data.forEach((patient) => {
           let patientNumber = Math.random().toString(36).slice(-10);
           let patientData = {
             patientInternalId: patient.INTERNALID,
@@ -267,7 +392,7 @@ const operations = {
             phoneNo: patient.HOMEPHONE,
             mobileNo: patient.MOBILEPHONE,
             orgId: privateKeyDetails.orgId,
-            importedDataId:importedObj.get('id')
+            importedDataId: importedObj.get('id')
           };
           if (patient.DOB) {
             patientData.dob = moment(patient.DOB, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
@@ -320,17 +445,17 @@ const operations = {
     let transactionRef;
     const {privateKeyDetails} = req.locals;
     let importData = [];
-    let patientInternalIds=[];
+    let patientInternalIds = [];
     return sequelize.transaction()
       .then((t) => {
         transactionRef = t;
         return importDataService.create({
-          importedData:body,
-          orgApiKeyId:privateKeyDetails.id
+          importedData: body,
+          orgApiKeyId: privateKeyDetails.id
         }, {transaction: transactionRef});
       }).then((importedObj) => {
-        const importedDataId=importedObj.get('id');
-        body.medicalHistory.forEach((medicalHistory) => {
+        const importedDataId = importedObj.get('id');
+        body.data.forEach((medicalHistory) => {
           let data = {
             patientInternalId: medicalHistory.InternalID,
             day: medicalHistory.Day,
@@ -350,7 +475,8 @@ const operations = {
             spiral: medicalHistory.Spiral,
             greenStick: medicalHistory.Greenstick,
             details: medicalHistory.Details,
-            importedDataId:importedDataId
+            importedDataId: importedDataId,
+            orgId: privateKeyDetails.orgId,
           };
           _.each(data, (v, k) => {
             v = _.trim(v);
@@ -364,32 +490,232 @@ const operations = {
           importData.push(data);
         });
 
-        patientInternalIds=_.uniq(patientInternalIds);
+        patientInternalIds = _.uniq(patientInternalIds);
         return patientService.getPatients({
-          attributes:['id','patientInternalId','orgId'],
-          where:{
-            orgId:privateKeyDetails.orgId,
-            patientInternalId:patientInternalIds
+          attributes: ['id', 'patientInternalId', 'orgId'],
+          where: {
+            orgId: privateKeyDetails.orgId,
+            patientInternalId: patientInternalIds
           }
         });
       })
-      .then(patientsObj=>{
-        let patientIdAndInternalIdKeyValueObj={};
-        patientsObj.map(a=>{
-          patientIdAndInternalIdKeyValueObj[a.patientInternalId]=a.id;
+      .then(patientsObj => {
+        let patientIdAndInternalIdKeyValueObj = {};
+        patientsObj.map(a => {
+          patientIdAndInternalIdKeyValueObj[a.patientInternalId] = a.id;
         });
 
-        importData.map(a=>{
-          a.patientId=patientIdAndInternalIdKeyValueObj[a.patientInternalId];
+        importData.map(a => {
+          a.patientId = patientIdAndInternalIdKeyValueObj[a.patientInternalId];
           return a;
         });
-        return patientMedicalHistoryService.bulkCreate(importData,{transaction: transactionRef});
+        return patientMedicalHistoryService.bulkCreate(importData, {transaction: transactionRef});
       })
       .then(res => {
         transactionRef.commit();
         return resp.json({
           success: true,
           message: successMessages.PATIENT_MEDICAL_HISTORY_IMPORTED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else if (err && err.name === 'SequelizeUniqueConstraintError') {
+          status = 403;
+          if (err.fields.patientInternalId !== undefined) {
+            message = 'INTERNALID=' + err.fields.patientInternalId + ' .' + errorMessages.PATIENT_INTERNAL_ID_EXIST;
+          } else {
+            message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
+          }
+        } else {
+          logger.error(err);
+          status = 500;
+          message = err.message || errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  importOrgPatientFamilyHistory: (req, resp) => {
+    const body = req.body;
+    let transactionRef;
+    const {privateKeyDetails} = req.locals;
+    let importData = [];
+    let patientInternalIds = [];
+    return sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return importDataService.create({
+          importedData: body,
+          orgApiKeyId: privateKeyDetails.id
+        }, {transaction: transactionRef});
+      }).then((importedObj) => {
+        const importedDataId = importedObj.get('id');
+        body.data.forEach((familyHistory) => {
+          let data = {
+            patientInternalId: familyHistory.InternalID,
+            relationName: familyHistory.RelationName,
+            condition: familyHistory.Condition,
+            diseaseCode: familyHistory.DiseaseCode,
+            comment: familyHistory.Comment,
+            orgId: privateKeyDetails.orgId,
+            importedDataId: importedDataId
+          };
+          _.each(data, (v, k) => {
+            v = _.trim(v);
+            if (v !== '' && v !== null) {
+              data[k] = v;
+            } else {
+              delete data[k];
+            }
+          });
+          patientInternalIds.push(familyHistory.InternalID);
+          importData.push(data);
+        });
+
+        patientInternalIds = _.uniq(patientInternalIds);
+        return patientService.getPatients({
+          attributes: ['id', 'patientInternalId', 'orgId'],
+          where: {
+            orgId: privateKeyDetails.orgId,
+            patientInternalId: patientInternalIds
+          }
+        });
+      })
+      .then(patientsObj => {
+        let patientIdAndInternalIdKeyValueObj = {};
+        patientsObj.map(a => {
+          patientIdAndInternalIdKeyValueObj[a.patientInternalId] = a.id;
+        });
+
+        importData.map(a => {
+          a.patientId = patientIdAndInternalIdKeyValueObj[a.patientInternalId];
+          return a;
+        });
+        return patientFamilyHistoryService.bulkCreate(importData, {transaction: transactionRef});
+      })
+      .then(res => {
+        transactionRef.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.PATIENT_FAMILY_HISTORY_IMPORTED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else if (err && err.name === 'SequelizeUniqueConstraintError') {
+          status = 403;
+          if (err.fields.patientInternalId !== undefined) {
+            message = 'INTERNALID=' + err.fields.patientInternalId + ' .' + errorMessages.PATIENT_INTERNAL_ID_EXIST;
+          } else {
+            message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
+          }
+        } else {
+          logger.error(err);
+          status = 500;
+          message = err.message || errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  importOrgPatientMedications: (req, resp) => {
+    const body = req.body;
+    let transactionRef;
+    const {privateKeyDetails} = req.locals;
+    let importData = [];
+    let patientInternalIds = [];
+    return sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return importDataService.create({
+          importedData: body,
+          orgApiKeyId: privateKeyDetails.id
+        }, {transaction: transactionRef});
+      }).then((importedObj) => {
+        const importedDataId = importedObj.get('id');
+        body.data.forEach((medication) => {
+          let data = {
+            patientInternalId: medication.InternalID,
+            productName: medication.ProductName,
+            productDescription: medication.ProductDescription,
+            dose: medication.Dose,
+            frequency: medication.Frequency,
+            food: medication.Food,
+            otherDetail: medication.OtherDetail,
+            PRN: medication.PRN,
+            instructions: medication.Instructions,
+            route: medication.Route,
+            quantity: medication.Quantity,
+            productUnit: medication.ProductUnit,
+            repeats: medication.Repeats,
+            repeatInterval: medication.RepeatInterval,
+            SAHCNo: medication.SAHCNo,
+            userId: medication.UserID,
+            restrictionCode: medication.RestrictionCode,
+            authority: medication.Authority,
+            authorityNumber: medication.AuthorityNumber,
+            approvalNumber: medication.ApprovalNumber,
+            allowSubscription: medication.AllowSubstitution,
+            regulation24: medication.Regulation24,
+            provider: medication.Provider,
+            SCID: medication.SCID,
+            orgId: privateKeyDetails.orgId,
+            importedDataId: importedDataId
+          };
+          if (medication.ScriptDate) {
+            data.scriptDate = moment(medication.ScriptDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+          }
+          _.each(data, (v, k) => {
+            v = _.trim(v);
+            if (v !== '' && v !== null) {
+              data[k] = v;
+            } else {
+              delete data[k];
+            }
+          });
+          patientInternalIds.push(medication.InternalID);
+          importData.push(data);
+        });
+
+        patientInternalIds = _.uniq(patientInternalIds);
+        return patientService.getPatients({
+          attributes: ['id', 'patientInternalId', 'orgId'],
+          where: {
+            orgId: privateKeyDetails.orgId,
+            patientInternalId: patientInternalIds
+          }
+        });
+      })
+      .then(patientsObj => {
+        let patientIdAndInternalIdKeyValueObj = {};
+        patientsObj.map(a => {
+          patientIdAndInternalIdKeyValueObj[a.patientInternalId] = a.id;
+        });
+
+        importData.map(a => {
+          a.patientId = patientIdAndInternalIdKeyValueObj[a.patientInternalId];
+          return a;
+        });
+        return patientMedicationsService.bulkCreate(importData, {transaction: transactionRef});
+      })
+      .then(res => {
+        transactionRef.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.PATIENT_MEDICATIONS_IMPORTED_SUCCESS
         });
       })
       .catch((err) => {

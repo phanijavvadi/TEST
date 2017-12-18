@@ -9,67 +9,7 @@ const Op = Sequelize.Op;
 import * as patientService from '../services/patient.service';
 
 const validators = {
-  importPatientsReqValidator: (req, resp, next) => {
-    const body = req.body;
-    const patientSchema = Joi.object().keys({
-      INTERNALID: Joi.number().required(),
-      FIRSTNAME: Joi.any().allow('', null),
-      SURNAME: Joi.any().allow('', null),
-      MIDDLENAME: Joi.any().allow('', null),
-      DATEOFDEATH: Joi.any().allow('', null),
-      SEXCODE: Joi.any().allow('', null),
-      ADDRESS1: Joi.any().allow('', null),
-      ADDRESS2: Joi.any().allow('', null),
-      CITY: Joi.any().allow('', null),
-      POSTCODE: Joi.any().allow('', null),
-      POSTALADDRESS: Joi.any().allow('', null),
-      POSTALCITY: Joi.any().allow('', null),
-      POSTALPOSTCODE: Joi.any().allow('', null),
-      HOMEPHONE: Joi.any().allow('', null),
-      MOBILEPHONE: Joi.any().allow('', null),
-    });
-    let schema = {
-      patients: Joi.array().unique((a, b) => a.INTERNALID === b.INTERNALID).items(patientSchema).min(1).required()
-    };
-    let result = Joi.validate(body, schema, {allowUnknown: true});
-    if (result && result.error) {
-      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
-    } else {
-      next();
-    }
-  },
-  importPatientMedicalHistoryReqValidator: (req, resp, next) => {
-    const body = req.body;
-    const medicalHistorySchema = Joi.object().keys({
-      InternalID: Joi.number().required(),
-      Day: Joi.any().allow('', null),
-      Month: Joi.any().allow('', null),
-      Year: Joi.any().allow('', null),
-      Condition: Joi.any().allow('', null),
-      ConditionID: Joi.any().allow('', null),
-      Status: Joi.any().allow('', null),
-      Side: Joi.any().allow('', null),
-      Severity: Joi.any().allow('', null),
-      Acute: Joi.any().allow('', null),
-      Summary: Joi.any().allow('', null),
-      Fracture: Joi.any().allow('', null),
-      Displaced: Joi.any().allow('', null),
-      Compound: Joi.any().allow('', null),
-      Comminuted: Joi.any().allow('', null),
-      Spiral: Joi.any().allow('', null),
-      Greenstick: Joi.any().allow('', null),
-      Details: Joi.any().allow('', null),
-  });
-    let schema = {
-      medicalHistory: Joi.array().items(medicalHistorySchema).min(1).required()
-    };
-    let result = Joi.validate(body, schema, {allowUnknown: true});
-    if (result && result.error) {
-      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
-    } else {
-      next();
-    }
-  },
+
   sendInvitationMessageValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
@@ -184,6 +124,124 @@ const validators = {
           message
         });
       });
-  }
+  },
+  importPatientsReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const patientSchema = Joi.object().keys({
+      INTERNALID: Joi.number().required(),
+      FIRSTNAME: Joi.any().allow('', null),
+      SURNAME: Joi.any().allow('', null),
+      MIDDLENAME: Joi.any().allow('', null),
+      DATEOFDEATH: Joi.any().allow('', null),
+      SEXCODE: Joi.any().allow('', null),
+      ADDRESS1: Joi.any().allow('', null),
+      ADDRESS2: Joi.any().allow('', null),
+      CITY: Joi.any().allow('', null),
+      POSTCODE: Joi.any().allow('', null),
+      POSTALADDRESS: Joi.any().allow('', null),
+      POSTALCITY: Joi.any().allow('', null),
+      POSTALPOSTCODE: Joi.any().allow('', null),
+      HOMEPHONE: Joi.any().allow('', null),
+      MOBILEPHONE: Joi.any().allow('', null),
+    });
+    let schema = {
+      data: Joi.array().unique((a, b) => a.INTERNALID === b.INTERNALID).items(patientSchema).min(1).required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: true});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  importPatientMedicalHistoryReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const medicalHistorySchema = Joi.object().keys({
+      InternalID: Joi.number().required(),
+      Day: Joi.any().allow('', null),
+      Month: Joi.any().allow('', null),
+      Year: Joi.any().allow('', null),
+      Condition: Joi.any().allow('', null),
+      ConditionID: Joi.any().allow('', null),
+      Status: Joi.any().allow('', null),
+      Side: Joi.any().allow('', null),
+      Severity: Joi.any().allow('', null),
+      Acute: Joi.any().allow('', null),
+      Summary: Joi.any().allow('', null),
+      Fracture: Joi.any().allow('', null),
+      Displaced: Joi.any().allow('', null),
+      Compound: Joi.any().allow('', null),
+      Comminuted: Joi.any().allow('', null),
+      Spiral: Joi.any().allow('', null),
+      Greenstick: Joi.any().allow('', null),
+      Details: Joi.any().allow('', null),
+    });
+    let schema = {
+      data: Joi.array().items(medicalHistorySchema).min(1).required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: true});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  importPatientFamilyHistoryReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const medicalHistorySchema = Joi.object().keys({
+      InternalID: Joi.number().required(),
+      RelationName: Joi.any().allow('', null),
+      Condition: Joi.any().allow('', null),
+      DiseaseCode: Joi.any().allow('', null),
+      Comment: Joi.any().allow('', null)
+    });
+    let schema = {
+      data: Joi.array().items(medicalHistorySchema).min(1).required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: true});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  importPatientMedicationReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const subSchema = Joi.object().keys({
+      InternalID: Joi.number().required(),
+      ScriptDate: Joi.any().allow('', null),
+      ProductName: Joi.any().allow('', null),
+      ProductDescription: Joi.any().allow('', null),
+      Dose: Joi.any().allow('', null),
+      Frequency: Joi.any().allow('', null),
+      Food: Joi.any().allow('', null),
+      OtherDetail: Joi.any().allow('', null),
+      PRN: Joi.any().allow('', null),
+      Instructions: Joi.any().allow('', null),
+      Route: Joi.any().allow('', null),
+      Quantity: Joi.any().allow('', null),
+      ProductUnit: Joi.any().allow('', null),
+      Repeats: Joi.any().allow('', null),
+      SAHCNo: Joi.any().allow('', null),
+      UserID: Joi.any().allow('', null),
+      RestrictionCode: Joi.any().allow('', null),
+      Authority: Joi.any().allow('', null),
+      AuthorityNumber: Joi.any().allow('', null),
+      ApprovalNumber: Joi.any().allow('', null),
+      AllowSubstitution: Joi.any().allow('', null),
+      Regulation24: Joi.any().allow('', null),
+      Provider: Joi.any().allow('', null),
+      SCID: Joi.any().allow('', null),
+    });
+    let schema = {
+      data: Joi.array().items(subSchema).min(1).required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: true});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
 }
 export default validators;

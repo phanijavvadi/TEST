@@ -34,6 +34,8 @@ const successMessage = {
   PATIENT_CREATED_SUCCESS:'Created Successfully',
   PATIENT_IMPORTED_SUCCESS:'Imported Successfully',
   PATIENT_MEDICAL_HISTORY_IMPORTED_SUCCESS:'Imported Successfully',
+  PATIENT_FAMILY_HISTORY_IMPORTED_SUCCESS:'Imported Successfully',
+  PATIENT_MEDICATIONS_IMPORTED_SUCCESS:'Imported Successfully',
   PATIENT_UPDATED_SUCCESS:'Updated Successfully',
   PATIENT_SIGNUP_SUCCESS:'Registered Successfully',
   PATIENT_LOGIN_SUCCESS:'Login Successfully',

@@ -25,6 +25,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'importedData'
     });
+    PatientHealthInsurance.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      },
+      as: 'organisation'
+    });
   }
   return PatientHealthInsurance;
 };

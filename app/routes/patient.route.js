@@ -24,12 +24,23 @@ export default function (app) {
   router.route('/:id').get([
     patientCtrl.get]);
 
+  router.route('/:id/medical-history').get([
+    patientCtrl.getMedicalHistory]);
+
+  router.route('/:id/family-history').get([
+    patientCtrl.getFamilyHistoryList]);
+
+  router.route('/:id/medications').get([
+    patientCtrl.getMedicationList]);
+
   router.route('/send-invitation-message').post([
     patientValidator.sendInvitationMessageValidator,
     userAccessValidator.validateUserHasOrgAccess,
     orgValidator.validateOrgId,
     patientCtrl.importOrgPatient
   ]);
+
+
   /**
    * Import patient details
    */
@@ -37,14 +48,22 @@ export default function (app) {
     patientValidator.importPatientsReqValidator,
     patientCtrl.importOrgPatient
   ]);
- patientImportRouter.route('/patient/medical-history').post([
+  patientImportRouter.route('/patient/medical-history').post([
     patientValidator.importPatientMedicalHistoryReqValidator,
     patientCtrl.importOrgPatientMedicalHistory
   ]);
+  patientImportRouter.route('/patient/family-history').post([
+    patientValidator.importPatientFamilyHistoryReqValidator,
+    patientCtrl.importOrgPatientFamilyHistory
+  ]);
+  patientImportRouter.route('/patient/medications').post([
+    patientValidator.importPatientMedicationReqValidator,
+    patientCtrl.importOrgPatientMedications
+  ]);
 
   /**
-  * Patient routers start
-  * */
+   * Patient routers start
+   */
   patientRouter.route('/profile/:id').get([
     patientCtrl.get]);
   patientPublicRouter.route('/sign-up').post([

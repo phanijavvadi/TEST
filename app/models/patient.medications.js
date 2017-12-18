@@ -46,6 +46,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'importedData'
     });
-  }
+    PatientMedication.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      },
+      as: 'organisation'
+    });
+  };
   return PatientMedication;
 };

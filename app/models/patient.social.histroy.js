@@ -10,9 +10,9 @@ export default function (sequelize, DataTypes) {
     },
     smokingPerDay: DataTypes.STRING,
     smokingFromDate: DataTypes.DATEONLY,
-    drinkingPerWeek:DataTypes.STRING,
-    drinkingPerDay:DataTypes.STRING,
-    drinkingFreqMoreThanSixPerDay:DataTypes.STRING,
+    drinkingPerWeek: DataTypes.STRING,
+    drinkingPerDay: DataTypes.STRING,
+    drinkingFreqMoreThanSixPerDay: DataTypes.STRING,
     description: DataTypes.TEXT
   }, {
     paranoid: true,
@@ -27,6 +27,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'importedData'
     });
-  }
+    PatientSocialHistory.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      },
+      as: 'organisation'
+    });
+  };
   return PatientSocialHistory;
 };

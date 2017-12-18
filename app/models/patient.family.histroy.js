@@ -11,20 +11,26 @@ export default function (sequelize, DataTypes) {
     relationName: DataTypes.TEXT,
     condition: DataTypes.TEXT,
     diseaseCode: DataTypes.INTEGER,
-    Comment: DataTypes.TEXT
+    comment: DataTypes.TEXT
   }, {
     paranoid: true,
     freezeTableName: true,
     tableName: 'cm_org_patient_family_history'
   });
   PatientFamilyHistory.associate = function (models) {
-
     PatientFamilyHistory.belongsTo(models.ImportedData, {
       foreignKey: {
         name: 'importedDataId',
         allowNull: true
       },
       as: 'importedData'
+    });
+    PatientFamilyHistory.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: false
+      },
+      as: 'organisation'
     });
 
   }
