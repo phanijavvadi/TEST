@@ -3,14 +3,14 @@
 import models from '../models';
 import errorMessages from '../../config/error.messages';
 
-const PatientImportData = models.PatientImportData;
+const ImportedData = models.ImportedData;
 
 /**
  * Find a patient import data by options
  **/
 export function findOne(options = {includeAll: false}) {
 
-  return PatientImportData.findOne({
+  return ImportedData.findOne({
     attributes: options.attributes || {exclude: ['deletedAt', 'updatedAt']},
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     where: {
@@ -24,12 +24,5 @@ export function findOne(options = {includeAll: false}) {
  * Create a new patient import data
  **/
 export function create(patient, {transaction = null, ...options} = {}) {
-  return PatientImportData.create(patient, {transaction});
-};
-
-/**
- * Create a new patients import data
- **/
-export function bulkCreate(patients, {transaction = null, ...options} = {}) {
-  return PatientImportData.bulkCreate(patients, {transaction});
+  return ImportedData.create(patient, {transaction});
 };

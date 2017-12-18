@@ -14,10 +14,17 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_patients_health_insurance'
+    tableName: 'cm_org_patient_health_insurance'
   });
   PatientHealthInsurance.associate = function (models) {
 
+    PatientHealthInsurance.belongsTo(models.ImportedData, {
+      foreignKey: {
+        name: 'importedDataId',
+        allowNull: true
+      },
+      as: 'importedData'
+    });
   }
   return PatientHealthInsurance;
 };

@@ -22,6 +22,21 @@ export function getOrgPatientList({limit = 50, offset = 0, ...otherOptions} = {}
   })
     ;
 };
+/**
+ * get patients
+ *
+ **/
+export function getPatients(options = {}) {
+  return Patient.findAll({
+    attributes:options.attributes ||  {
+      exclude: ['createdBy', 'deletedAt', 'password','registered'],
+    },
+    where: {
+      ...(options.where || {})
+    }
+  })
+    ;
+};
 
 /**
  * Find a patient by patient id

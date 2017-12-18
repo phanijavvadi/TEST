@@ -55,7 +55,7 @@ const operations = {
           firstName: userResult.firstName,
           lastName: userResult.lastName,
           context:req.headers['context']
-        }
+        };
         if (userResult.userCategory.value === constants.userCategoryTypes.ORG_USER) {
 
           logger.info('About to validate organisation has valid subscription');

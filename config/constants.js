@@ -2,7 +2,7 @@
 
 export default  {
   contexts:{
-    PATIENT:'PATIENT'
+    PATIENT:'PATIENT',
   },
   userCategoryTypes: {
     CM_USER: 'CM_USER',

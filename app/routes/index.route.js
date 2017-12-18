@@ -7,6 +7,7 @@ import express from 'express';
 import AdminCtrl from '../controllers/admin.ctrl';
 import adminValidator from '../validators/admin.validator';
 import userJwtValidator from '../validators/user.jwt.validator';
+import orgApiKeysValidator from '../validators/org.api.keys.validator';
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ export default function (app) {
   app.use('/api/admin/private', userJwtValidator.validateAdminJwtToken);
   app.use('/api/patient/private', userJwtValidator.validatePatientJwtToken);
   app.use('/api/org-user/private', userJwtValidator.validateOrgUserJwtToken);
+  app.use('/api/import-data/private', orgApiKeysValidator.validateOrgPrivateKey);
 
 }

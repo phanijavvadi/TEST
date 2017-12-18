@@ -32,11 +32,17 @@ const successMessage = {
   //Patient services
 
   PATIENT_CREATED_SUCCESS:'Created Successfully',
-  PATIENT_IMPORTED_SUCCESS:'Created Successfully',
+  PATIENT_IMPORTED_SUCCESS:'Imported Successfully',
+  PATIENT_MEDICAL_HISTORY_IMPORTED_SUCCESS:'Imported Successfully',
   PATIENT_UPDATED_SUCCESS:'Updated Successfully',
   PATIENT_SIGNUP_SUCCESS:'Registered Successfully',
   PATIENT_LOGIN_SUCCESS:'Login Successfully',
   PATIENT_INVALID_LOGIN_CREDENTIALS:'Login Successfully',
+
+  // API keys services
+
+  ORG_API_KEY_CREATED:'Created successfully',
+  ORG_API_KEY_DELETED:'Deleted successfully',
 
 };
 export default successMessage;

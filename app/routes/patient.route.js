@@ -14,6 +14,7 @@ const publicRouter = express.Router();
 const adminRoutes = express.Router();
 const patientRouter = express.Router();
 const patientPublicRouter = express.Router();
+const patientImportRouter = express.Router();
 
 export default function (app) {
 
@@ -23,18 +24,24 @@ export default function (app) {
   router.route('/:id').get([
     patientCtrl.get]);
 
-  router.route('/import').post([
-    patientValidator.importReqValidator,
-    userAccessValidator.validateUserHasOrgAccess,
-    orgValidator.validateOrgId,
-    patientCtrl.importOrgPatient
-  ]);
   router.route('/send-invitation-message').post([
     patientValidator.sendInvitationMessageValidator,
     userAccessValidator.validateUserHasOrgAccess,
     orgValidator.validateOrgId,
     patientCtrl.importOrgPatient
   ]);
+  /**
+   * Import patient details
+   */
+  patientImportRouter.route('/patients').post([
+    patientValidator.importPatientsReqValidator,
+    patientCtrl.importOrgPatient
+  ]);
+ patientImportRouter.route('/patient/medical-history').post([
+    patientValidator.importPatientMedicalHistoryReqValidator,
+    patientCtrl.importOrgPatientMedicalHistory
+  ]);
+
   /**
   * Patient routers start
   * */
@@ -57,4 +64,5 @@ export default function (app) {
 
   app.use('/api/org-user/patient', publicRouter);
   app.use('/api/org-user/private/patient', router);
+  app.use('/api/import-data/private', patientImportRouter);
 }

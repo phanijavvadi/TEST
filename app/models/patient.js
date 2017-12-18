@@ -16,7 +16,7 @@ export default function (sequelize, DataTypes) {
       unique: true
     },
     patientInternalId: {
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER
     },
     dob: {type: DataTypes.DATEONLY},
     gender: {
@@ -67,6 +67,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'organisation'
     });
+    Patient.belongsTo(models.ImportedData, {
+      foreignKey: {
+        name: 'importedDataId',
+        allowNull: true
+      },
+      as: 'importedData'
+    });
     Patient.hasOne(models.PatientHealthInsurance, {
       foreignKey: {
         name: 'patientId',
@@ -81,19 +88,20 @@ export default function (sequelize, DataTypes) {
       },
       as: 'socialHistory'
     });
-    Patient.hasOne(models.PatientImportData, {
-      foreignKey: {
-        name: 'patientId',
-        allowNull: false
-      },
-      as: 'patientImportData'
-    });
+
     Patient.hasMany(models.PatientMedicalHistory, {
       foreignKey: {
         name: 'patientId',
         allowNull: false
       },
       as: 'medicalHistory'
+    });
+    Patient.hasMany(models.PatientFamilyHistory, {
+      foreignKey: {
+        name: 'patientId',
+        allowNull: false
+      },
+      as: 'familyHistory'
     });
   }
 

@@ -14,8 +14,8 @@ import constants from '../../config/constants';
 import * as commonUtil from '../util/common.util';
 
 import * as patientService from '../services/patient.service';
-import * as patientImportDataService from '../services/patient.import.data.service';
-import patient from "../models/patient";
+import * as patientMedicalHistoryService from '../services/patient.medical.history.service';
+import * as importDataService from '../services/import.data.service';
 
 const operations = {
   getOrgPatientList: (req, resp) => {
@@ -110,93 +110,6 @@ const operations = {
           logger.error(err);
           status = 500;
           message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
-      });
-  },
-  importOrgPatient: (req, resp) => {
-    const body = req.body;
-    let transactionRef, createdPatients;
-
-    const {organization} = req.locals;
-    let patientsData = [];
-    body.patients.forEach((patient) => {
-      let patientNumber = Math.random().toString(36).slice(-10);
-      let patientData = {
-        patientInternalId: patient.INTERNALID,
-        firstName: patient.FIRSTNAME,
-        surName: patient.SURNAME,
-        middleName: patient.MIDDLENAME,
-        patientNumber: patientNumber,
-        gender: patient.SEXCODE,
-        address1: patient.ADDRESS1,
-        address2: patient.ADDRESS2,
-        city: patient.CITY,
-        postcode: patient.POSTCODE,
-        postalAddress: patient.POSTALADDRESS,
-        postalCity: patient.POSTALCITY,
-        postalPostcode: patient.POSTALPOSTCODE,
-        phoneNo: patient.HOMEPHONE,
-        mobileNo: patient.MOBILEPHONE,
-        orgId: organization.id
-      };
-      if (patient.DOB) {
-        patientData.dob = moment(patient.DOB, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
-      }
-      _.each(patientData, (v, k) => {
-        v = _.trim(v);
-        if (v !== '' && v !== null) {
-          patientData[k] = v;
-        } else {
-          delete patientData[k];
-        }
-      });
-      patientsData.push(patientData);
-    });
-
-
-    return sequelize.transaction()
-      .then((t) => {
-        transactionRef = t;
-        return patientService.bulkCreate(patientsData, {transaction: transactionRef});
-      }).then((patients) => {
-        createdPatients = patients;
-        let patientsImportData = [];
-        body.patients.forEach((patient, i) => {
-          patientsImportData.push({
-            patientId: patients[i].get('id'),
-            importedData: patient
-          })
-        });
-        return patientImportDataService.bulkCreate(patientsImportData, {transaction: transactionRef});
-      })
-      .then(res => {
-        transactionRef.commit();
-        return resp.json({
-          success: true,
-          message: successMessages.PATIENT_IMPORTED_SUCCESS
-        });
-      })
-      .catch((err) => {
-        transactionRef.rollback();
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else if (err && err.name === 'SequelizeUniqueConstraintError') {
-          status = 403;
-          if (err.fields.patientInternalId !== undefined) {
-            message = 'INTERNALID=' + err.fields.patientInternalId + ' .' + errorMessages.PATIENT_INTERNAL_ID_EXIST;
-          } else {
-            message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
-          }
-        } else {
-          logger.error(err);
-          status = 500;
-          message = err.message || errorMessages.SERVER_ERROR;
         }
         resp.status(status).send({
           success: false,
@@ -321,7 +234,188 @@ const operations = {
           code
         });
       });
-  }
+  },
+  importOrgPatient: (req, resp) => {
+    const body = req.body;
+    let transactionRef, createdPatients;
+    const {privateKeyDetails} = req.locals;
+    let patientsData = [];
+    return sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return importDataService.create({
+          importedData:body,
+          orgApiKeyId:privateKeyDetails.id
+        }, {transaction: transactionRef});
+      }).then((importedObj) => {
+        body.patients.forEach((patient) => {
+          let patientNumber = Math.random().toString(36).slice(-10);
+          let patientData = {
+            patientInternalId: patient.INTERNALID,
+            firstName: patient.FIRSTNAME,
+            surName: patient.SURNAME,
+            middleName: patient.MIDDLENAME,
+            patientNumber: patientNumber,
+            gender: patient.SEXCODE,
+            address1: patient.ADDRESS1,
+            address2: patient.ADDRESS2,
+            city: patient.CITY,
+            postcode: patient.POSTCODE,
+            postalAddress: patient.POSTALADDRESS,
+            postalCity: patient.POSTALCITY,
+            postalPostcode: patient.POSTALPOSTCODE,
+            phoneNo: patient.HOMEPHONE,
+            mobileNo: patient.MOBILEPHONE,
+            orgId: privateKeyDetails.orgId,
+            importedDataId:importedObj.get('id')
+          };
+          if (patient.DOB) {
+            patientData.dob = moment(patient.DOB, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
+          }
+          _.each(patientData, (v, k) => {
+            v = _.trim(v);
+            if (v !== '' && v !== null) {
+              patientData[k] = v;
+            } else {
+              delete patientData[k];
+            }
+          });
+          patientsData.push(patientData);
+        });
+        return patientService.bulkCreate(patientsData, {transaction: transactionRef});
+      })
+      .then(res => {
+        transactionRef.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.PATIENT_IMPORTED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else if (err && err.name === 'SequelizeUniqueConstraintError') {
+          status = 403;
+          if (err.fields.patientInternalId !== undefined) {
+            message = 'INTERNALID=' + err.fields.patientInternalId + ' .' + errorMessages.PATIENT_INTERNAL_ID_EXIST;
+          } else {
+            message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
+          }
+        } else {
+          logger.error(err);
+          status = 500;
+          message = err.message || errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  importOrgPatientMedicalHistory: (req, resp) => {
+    const body = req.body;
+    let transactionRef;
+    const {privateKeyDetails} = req.locals;
+    let importData = [];
+    let patientInternalIds=[];
+    return sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return importDataService.create({
+          importedData:body,
+          orgApiKeyId:privateKeyDetails.id
+        }, {transaction: transactionRef});
+      }).then((importedObj) => {
+        const importedDataId=importedObj.get('id');
+        body.medicalHistory.forEach((medicalHistory) => {
+          let data = {
+            patientInternalId: medicalHistory.InternalID,
+            day: medicalHistory.Day,
+            month: medicalHistory.Month,
+            year: medicalHistory.Year,
+            condition: medicalHistory.Condition,
+            conditionId: medicalHistory.ConditionID,
+            status: medicalHistory.Status,
+            side: medicalHistory.Side,
+            severity: medicalHistory.Severity,
+            acute: medicalHistory.Acute,
+            summary: medicalHistory.Summary,
+            fracture: medicalHistory.Fracture,
+            displaced: medicalHistory.Displaced,
+            compound: medicalHistory.Compound,
+            comminuted: medicalHistory.Comminuted,
+            spiral: medicalHistory.Spiral,
+            greenStick: medicalHistory.Greenstick,
+            details: medicalHistory.Details,
+            importedDataId:importedDataId
+          };
+          _.each(data, (v, k) => {
+            v = _.trim(v);
+            if (v !== '' && v !== null) {
+              data[k] = v;
+            } else {
+              delete data[k];
+            }
+          });
+          patientInternalIds.push(medicalHistory.InternalID);
+          importData.push(data);
+        });
+
+        patientInternalIds=_.uniq(patientInternalIds);
+        return patientService.getPatients({
+          attributes:['id','patientInternalId','orgId'],
+          where:{
+            orgId:privateKeyDetails.orgId,
+            patientInternalId:patientInternalIds
+          }
+        });
+      })
+      .then(patientsObj=>{
+        let patientIdAndInternalIdKeyValueObj={};
+        patientsObj.map(a=>{
+          patientIdAndInternalIdKeyValueObj[a.patientInternalId]=a.id;
+        });
+
+        importData.map(a=>{
+          a.patientId=patientIdAndInternalIdKeyValueObj[a.patientInternalId];
+          return a;
+        });
+        return patientMedicalHistoryService.bulkCreate(importData,{transaction: transactionRef});
+      })
+      .then(res => {
+        transactionRef.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.PATIENT_MEDICAL_HISTORY_IMPORTED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else if (err && err.name === 'SequelizeUniqueConstraintError') {
+          status = 403;
+          if (err.fields.patientInternalId !== undefined) {
+            message = 'INTERNALID=' + err.fields.patientInternalId + ' .' + errorMessages.PATIENT_INTERNAL_ID_EXIST;
+          } else {
+            message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
+          }
+        } else {
+          logger.error(err);
+          status = 500;
+          message = err.message || errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
 }
 
 export default operations;

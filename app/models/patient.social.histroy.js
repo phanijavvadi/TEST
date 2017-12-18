@@ -20,7 +20,13 @@ export default function (sequelize, DataTypes) {
     tableName: 'cm_org_patients_social_history'
   });
   PatientSocialHistory.associate = function (models) {
-
+    PatientSocialHistory.belongsTo(models.ImportedData, {
+      foreignKey: {
+        name: 'importedDataId',
+        allowNull: true
+      },
+      as: 'importedData'
+    });
   }
   return PatientSocialHistory;
 };

@@ -68,6 +68,11 @@ const errorMessages = {
   ALREADY_REGISTERED_WITH_PATIENT_NUMBER:'Already registered with patient number',
   PATIENT_INVALID_LOGIN_CREDENTIALS:'Invalid email/password',
 
+  // Org API KEYS Service
+
+  INVALID_ORG_API_KEY:'Invalid api key',
+  INVALID_ORG_API_KEY_ID:'Api key not found',
+
 
 };
 export default errorMessages;
