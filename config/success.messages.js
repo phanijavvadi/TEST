@@ -40,6 +40,7 @@ const successMessage = {
   PATIENT_SIGNUP_SUCCESS:'Registered Successfully',
   PATIENT_LOGIN_SUCCESS:'Login Successfully',
   PATIENT_INVALID_LOGIN_CREDENTIALS:'Login Successfully',
+  PATIENT_INVITATION_SENT_SUCCESS:'SMS sent Successfully',
 
   // API keys services
 

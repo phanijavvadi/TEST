@@ -8,16 +8,24 @@ const Op = Sequelize.Op;
 import logger from '../util/logger';
 import * as _ from 'lodash';
 import moment from 'moment';
+import twilio from 'twilio';
+
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
 import constants from '../../config/constants';
 import * as commonUtil from '../util/common.util';
+
 
 import * as patientService from '../services/patient.service';
 import * as patientMedicalHistoryService from '../services/patient.medical.history.service';
 import * as patientFamilyHistoryService from '../services/patient.family.history.service';
 import * as patientMedicationsService from '../services/patient.medications.service';
 import * as importDataService from '../services/import.data.service';
+
+const accountSid = 'ACb7b23ed8621e530844ed7d8d30e25056'; // Your Account SID from www.twilio.com/console
+const authToken = '77caa6888bc1405068280c112125940b';   // Your Auth Token from www.twilio.com/console
+
+const client = new twilio(accountSid, authToken);
 
 const operations = {
   getOrgPatientList: (req, resp) => {
@@ -93,7 +101,7 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
-    return patientService.findById(id,options)
+    return patientService.findById(id, options)
       .then((data) => {
         if (data) {
           const resultObj = _.pickBy(data.get({plain: true}), (value, key) => {
@@ -123,9 +131,11 @@ const operations = {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
-    const options = {where: {
-      patientId:id
-    }};
+    const options = {
+      where: {
+        patientId: id
+      }
+    };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
@@ -137,7 +147,7 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
-    return patientMedicalHistoryService.getMedicalHistoryList(req.query,options)
+    return patientMedicalHistoryService.getMedicalHistoryList(req.query, options)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
@@ -164,9 +174,11 @@ const operations = {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
-    const options = {where: {
-      patientId:id
-    }};
+    const options = {
+      where: {
+        patientId: id
+      }
+    };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
@@ -178,7 +190,7 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
-    return patientFamilyHistoryService.getFamilyHistoryList(req.query,options)
+    return patientFamilyHistoryService.getFamilyHistoryList(req.query, options)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
@@ -205,9 +217,11 @@ const operations = {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
-    const options = {where: {
-      patientId:id
-    }};
+    const options = {
+      where: {
+        patientId: id
+      }
+    };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
@@ -219,7 +233,7 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
-    return patientMedicationsService.getMedicationList(req.query,options)
+    return patientMedicationsService.getMedicationList(req.query, options)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
@@ -731,6 +745,48 @@ const operations = {
           } else {
             message = errorMessages.UNIQUE_CONSTRAINT_ERROR;
           }
+        } else {
+          logger.error(err);
+          status = 500;
+          message = err.message || errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
+  sendInvitationMessage: (req, resp) => {
+    const body = req.body;
+    logger.info('About to get patient ', body.id);
+    const options = {
+      where: {},
+      attributes: ['id', 'patientNumber', 'firstName', 'middleName', 'surName']
+    };
+
+    return patientService.findById(body.patientId, options)
+      .then((data) => {
+        if (!data) {
+          throw new Error('INVALID_PATIENT_ID');
+        }
+        return client.messages.create({
+          body: `Hi ${data.firstName} ${data.surName}, thanks for seeing Dr xyzz today. 
+You can access your care plan via the CareMonitor 
+app: <playstore_link> and your unique patient number is ${data.patientNumber}. 
+If you need any assistance, call us on 1300123445. Thanks, General Medical Practice.`,
+          to: body.mobileNo,
+          from: '+61417409688',
+        })
+      }).then((message) => {
+        return resp.json({
+          success: true,
+          message: successMessages.PATIENT_INVITATION_SENT_SUCCESS
+        });
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
         } else {
           logger.error(err);
           status = 500;

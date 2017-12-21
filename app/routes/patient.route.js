@@ -37,7 +37,7 @@ export default function (app) {
     patientValidator.sendInvitationMessageValidator,
     userAccessValidator.validateUserHasOrgAccess,
     orgValidator.validateOrgId,
-    patientCtrl.importOrgPatient
+    patientCtrl.sendInvitationMessage
   ]);
 
 
