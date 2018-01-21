@@ -9,8 +9,8 @@ const config = {
   SENDGRID_API_KEY:'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',
   mailNotifications:{
 	  admin:{
-	    from:"murali.uideveloper@gmail.com",
-      name:"Murali Yarra"
+	    from:"dinesh.reddy@caremonitor.com.au",
+      name:"Dinesh"
 	  }
   }
 };

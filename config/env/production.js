@@ -24,8 +24,8 @@ const config = {
 	},
   mailNotifications:{
     admin:{
-      from:"murali.uideveloper@gmail.com",
-      name:"Murali Yarra"
+      from:"dinesh.reddy@caremonitor.com.au",
+      name:"Dinesh"
     }
   }
 };
