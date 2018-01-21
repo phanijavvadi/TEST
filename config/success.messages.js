@@ -2,15 +2,17 @@
 
 const successMessage = {
 
+  CONTACT_MAIL_SENT_SUCCESS:'Mail sent successfully',
+  ///admin table service end
   // users table service start
   USER_LOGIN_SUCCESS: 'Login Successfully',
   USER_USER_CREATED_SCUCCESS: 'Admin User created successfully',
   USER_USER_UPDATED_SCUCCESS: 'Admin User updated successfully',
-  ///admin table service end
   //Organization services start
   ORG_CREATED:'Organization created successfully',
   ORG_SIGN_UP_SUCCESS:'sign up successfully',
   ORG_UPDATED:'Organization updated successfully',
+
   //Organization users
   ORG_USER_CREATED: "User created successfully",
   ORG_USER_UPDATED: "User updated successfully",

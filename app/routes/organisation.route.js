@@ -57,6 +57,9 @@ export default function (app) {
     orgValidator.validateContPerTypeId,
     orgValidator.validateRegNoRequiredOrNot,
     orgCtrl.signUp]);
+publicRouter.route('/contact').post([
+    orgValidator.contactFormValidator,
+    orgCtrl.contact]);
 
   app.use('/api/admin/private/organisation', router);
   app.use('/api/admin/private/organisation', adminRouter);

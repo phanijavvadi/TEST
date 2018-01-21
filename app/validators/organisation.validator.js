@@ -71,6 +71,22 @@ const validators = {
       next();
     }
   },
+  contactFormValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      firstName: Joi.string().min(3).required(),
+      lastName: Joi.string().required(),
+      email: Joi.string().min(3).required(),
+      phoneNo: Joi.string().allow(''),
+      message: Joi.string().allow(''),
+    };
+    let result = Joi.validate(body, schema);
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
   validateOrgLogo: (req, resp, next) => {
     const body = req.body;
     if (!body.orgLogo) {

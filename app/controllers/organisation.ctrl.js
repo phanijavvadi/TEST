@@ -25,7 +25,7 @@ const Op = Sequelize.Op;
 
 const operations = {
   list: (req, resp) => {
-    const { authenticatedUser} = req.locals;
+    const {authenticatedUser} = req.locals;
     logger.info('About to get organisation list');
 
     const options = {
@@ -75,7 +75,7 @@ const operations = {
     const options = {
       where: {}
     };
-    const { authenticatedUser} = req.locals;
+    const {authenticatedUser} = req.locals;
     if (authenticatedUser.userCategory.value === 'ORG_USER') {
       options.where.id = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
@@ -365,6 +365,23 @@ const operations = {
             });
           });
       });
+  },
+  contact: (req, resp) => {
+    const body = req.body;
+    logger.info('About to send contact us mail notification ', body);
+
+    const contentObj = adminMailTemplate.contactUs({
+      ...body
+    });
+    mailNotificationUtil.sendMail({
+      to: [{email: config.mailNotifications.admin.from, name: config.mailNotifications.admin.name}],
+      body: contentObj.body,
+      subject: contentObj.subject
+    });
+    return resp.json({
+      success: true,
+      message: successMessages.CONTACT_MAIL_SENT_SUCCESS
+    });
   },
   update: (req, resp) => {
     logger.info('About to update organisation ', organisation);
