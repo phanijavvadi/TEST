@@ -40,7 +40,7 @@ export function contactUs(data) {
   const body = `<div>
  
     
-    <p> ${data.name} reached from contact us page , Please find below details.
+    <p> ${data.firstName} reached from contact us page , Please find below details.
      </p>
     <p> Name: ${data.firstName} ${data.lastName}</p>
     <p> Phone No: ${data.phoneNo}</p>
