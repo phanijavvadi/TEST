@@ -6,11 +6,11 @@ const config = {
   ENCRYPTION_KEY:'kz64wp3uxvpoh85ayr7ql305f8hhfwve',//Must be 256 bytes (32 characters)
   jsonwebtokenSecrete:'jsonwebtokenSecrete',
   jsonwebtokenExpiresIn:24*60*60,//In seconds,
-  SENDGRID_API_KEY:'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',
+  SENDGRID_API_KEY:'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',
   mailNotifications:{
 	  admin:{
-	    from:"dinesh.reddy@caremonitor.com.au",
-      name:"Dinesh"
+	    from:"support@caremonitor.com.au",
+      name:"Caremonitor"
 	  }
   }
 };
