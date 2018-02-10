@@ -2,7 +2,6 @@
 import moment from 'moment';
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
-import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
 import constants from '../../config/constants';
 import * as userService from '../services/user.service';
@@ -12,7 +11,7 @@ import models from '../models';
 
 const operations = {
 
-  login: (req, resp) => {
+  login: (req, resp, next) => {
     const {
       userName,
       password
@@ -54,7 +53,7 @@ const operations = {
           email: userResult.email,
           firstName: userResult.firstName,
           lastName: userResult.lastName,
-          context:req.headers['context']
+          context: req.headers['context']
         };
         if (userResult.userCategory.value === constants.userCategoryTypes.ORG_USER) {
 
@@ -92,23 +91,7 @@ const operations = {
         });
       })
       .catch((err) => {
-        let message, status, code;
-        if (err && errorMessages[err.message]) {
-          code = err.message;
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          code = 'SERVER_ERROR';
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-
-        resp.status(status).send({
-          success: false,
-          message,
-          code
-        });
+        commonUtil.handleException(err, req, resp, next)
       });
   }
 }

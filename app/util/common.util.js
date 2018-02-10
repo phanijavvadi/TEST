@@ -4,7 +4,8 @@ import path from 'path';
 import crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as config from '../../config/config';
-
+import errorMessages from '../../config/error.messages';
+import logger from '../util/logger';
 const ENCRYPTION_KEY = config.ENCRYPTION_KEY; // Must be 256 bytes (32 characters)
 const IV_LENGTH = 16; // For AES, this is always 16
 
@@ -79,6 +80,25 @@ const commonUtil = {
       } else if (stat.isDirectory() && file !== excludeDir && ~newPath.indexOf(type)) {
         walk(newPath, type, excludeDir, callback);
       }
+    });
+  },
+  handleException(err, req, resp,next) {
+    let message, status, code;
+    if (err && errorMessages[err.message]) {
+      code = err.message;
+      status = 403;
+      message = errorMessages[err.message];
+    } else {
+      logger.error(err);
+      code = 'SERVER_ERROR';
+      status = 500;
+      message = err.message || errorMessages.SERVER_ERROR;
+    }
+
+    resp.status(status).send({
+      success: false,
+      message,
+      code
     });
   }
 

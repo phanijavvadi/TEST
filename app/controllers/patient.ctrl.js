@@ -28,7 +28,7 @@ const authToken = '77caa6888bc1405068280c112125940b';   // Your Auth Token from 
 const client = new twilio(accountSid, authToken);
 
 const operations = {
-  getOrgPatientList: (req, resp) => {
+  getOrgPatientList: (req, resp, next) => {
     logger.info('About to get organisation patient list');
     const {authenticatedUser} = req.locals;
     const options = {};
@@ -70,22 +70,10 @@ const operations = {
           resp.status(200).json(data);
         }
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
-  get: (req, resp) => {
+  get: (req, resp, next) => {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient ', id);
@@ -112,22 +100,10 @@ const operations = {
           resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
         }
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMedicalHistory: (req, resp) => {
+  getMedicalHistory: (req, resp, next) => {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
@@ -155,22 +131,10 @@ const operations = {
           resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
         }
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
-  getFamilyHistoryList: (req, resp) => {
+  getFamilyHistoryList: (req, resp, next) => {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
@@ -198,22 +162,10 @@ const operations = {
           resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
         }
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMedicationList: (req, resp) => {
+  getMedicationList: (req, resp, next) => {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient medical history ', id);
@@ -241,22 +193,10 @@ const operations = {
           resp.status(404).send(errorMessages.INVALID_PATIENT_ID);
         }
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
-  signUp: (req, resp) => {
+  signUp: (req, resp, next) => {
     const body = req.body;
     logger.info('About to signup patient ', body);
     const {patient} = req.locals;
@@ -294,23 +234,11 @@ const operations = {
           })
           .catch((err) => {
             t.rollback();
-            let message, status;
-            if (err && errorMessages[err.message]) {
-              status = 403;
-              message = errorMessages[err.message];
-            } else {
-              logger.error(err);
-              status = 500;
-              message = errorMessages.SERVER_ERROR;
-            }
-            resp.status(status).send({
-              success: false,
-              message,
-            });
+            commonUtil.handleException(err, req, resp, next);
           });
       });
   },
-  signIn: (req, resp) => {
+  signIn: (req, resp, next) => {
     const {
       email,
       password
@@ -355,23 +283,7 @@ const operations = {
         });
       })
       .catch((err) => {
-        let message, status, code;
-        if (err && errorMessages[err.message]) {
-          code = err.message;
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          code = 'SERVER_ERROR';
-          status = 500;
-          message = errorMessages.SERVER_ERROR;
-        }
-
-        resp.status(status).send({
-          success: false,
-          message,
-          code
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
   importOrgPatient: (req, resp) => {
@@ -756,7 +668,7 @@ const operations = {
         });
       });
   },
-  sendInvitationMessage: (req, resp) => {
+  sendInvitationMessage: (req, resp, next) => {
     const body = req.body;
     logger.info('About to get patient ', body.id);
     const options = {
@@ -770,10 +682,7 @@ const operations = {
           throw new Error('INVALID_PATIENT_ID');
         }
         return client.messages.create({
-          body: `Hi ${data.firstName} ${data.surName}, thanks for seeing Dr xyzz today. 
-You can access your care plan via the CareMonitor 
-app: <playstore_link> and your unique patient number is ${data.patientNumber}. 
-If you need any assistance, call us on 1300123445. Thanks, General Medical Practice.`,
+          body: body.message,
           to: body.mobileNo,
           from: '+61417409688',
         })
@@ -783,19 +692,7 @@ If you need any assistance, call us on 1300123445. Thanks, General Medical Pract
           message: successMessages.PATIENT_INVITATION_SENT_SUCCESS
         });
       }).catch((err) => {
-        let message, status;
-        if (err && errorMessages[err.message]) {
-          status = 403;
-          message = errorMessages[err.message];
-        } else {
-          logger.error(err);
-          status = 500;
-          message = err.message || errorMessages.SERVER_ERROR;
-        }
-        resp.status(status).send({
-          success: false,
-          message
-        });
+        commonUtil.handleException(err, req, resp, next);
       });
   },
 }

@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 import logger from '../util/logger';
 
 import errorMessages from '../../config/error.messages';
+
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -15,7 +16,8 @@ const validators = {
     let schema = {
       orgId: Joi.string().required(),
       patientId: Joi.string().required(),
-      mobileNo: Joi.string().required()
+      mobileNo: Joi.string().required(),
+      message: Joi.any().required()
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
@@ -93,7 +95,7 @@ const validators = {
     let where = {patientNumber};
     const options = {
       where,
-      attributes: ['id', 'email', 'firstName','surName','middleName','registered', 'status', 'patientNumber','orgId']
+      attributes: ['id', 'email', 'firstName', 'surName', 'middleName', 'registered', 'status', 'patientNumber', 'orgId']
     };
     patientService.findOne(options)
       .then((data) => {

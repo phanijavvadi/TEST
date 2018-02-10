@@ -4,6 +4,7 @@ const path = require('path');
 import logger from '../util/logger';
 import errorMessages from '../../config/error.messages';
 import successMessages from '../../config/success.messages';
+import * as commonUtil from '../util/common.util';
 import * as attachmentService from '../services/attachment.service';
 
 
@@ -20,7 +21,7 @@ const upload = multer({
   fileFilter: function (req, file, callback) {
     var ext = path.extname(file.originalname)
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
-      return callback({code:'FILE_INVALID_IMAGE_EXT'}, null)
+      return callback({code: 'FILE_INVALID_IMAGE_EXT'}, null)
     }
     callback(null, true)
   }
@@ -29,16 +30,21 @@ const upload = multer({
 
 const operations = {
 
-  upload: (req, resp) => {
+  upload: (req, resp, next) => {
     upload(req, resp, (err) => {
       let file = req.file;
       if (err) {
-        if(err.code==='FILE_INVALID_IMAGE_EXT'){
-          return resp.status(403).send({success: false, code:'FILE_INVALID_IMAGE_EXT', message: errorMessages.FILE_INVALID_IMAGE_EXT});
+        if (err.code === 'FILE_INVALID_IMAGE_EXT') {
+          return resp.status(403).send({
+            success: false,
+            code: 'FILE_INVALID_IMAGE_EXT',
+            message: errorMessages.FILE_INVALID_IMAGE_EXT
+          });
         }
         logger.info(err);
         return resp.status(403).send({success: false, message: errorMessages.UNABLE_TO_UPLOAD_FILE});
-      }if (file ===undefined) {
+      }
+      if (file === undefined) {
         return resp.status(403).send({success: false, message: errorMessages.ATTACHMENT_REQUIRED});
       }
       const fileInfo = {
@@ -56,31 +62,23 @@ const operations = {
             message: successMessages.FILE_UPLOADED_SUCCESS
           });
         }).catch((err) => {
-          let message = err.message || errorMessages.SERVER_ERROR;
-          logger.info(err);
-          resp.status(500).send({
-            message
-          });
+          commonUtil.handleException(err, req, resp, next)
         });
     });
   },
-  getFile:(req, resp)=>{
+  getFile: (req, resp, next) => {
     const id = req.params.id;
     logger.info('About to get user ', id);
 
     return attachmentService.findById(id)
       .then((data) => {
         if (data) {
-          resp.status(200).sendFile(data.fileInfo.filename,{ root: path.join(__dirname, '../../public/uploads') });
+          resp.status(200).sendFile(data.fileInfo.filename, {root: path.join(__dirname, '../../public/uploads')});
         } else {
           resp.status(404).send(errorMessages.INVALID_ATTACHMENT_ID);
         }
       }).catch((err) => {
-        let message = err.message || errorMessages.SERVER_ERROR;
-        logger.info(err);
-        resp.status(500).send({
-          message
-        });
+        commonUtil.handleException(err, req, resp, next)
       });
   }
 
