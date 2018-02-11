@@ -23,6 +23,9 @@ export default function (app) {
 
   router.route('/:id').get([
     patientCtrl.get]);
+  router.route('/update-profile-pic').put([
+    patientValidator.updateProfilePicValidator,
+    patientCtrl.updateProfilePic]);
 
   router.route('/:id/medical-history').get([
     patientCtrl.getMedicalHistory]);
@@ -66,6 +69,10 @@ export default function (app) {
    */
   patientRouter.route('/profile/:id').get([
     patientCtrl.get]);
+  patientRouter.route('/update-profile-pic').put([
+    patientValidator.updateProfilePicValidator,
+    patientCtrl.updateProfilePic]);
+
   patientPublicRouter.route('/sign-up').post([
     patientValidator.signUpValidator,
     patientValidator.patientEmailUniqueValidation,

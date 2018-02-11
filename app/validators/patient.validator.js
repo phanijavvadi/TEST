@@ -8,6 +8,7 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 import * as patientService from '../services/patient.service';
+import * as attachmentValidator from './attachment.validator';
 
 const validators = {
 
@@ -24,6 +25,19 @@ const validators = {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
       next();
+    }
+  },
+  updateProfilePicValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      profilePic: Joi.string().required(),
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      attachmentValidator.validateAttachmentId(body.profilePic, req, resp, next);
     }
   },
   signUpValidator: (req, resp, next) => {

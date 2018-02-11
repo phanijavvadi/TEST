@@ -695,6 +695,22 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
+
+
+  updateProfilePic: (req, resp) => {
+    const data = req.body;
+    logger.info('About to updateProfilePic');
+    return patientService
+      .update(data)
+      .then(() => {
+        resp.json({
+          success: true,
+          message: successMessages.PATIENT_UPDATED_SUCCESS
+        });
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp);
+      });
+  },
 }
 
 export default operations;

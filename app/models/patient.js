@@ -39,7 +39,7 @@ export default function (sequelize, DataTypes) {
     },
     password: DataTypes.STRING,
     registered: {
-      type:DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
       defaultValue: 2,
       allowNull: false,
       comment: "1=>Registered,2=>Not registered"
@@ -54,9 +54,9 @@ export default function (sequelize, DataTypes) {
     paranoid: true,
     freezeTableName: true,
     tableName: 'cm_org_patients',
-    indexes:[{
-      unique:true,
-      fields:['patientInternalId','orgId']
+    indexes: [{
+      unique: true,
+      fields: ['patientInternalId', 'orgId']
     }]
   });
   Patient.associate = function (models) {
@@ -110,7 +110,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'medications'
     });
-  }
+    Patient.belongsTo(models.Attachment, {
+      foreignKey: {
+        name: 'profilePic',
+        allowNull: true,
+      }
+    });
+  };
 
   Patient.beforeCreate((user, options) => {
     if (user.password) {
