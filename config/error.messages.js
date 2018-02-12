@@ -73,6 +73,11 @@ const errorMessages = {
   INVALID_ORG_API_KEY:'Invalid api key',
   INVALID_ORG_API_KEY_ID:'Api key not found',
 
+  // Care Plan
+
+  CARE_PLAN_EXIST:'Care plan already exist',
+  INVALID_PATIENT_CARE_PLAN_ID:'Invalid care plan id',
+
 
 };
 export default errorMessages;

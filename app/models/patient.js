@@ -89,6 +89,13 @@ export default function (sequelize, DataTypes) {
       as: 'socialHistory'
     });
 
+    Patient.hasMany(models.PatientCarePlan, {
+      foreignKey: {
+        name: 'patientId',
+        allowNull: false
+      },
+      as: 'carePlan'
+    });
     Patient.hasMany(models.PatientMedicalHistory, {
       foreignKey: {
         name: 'patientId',

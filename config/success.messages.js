@@ -49,5 +49,13 @@ const successMessage = {
   ORG_API_KEY_CREATED:'Created successfully',
   ORG_API_KEY_DELETED:'Deleted successfully',
 
+  // Care Plan
+  CARE_PLAN_CREATEED:'Created successfully',
+  CARE_PLAN_UPDATED:'Updated successfully',
+  CARE_PLAN_PROBLEM_CREATEED:'Created successfully',
+  CARE_PLAN_PROBLEM_REMOVED:'Removed successfully',
+
+
+
 };
 export default successMessage;

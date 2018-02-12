@@ -1,0 +1,28 @@
+"use strict";
+export default function (sequelize, DataTypes) {
+  const CareProblems = sequelize.define("CareProblems", {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4
+    },
+    problem: {
+      type: DataTypes.STRING
+    }, description: {
+      type: DataTypes.TEXT
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
+      allowNull: false,
+      comment: "1=>Active,2=>In Active"
+    }
+  }, {
+    paranoid: true,
+    freezeTableName: true,
+    tableName: 'cm_care_problems'
+  });
+  CareProblems.associate = function (models) {
+  };
+  return CareProblems;
+};

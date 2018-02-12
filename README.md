@@ -27,7 +27,7 @@ This is a care monitor restful APIs with node, express, sequelize and postgresql
 		¦	 ¦   +-- organisation.js
 		¦	 ¦   +-- organization.user.roles.service.js
 		¦	 +-- routes
-		¦	 ¦   +-- index.route.js
+		¦	 ¦   +-- _index.route.js
 		¦	 ¦   +-- organisation.route.js
 		¦	 +-- services
 		¦	 ¦   +-- admin.service.js
