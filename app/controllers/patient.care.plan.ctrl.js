@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import models from '../models';
 import errorMessages from '../../config/error.messages';
+import * as commonUtil from '../util/common.util';
 import successMessages from '../../config/success.messages';
 import * as patientCarePlanService from '../services/patient.care.plan.service';
 import * as patientCarePlanProblemService from '../services/patient.care.plan.problems.service';
@@ -21,7 +22,13 @@ const operations = {
         patientId: patientId,
         status: 1
       },
-      includeAll: true
+      include: [{
+        model: models.PatientCarePlanProblems,
+        as: 'carePlanProblems'
+      }],
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt']
+      }
     };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
@@ -32,19 +39,19 @@ const operations = {
       if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
-      options.where['orgId'] = userOrgIds;
+      // options.where['orgId'] = userOrgIds;
     }
-    return patientCarePlanService.findById(carePlantId, options)
+    return patientCarePlanService.findOne(options)
       .then((data) => {
         if (data) {
           const resultObj = data.get({plain: true});
           resp.status(200).json(resultObj);
         } else {
-          resp.status(404).send(errorMessages.INVALID_PATIENT_CARE_PLAN_ID);
+          resp.status(200).send({});
         }
       })
       .catch((err) => {
-        commonUtil.handleException(err, req, resp, next);
+        commonUtil.handleException(err, req, resp);
       });
   },
   create: (req, resp, next) => {
@@ -79,6 +86,7 @@ const operations = {
           })
           .catch((err) => {
             t.rollback();
+
             commonUtil.handleException(err, req, resp, next);
           });
       });
@@ -95,16 +103,18 @@ const operations = {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
     }
-    const data = {
-      carePlanId: body.carePlanId,
-      careProblemId: body.careProblemId,
-      patientId: body.patientId,
-      createdBy: authenticatedUser.id,
-    };
+    const data = body.careProblems.map(a => {
+      return {
+        carePlanId: body.carePlanId,
+        careProblemId: a.id,
+        patientId: body.patientId,
+        createdBy: authenticatedUser.id,
+      }
+    });
     return sequelize.transaction()
       .then((t) => {
         return patientCarePlanProblemService
-          .create(data, {transaction: t})
+          .bulkCreate(data, {transaction: t})
           .then((res) => {
             t.commit();
             return resp.json({
@@ -115,6 +125,13 @@ const operations = {
           })
           .catch((err) => {
             t.rollback();
+            if (err && err.name === 'SequelizeUniqueConstraintError') {
+              return resp.status(403).send({
+                success: false,
+                code: 'CARE_PROBLEM_ALREADY_MAPPED',
+                message: errorMessages.CARE_PROBLEM_ALREADY_MAPPED
+              });
+            }
             commonUtil.handleException(err, req, resp, next);
           });
       });
@@ -132,7 +149,7 @@ const operations = {
       }
     }
     const data = {
-      id: body.carePlanProblemId,
+      id: body.careProblems.map(a => a.id),
       carePlanId: body.carePlanId,
     };
     return sequelize.transaction()
@@ -143,8 +160,7 @@ const operations = {
             t.commit();
             return resp.json({
               success: true,
-              data: res,
-              message: successMessages.ORG_CREATED
+              message: successMessages.CARE_PLAN_PROBLEM_REMOVED
             });
           })
           .catch((err) => {

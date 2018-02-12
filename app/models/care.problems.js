@@ -8,12 +8,13 @@ export default function (sequelize, DataTypes) {
     },
     problem: {
       type: DataTypes.STRING
-    }, description: {
+    },
+    description: {
       type: DataTypes.TEXT
     },
     status: {
       type: DataTypes.INTEGER,
-      defaultValue: 2,
+      defaultValue: 1,
       allowNull: false,
       comment: "1=>Active,2=>In Active"
     }

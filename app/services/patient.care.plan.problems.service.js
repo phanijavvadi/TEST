@@ -52,6 +52,10 @@ export function create(patientCarePlanProblem, {transaction = null, ...options} 
   return PatientCarePlanProblems.create(patientCarePlanProblem, {transaction});
 }
 
+export function bulkCreate(patientCarePlanProblems, {transaction = null, ...options} = {}) {
+  return PatientCarePlanProblems.bulkCreate(patientCarePlanProblems, {transaction, individualHooks: true});
+}
+
 export function update(patientCarePlanProblem, {transaction = null, ...options} = {}) {
   return PatientCarePlanProblems.findById(patientCarePlanProblem.id, {
     attributes: {
@@ -66,10 +70,10 @@ export function update(patientCarePlanProblem, {transaction = null, ...options} 
   });
 }
 
-export function destroy(patientCarePlanProblem,{transaction = null, ...options} = {}) {
+export function destroy(patientCarePlanProblem, {transaction = null, ...options} = {}) {
   return PatientCarePlanProblems.destroy({
     where: {
       ...patientCarePlanProblem
     }
-  },{transaction});
+  }, {transaction});
 }

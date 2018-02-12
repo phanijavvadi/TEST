@@ -9,9 +9,15 @@ export default function (sequelize, DataTypes) {
       defaultValue: DataTypes.UUIDV4
     }
   }, {
-    paranoid: true,
+    paranoid: false,
     freezeTableName: true,
-    tableName: 'cm_org_patient_care_plan'
+    tableName: 'cm_org_patient_care_plan_problems',
+    indexes: [
+      {
+        unique: true,
+        fields: ['careProblemId', 'carePlanId']
+      }
+    ]
   });
   PatientCarePlanProblems.associate = function (models) {
     PatientCarePlanProblems.belongsTo(models.CareProblems, {

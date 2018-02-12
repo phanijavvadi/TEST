@@ -1,7 +1,7 @@
 'use strict';
 
 const errorMessages = {
-  SERVER_ERROR: "Oops..Server error!!! Please conctact the system admin",
+  SERVER_ERROR: "Internal erver error",
   UNIQUE_CONSTRAINT_ERROR: "Fields unique key validation error",
   NOT_FOUND: "The submitted request can not be understood",
   UNPARSABLE_REQUEST: "Can not parse the request. Please try again with correct format",
@@ -77,6 +77,8 @@ const errorMessages = {
 
   CARE_PLAN_EXIST:'Care plan already exist',
   INVALID_PATIENT_CARE_PLAN_ID:'Invalid care plan id',
+  INVALID_CARE_PLAN_PROBLEM_ID:'Invalid input',
+  CARE_PROBLEM_ALREADY_MAPPED:'Care problem already added to care plan'
 
 
 };

@@ -1,9 +1,9 @@
 module.exports = {
   development: {
-    username: 'cmdev',
-    password: 'cmdev',
-    database: 'cmdev',
-    host: '127.0.0.1',
+    username: 'caremonitorbeta',
+    password: ',=wg$6|TYtw4',
+    database: 'caremonitorbeta',
+    host: 'caremonitorbeta.cgshy2ta5lpn.ap-southeast-2.rds.amazonaws.com',
     dialect: 'postgres'
   },
   test: {
