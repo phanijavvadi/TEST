@@ -27,7 +27,7 @@ const validators = {
     }
   },
   checkCarePlanExist: (patientId, req, resp, next) => {
-    patientCarePlanService.findOne({patientId})
+    patientCarePlanService.findOne({where: {patientId, status: 1}})
       .then((data) => {
         if (data) {
           throw new Error('CARE_PLAN_EXIST');

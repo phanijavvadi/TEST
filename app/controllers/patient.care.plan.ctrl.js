@@ -39,7 +39,7 @@ const operations = {
       if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
-      // options.where['orgId'] = userOrgIds;
+      options.where['orgId'] = userOrgIds;
     }
     return patientCarePlanService.findOne(options)
       .then((data) => {
