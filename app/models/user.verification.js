@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const UserVerification = sequelize.define("UserVerification", {
     id: {
@@ -16,7 +17,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_user_verifications'
+    tableName: constants.getTableName('user_verifications')
   });
   UserVerification.associate = function (models) {
     UserVerification.belongsTo(models.User, {

@@ -3,7 +3,7 @@ import * as Joi from 'joi';
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 import * as orgApiKeysService from '../services/org.api.keys.service';
 import commonUtil from "../util/common.util";
 

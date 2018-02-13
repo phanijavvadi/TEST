@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const OrgApiKey = sequelize.define("OrgApiKey", {
     id: {
@@ -12,7 +13,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_api_keys'
+    tableName: constants.getTableName('org_api_keys')
   });
   OrgApiKey.associate = function (models) {
     OrgApiKey.belongsTo(models.Organisation, {

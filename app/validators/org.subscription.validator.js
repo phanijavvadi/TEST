@@ -1,7 +1,7 @@
 'use strict';
 import * as Joi from 'joi';
 import logger from '../util/logger';
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 import * as subscriptionTypeService from '../services/subscription.type.service';
 import * as orgSubscriptionService from '../services/org.subscription.service';
 

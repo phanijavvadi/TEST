@@ -1,7 +1,7 @@
 'use strict';
 import * as Joi from 'joi';
-import errorMessages from '../../config/error.messages';
-import constants from '../../config/constants';
+import errorMessages from '../util/constants/error.messages';
+import constants from '../util/constants/constants';
 
 const validators = {
   loginReqValidator: (req, resp, next) => {

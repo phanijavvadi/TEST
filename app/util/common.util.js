@@ -4,7 +4,7 @@ import path from 'path';
 import crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as config from '../../config/config';
-import errorMessages from '../../config/error.messages';
+import errorMessages from './constants/error.messages';
 import logger from '../util/logger';
 const ENCRYPTION_KEY = config.ENCRYPTION_KEY; // Must be 256 bytes (32 characters)
 const IV_LENGTH = 16; // For AES, this is always 16

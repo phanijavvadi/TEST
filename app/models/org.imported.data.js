@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
   const ImportedData = sequelize.define("ImportedData", {
@@ -12,7 +13,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_imported_data'
+    tableName: constants.getTableName('org_imported_data')
   });
   ImportedData.associate = function (models) {
     ImportedData.belongsTo(models.OrgApiKey, {

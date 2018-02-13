@@ -7,6 +7,8 @@ const config = {
   jsonwebtokenSecrete:'732f17d08213caf280ae3c4092414dbd0dcc62b424d393fccb00406bcb8f642b',
   jsonwebtokenExpiresIn:24*60*60,//in seconds,
   SENDGRID_API_KEY:'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',
+  TWILIO_ACCOUNTSID:'ACb7b23ed8621e530844ed7d8d30e25056',
+  TWILIO_AUTHTOKEN:'77caa6888bc1405068280c112125940b',
   log: {
 		//morgan options: 'combined', 'common', 'dev', 'short', 'tiny'
 		format: 'combined',

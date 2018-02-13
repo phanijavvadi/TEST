@@ -6,8 +6,8 @@ import * as _ from 'lodash';
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-import errorMessages from '../../config/error.messages';
-import constants from '../../config/constants';
+import errorMessages from '../util/constants/error.messages';
+import constants from '../util/constants/constants';
 import * as orgService from '../services/organisation.service';
 import * as userService from '../services/user.service';
 import * as userTypeService from '../services/user.type.service';

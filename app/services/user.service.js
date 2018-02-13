@@ -1,7 +1,7 @@
 'use strict';
 
 import models from '../models';
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 
 const User = models.User;
 

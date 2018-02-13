@@ -9,8 +9,8 @@ import moment from 'moment';
 import logger from '../util/logger';
 import commonUtil from '../util/common.util';
 import * as _ from 'lodash';
-import errorMessages from '../../config/error.messages';
-import successMessages from '../../config/success.messages';
+import errorMessages from '../util/constants/error.messages';
+import successMessages from '../util/constants/success.messages';
 import * as orgApiKeysService from '../services/org.api.keys.service';
 
 const operations = {

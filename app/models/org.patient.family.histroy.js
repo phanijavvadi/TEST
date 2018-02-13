@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
 
   const PatientFamilyHistory = sequelize.define("PatientFamilyHistory", {
@@ -15,7 +16,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_patient_family_history'
+    tableName: constants.getTableName('org_patient_family_history')
   });
   PatientFamilyHistory.associate = function (models) {
     PatientFamilyHistory.belongsTo(models.ImportedData, {

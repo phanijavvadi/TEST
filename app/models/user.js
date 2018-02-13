@@ -1,5 +1,6 @@
 "use strict";
 import commonUtil from "../util/common.util";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
   const User = sequelize.define("User", {
@@ -26,7 +27,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_users'
+    tableName: constants.getTableName('users')
   });
   User.associate = function (models) {
     User.belongsTo(models.UserCategory, {

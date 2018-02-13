@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const UserSubCategory = sequelize.define("UserSubCategory", {
     id: {
@@ -18,7 +19,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_user_sub_categories'
+    tableName: constants.getTableName('user_sub_categories')
   });
   UserSubCategory.associate = function (models) {
     UserSubCategory.belongsTo(models.UserCategory, {

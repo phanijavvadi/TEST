@@ -2,8 +2,8 @@
 const multer = require('multer');
 const path = require('path');
 import logger from '../util/logger';
-import errorMessages from '../../config/error.messages';
-import successMessages from '../../config/success.messages';
+import errorMessages from '../util/constants/error.messages';
+import successMessages from '../util/constants/success.messages';
 import * as commonUtil from '../util/common.util';
 import * as attachmentService from '../services/attachment.service';
 

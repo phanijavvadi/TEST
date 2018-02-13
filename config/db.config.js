@@ -1,10 +1,15 @@
 module.exports = {
   development: {
-    username: 'caremonitorbeta',
+    username: 'cmdev',
+    password: 'cmdev',
+    database: 'cmdev',
+    host: 'localhost',
+    dialect: 'postgres'
+    /*username: 'caremonitorbeta',
     password: ',=wg$6|TYtw4',
     database: 'caremonitorbeta',
     host: 'caremonitorbeta.cgshy2ta5lpn.ap-southeast-2.rds.amazonaws.com',
-    dialect: 'postgres'
+    dialect: 'postgres'*/
   },
   test: {
     username: "",

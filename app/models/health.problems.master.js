@@ -1,5 +1,6 @@
 "use strict";
 import commonUtil from "../util/common.util";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
   const PatientHealthInsurance = sequelize.define("Patient", {
@@ -13,7 +14,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_health_problems_master'
+    tableName: constants.getTableName('org_health_problems_master')
   });
   PatientHealthInsurance.associate = function (models) {
 

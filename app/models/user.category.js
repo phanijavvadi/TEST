@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const UserCategory = sequelize.define("UserCategory", {
     id: {
@@ -11,7 +12,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_user_categories'
+    tableName: constants.getTableName('user_categories')
   });
   UserCategory.associate = function (models) {
 

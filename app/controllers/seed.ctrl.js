@@ -4,7 +4,7 @@ import logger from '../util/logger';
 import models from '../models';
 import user from "../models/user";
 
-import constants from '../../config/constants';
+import constants from '../util/constants/constants';
 
 const operations = {
   seed: (req, resp) => {

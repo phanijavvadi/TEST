@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const OrgContactDetails = sequelize.define("OrgContactDetails", {
     id: {
@@ -16,7 +17,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_contact_details'
+    tableName: constants.getTableName('org_contact_details')
   });
   OrgContactDetails.associate = function (models) {
     OrgContactDetails.belongsTo(models.User, {

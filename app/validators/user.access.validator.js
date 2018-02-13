@@ -1,7 +1,7 @@
 'use strict';
 import _ from 'lodash';
-import errorMessages from '../../config/error.messages';
-import constants from '../../config/constants';
+import errorMessages from '../util/constants/error.messages';
+import constants from '../util/constants/constants';
 
 const validators = {
   isUserHasOrgAccess: (locals,orgId) => {

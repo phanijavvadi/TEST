@@ -1,6 +1,6 @@
 'use strict';
 import * as Joi from 'joi';
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 import * as attachmentService from '../services/attachment.service';
 import commonUtil from "../util/common.util";
 

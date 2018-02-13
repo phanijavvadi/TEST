@@ -2,8 +2,8 @@
 import moment from 'moment';
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
-import successMessages from '../../config/success.messages';
-import constants from '../../config/constants';
+import successMessages from '../util/constants/success.messages';
+import constants from '../util/constants/constants';
 import * as userService from '../services/user.service';
 import * as orgSubscriptionService from '../services/org.subscription.service';
 

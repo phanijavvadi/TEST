@@ -3,8 +3,8 @@
 import logger from '../util/logger';
 import * as _ from 'lodash';
 import moment from 'moment';
-import errorMessages from '../../config/error.messages';
-import successMessages from '../../config/success.messages';
+import errorMessages from '../util/constants/error.messages';
+import successMessages from '../util/constants/success.messages';
 import * as orgSubscriptionService from '../services/org.subscription.service';
 
 

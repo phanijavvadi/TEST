@@ -2,7 +2,7 @@
 import * as Joi from 'joi';
 import logger from '../util/logger';
 
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;

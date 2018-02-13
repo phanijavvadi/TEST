@@ -2,11 +2,11 @@
 import * as Joi from 'joi';
 import logger from '../util/logger';
 import commonUtil from "../util/common.util";
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 import * as patientCarePlanService from '../services/patient.care.plan.service';
 import * as patientCarePlanProblemService from '../services/patient.care.plan.problems.service';
 import * as attachmentValidator from './attachment.validator';
-import constants from '../../config/constants';
+import constants from '../util/constants/constants';
 import _ from 'lodash';
 
 const Sequelize = require('sequelize');

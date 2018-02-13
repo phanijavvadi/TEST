@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const SubscriptionType = sequelize.define("SubscriptionType", {
     id: {
@@ -13,7 +14,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_org_subscription_types'
+    tableName: constants.getTableName('org_subscription_types')
   });
   SubscriptionType.associate = function (models) {
 

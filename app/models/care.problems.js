@@ -1,4 +1,5 @@
 "use strict";
+import  constants from '../util/constants/constants';
 export default function (sequelize, DataTypes) {
   const CareProblems = sequelize.define("CareProblems", {
     id: {
@@ -21,7 +22,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_care_problems'
+    tableName: constants.getTableName('care_problems')
   });
   CareProblems.associate = function (models) {
   };

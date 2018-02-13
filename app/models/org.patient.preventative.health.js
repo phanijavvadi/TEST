@@ -1,7 +1,8 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
 
-  const PatientCarePlan = sequelize.define("PatientCarePlan", {
+  const PreventativeHealth = sequelize.define("PreventativeHealth", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -17,29 +18,29 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_patient_care_plan'
+    tableName: constants.getTableName('w')
   });
-  PatientCarePlan.associate = function (models) {
-    PatientCarePlan.belongsTo(models.Organisation, {
+  PreventativeHealth.associate = function (models) {
+    PreventativeHealth.belongsTo(models.Organisation, {
       foreignKey: {
         name: 'orgId',
         allowNull: false
       },
       as: 'organisation'
     });
-    PatientCarePlan.hasMany(models.PatientCarePlanProblems, {
+    PreventativeHealth.hasMany(models.PatientCarePlanProblems, {
       foreignKey: {
         name: 'carePlanId',
         allowNull: false
       },
       as: 'carePlanProblems'
     });
-    PatientCarePlan.belongsTo(models.User, {
+    PreventativeHealth.belongsTo(models.User, {
       foreignKey: {
         name:'createdBy',
         allowNull: true
       }
     });
   };
-  return PatientCarePlan;
+  return PreventativeHealth;
 };

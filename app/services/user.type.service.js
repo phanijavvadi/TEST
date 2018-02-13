@@ -1,7 +1,7 @@
 'use strict';
 
 import models from '../models';
-import constants from '../../config/constants';
+import constants from '../util/constants/constants';
 const UserType = models.UserType;
 
 /**

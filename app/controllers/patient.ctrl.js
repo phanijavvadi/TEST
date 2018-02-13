@@ -10,9 +10,9 @@ import * as _ from 'lodash';
 import moment from 'moment';
 import twilio from 'twilio';
 
-import errorMessages from '../../config/error.messages';
-import successMessages from '../../config/success.messages';
-import constants from '../../config/constants';
+import errorMessages from '../util/constants/error.messages';
+import successMessages from '../util/constants/success.messages';
+import constants from '../util/constants/constants';
 import * as commonUtil from '../util/common.util';
 
 
@@ -21,11 +21,9 @@ import * as patientMedicalHistoryService from '../services/patient.medical.histo
 import * as patientFamilyHistoryService from '../services/patient.family.history.service';
 import * as patientMedicationsService from '../services/patient.medications.service';
 import * as importDataService from '../services/import.data.service';
+import * as config from '../../config/config';
 
-const accountSid = 'ACb7b23ed8621e530844ed7d8d30e25056'; // Your Account SID from www.twilio.com/console
-const authToken = '77caa6888bc1405068280c112125940b';   // Your Auth Token from www.twilio.com/console
-
-const client = new twilio(accountSid, authToken);
+const client = new twilio(config.TWILIO_ACCOUNTSID, config.TWILIO_AUTHTOKEN);
 
 const operations = {
   getOrgPatientList: (req, resp, next) => {

@@ -14,7 +14,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config';
 import logger from '../app/util/logger';
-import errorMessages from './error.messages';
+import errorMessages from '../app/util/constants/error.messages';
 import Promise from 'bluebird';
 import commonUtil from '../app/util/common.util';
 

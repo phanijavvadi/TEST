@@ -1,12 +1,12 @@
 'use strict';
 import * as _ from 'lodash';
 import models from '../models';
-import errorMessages from '../../config/error.messages';
+import errorMessages from '../util/constants/error.messages';
 import * as commonUtil from '../util/common.util';
-import successMessages from '../../config/success.messages';
+import successMessages from '../util/constants/success.messages';
 import * as patientCarePlanService from '../services/patient.care.plan.service';
 import * as patientCarePlanProblemService from '../services/patient.care.plan.problems.service';
-import constants from '../../config/constants';
+import constants from '../util/constants/constants';
 
 const sequelize = models.sequelize;
 const Sequelize = require('sequelize');

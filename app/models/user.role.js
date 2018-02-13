@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const UserRole = sequelize.define("UserRole", {
     id: {
@@ -9,7 +10,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_user_roles'
+    tableName: constants.getTableName('user_roles')
   });
   UserRole.associate = function (models) {
 

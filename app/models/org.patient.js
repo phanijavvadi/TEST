@@ -1,5 +1,6 @@
 "use strict";
 import commonUtil from "../util/common.util";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
   const Patient = sequelize.define("Patient", {
@@ -53,7 +54,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_org_patients',
+    tableName: constants.getTableName('org_patients'),
     indexes: [{
       unique: true,
       fields: ['patientInternalId', 'orgId']

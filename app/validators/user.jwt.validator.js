@@ -1,7 +1,7 @@
 'use strict';
 import moment from 'moment';
-import errorMessages from '../../config/error.messages';
-import constants from '../../config/constants';
+import errorMessages from '../util/constants/error.messages';
+import constants from '../util/constants/constants';
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
 import * as userService from '../services/user.service';

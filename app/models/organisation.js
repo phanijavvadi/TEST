@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 export default function (sequelize, DataTypes) {
   const Organisation = sequelize.define("Organisation", {
     id: {
@@ -25,7 +26,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: 'cm_organisations'
+    tableName: constants.getTableName('organisations')
   });
   Organisation.associate = function (models) {
     Organisation.belongsToMany(models.Organisation, {

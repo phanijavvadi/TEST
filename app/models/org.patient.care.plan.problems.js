@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
 
@@ -11,7 +12,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: false,
     freezeTableName: true,
-    tableName: 'cm_org_patient_care_plan_problems',
+    tableName: constants.getTableName('org_patient_care_plan_problems'),
     indexes: [
       {
         unique: true,

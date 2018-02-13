@@ -1,4 +1,5 @@
 "use strict";
+import constants from "../util/constants/constants";
 
 export default function (sequelize, DataTypes) {
   const Attachment = sequelize.define("Attachment", {
@@ -14,7 +15,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName:'cm_attachments'
+    tableName: constants.getTableName('attachments')
   });
   return Attachment;
 };
