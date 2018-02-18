@@ -14,10 +14,10 @@ export default function (sequelize, DataTypes) {
     freezeTableName: true,
     tableName: constants.getTableName('org_patient_preventative_health_problems'),
     indexes: [
-      {
+    /*  {
         unique: true,
-        fields: ['careProblemId', 'carePlanId']
-      }
+        fields: ['careProblemId', 'prevHealthId','deletedAt']
+      }*/
     ]
   });
   PreventativeHealthProblems.associate = function (models) {

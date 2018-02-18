@@ -132,7 +132,6 @@ const validators = {
           code
         });
       })
-
   },
   validatePatientJwtToken: (req, resp, next) => {
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -178,5 +177,5 @@ const validators = {
       })
 
   }
-}
+};
 export default validators;

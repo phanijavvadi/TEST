@@ -20,6 +20,10 @@ export default function (app) {
     .post([
       patientCarePlanValidator.createReqValidator,
       patientCarePlanCtrl.create]);
+  router.route('/publish')
+    .post([
+      patientCarePlanValidator.publishReqValidator,
+      patientCarePlanCtrl.publish]);
 
   router.route('/add-problem')
     .post([

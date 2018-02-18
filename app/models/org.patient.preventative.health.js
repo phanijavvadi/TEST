@@ -18,7 +18,7 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('w')
+    tableName: constants.getTableName('org_patient_preventative_health')
   });
   PreventativeHealth.associate = function (models) {
     PreventativeHealth.belongsTo(models.Organisation, {
@@ -28,12 +28,19 @@ export default function (sequelize, DataTypes) {
       },
       as: 'organisation'
     });
-    PreventativeHealth.hasMany(models.PatientCarePlanProblems, {
+    PreventativeHealth.belongsTo(models.Patient, {
       foreignKey: {
-        name: 'carePlanId',
+        name: 'patientId',
         allowNull: false
       },
-      as: 'carePlanProblems'
+      as: 'patient'
+    });
+    PreventativeHealth.hasMany(models.PreventativeHealthProblems, {
+      foreignKey: {
+        name: 'prevHealthId',
+        allowNull: false
+      },
+      as: 'prevHealthProblems'
     });
     PreventativeHealth.belongsTo(models.User, {
       foreignKey: {
