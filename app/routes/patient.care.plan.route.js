@@ -7,12 +7,15 @@ import express from 'express';
 import patientCarePlanCtrl from '../controllers/patient.care.plan.ctrl';
 
 const router = express.Router();
-const publicRouter = express.Router();
+const patientRouter = express.Router();
 
 export default function (app) {
 
 
   router.route('/:patientId')
+    .get([
+      patientCarePlanCtrl.get]);
+  patientRouter.route('/:patientId')
     .get([
       patientCarePlanCtrl.get]);
 
@@ -35,4 +38,5 @@ export default function (app) {
       patientCarePlanCtrl.removeProblem]);
 
   app.use('/api/org-user/private/care-plan', router);
+  app.use('/api/patient/private/care-plan', patientRouter);
 }

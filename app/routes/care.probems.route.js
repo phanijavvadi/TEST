@@ -14,6 +14,10 @@ export default function (app) {
     .get([
       careProblemsCtrl.getOptions]);
 
+  router.route('/:careProblemId/metrics')
+    .get([
+      careProblemsCtrl.getMetrics]);
+
   app.use('/api/admin/private/care-problems', router);
   app.use('/api/org-user/private/care-problems', router);
 }

@@ -11,6 +11,7 @@ const router = express.Router();
 export default function (app) {
   router.route('/seed').get([SeedCtrl.seed]);
   router.route('/problemsMasterData').get([SeedCtrl.importProblemsMasterData]);
+  router.route('/importMasterData').get([SeedCtrl.importMasterData]);
   app.use('/api/masterimport', router);
 
 }

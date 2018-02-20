@@ -110,19 +110,143 @@ const operations = {
   },
   importProblemsMasterData: (req, resp) => {
     let userCats, userSubCats, userTypes, users, userroles;
-    models.CareProblems.bulkCreate([
-      {
-        problem: 'Asthma', description: 'Asthma'
-      }, {
-        problem: 'Heart Failure',
-        description: 'Heart Failure'
-      }, {
-        problem: 'Ischaemic Heart Disease',
-        description: 'Ischaemic Heart Disease'
-      }, {
+
+    const data=[{
+      problem: 'Hypertension',
+      description: 'Hypertension',
+      metrics: [
+        {
+          name: 'BP',
+          goal: 'Keep blood pressure within target range',
+          management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
+          frequency: 'PROBLEM_METRIC_FREQUENCY',
+          status: 1,
+          targets: [
+            {
+              operator: '<',
+              value: '140/90',
+              uom: null,
+              status: 1
+            },
+            {
+              operator: '>',
+              value: '120/60',
+              uom: null,
+              status: 1
+            }
+          ]
+        }, {
+          name: 'Weight',
+          goal: 'Keep weight within target range',
+          management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
+          frequency: 'PROBLEM_METRIC_FREQUENCY',
+          status: 1,
+          targets: [
+            {
+              operator: '<',
+              value: '50',
+              uom: 'KG',
+              status: 1
+            }
+          ]
+        }, {
+          name: 'Minutes Exercise',
+          goal: 'Maintain good activity levels',
+          management: 'Regular Exercise',
+          frequency: 'PROBLEM_METRIC_FREQUENCY',
+          status: 1,
+          targets: [
+            {
+              operator: '>',
+              value: '50',
+              uom: 'KG',
+              status: 1
+            }
+          ]
+        }
+      ]
+    }];
+    const que=[];
+    data.forEach(a=>{
+      que.push(models.CareProblems.create(a,{include: [{
+        model: models.CareProblemMetric,
+        as: 'metrics',
+        include: [
+          {
+            model: models.CareProblemMetricTarget,
+            as: 'targets'
+          }
+        ]
+      }]
+      }))
+    });
+
+   Promise.all(que)
+    /*models.CareProblems.bulkCreate([
+      /!* {
+         problem: 'Asthma',
+         description: 'Asthma'
+       }, {
+         problem: 'Heart Failure',
+         description: 'Heart Failure'
+       }, {
+         problem: 'Ischaemic Heart Disease',
+         description: 'Ischaemic Heart Disease'
+       }, *!/{
         problem: 'Hypertension',
-        description: 'Hypertension'
-      }, {
+        description: 'Hypertension',
+        metrics: [
+          {
+            name: 'BP',
+            goal: 'Keep blood pressure within target range',
+            management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
+            frequency: 'PROBLEM_METRIC_FREQUENCY',
+            status: 1,
+            targets: [
+              {
+                operator: '<',
+                value: '140/90',
+                uom: null,
+                status: 1
+              },
+              {
+                operator: '>',
+                value: '120/60',
+                uom: null,
+                status: 1
+              }
+            ]
+          }, {
+            name: 'Weight',
+            goal: 'Keep weight within target range',
+            management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
+            frequency: 'PROBLEM_METRIC_FREQUENCY',
+            status: 1,
+            targets: [
+              {
+                operator: '<',
+                value: '50',
+                uom: 'KG',
+                status: 1
+              }
+            ]
+          }, {
+            name: 'Minutes Exercise',
+            goal: 'Maintain good activity levels',
+            management: 'Regular Exercise',
+            frequency: 'PROBLEM_METRIC_FREQUENCY',
+            status: 1,
+            targets: [
+              {
+                operator: '>',
+                value: '50',
+                uom: 'KG',
+                status: 1
+              }
+            ]
+          }
+        ]
+      }/!*, {
         problem: 'Diabetes',
         description: 'Diabetes'
       }, {
@@ -137,7 +261,105 @@ const operations = {
       }, {
         problem: 'Smoking',
         description: 'Smoking'
-      }
+      }*!/
+    ], {
+      individualHooks: true, include: [{
+        model: models.CareProblemMetric,
+        as: 'metrics',
+        include: [
+          {
+            model: models.CareProblemMetricTarget,
+            as: 'targets'
+          }
+        ]
+      }]
+    })*/
+      .then(() => {
+        resp.send('seed completed successfully');
+      }).catch((err) => {
+      logger.info(err);
+      resp.status(500).send('error');
+    });
+  },
+  importMasterData: (req, resp) => {
+    models.MasterData.bulkCreate([
+      {
+        key: 'PROBLEM_METRIC_FREQUENCY',
+        order: 1,
+        name: 'Daily',
+        value: 'DAILY'
+      },
+      {
+        key: 'PROBLEM_METRIC_FREQUENCY',
+        order: 2,
+        name: 'Weekly',
+        value: 'WEEKLY'
+      }, {
+        key: 'PROBLEM_METRIC_FREQUENCY',
+        order: 3,
+        name: 'Monthly',
+        value: 'MONTHLY'
+      }, {
+        key: 'PROBLEM_METRIC_FREQUENCY',
+        order: 4,
+        name: 'Yearly',
+        value: 'YEARLY',
+      },
+      {
+        key: 'METRIC_TARGET_OPERATOR',
+        order: 1,
+        name: '>',
+        value: '>'
+      }, {
+        key: 'METRIC_TARGET_OPERATOR',
+        order: 2,
+        name: '>=',
+        value: '>=',
+      }, {
+        key: 'METRIC_TARGET_OPERATOR',
+        order: 3,
+        name: '<',
+        value: '<',
+      }, {
+        key: 'METRIC_TARGET_OPERATOR',
+        order: 4,
+        name: '<=',
+        value: '<=',
+      }, {
+        key: 'METRIC_TARGET_OPERATOR',
+        order: 4,
+        name: '=',
+        value: '=',
+      },
+      {
+        key: 'UOM',
+        order: 1,
+        name: 'Kg',
+        value: 'KG',
+      },
+      {
+        key: 'UOM',
+        order: 1,
+        name: 'Min/Week',
+        value: 'MIN_PER_WEEK',
+      },
+      {
+        key: 'UOM',
+        order: 1,
+        name: 'cm',
+        value: 'CM',
+      },
+      {
+        key: 'UOM',
+        order: 1,
+        name: '1/min',
+        value: '1_PER_MIN',
+      }, {
+        key: 'UOM',
+        order: 1,
+        name: '/day',
+        value: 'PER_DAY',
+      },
     ], {individualHooks: true})
       .then(() => {
         resp.send('seed completed successfully');
@@ -146,6 +368,6 @@ const operations = {
       resp.status(500).send('error');
     });
   }
-}
+};
 
 export default operations;

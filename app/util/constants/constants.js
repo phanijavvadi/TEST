@@ -29,7 +29,12 @@ export default {
   tables: {
     prefix: 'cm_',
     attachments: 'attachments',
+    master_data: 'master_data',
     care_problems: 'care_problems',
+    care_problem_metrics: 'care_problem_metrics',
+    care_problem_metric_action_plans: 'care_problem_metric_action_plans',
+    care_problem_metrics_target: 'care_problem_metrics_target',
+
     org_health_problems_master: 'org_health_problems_master',
     org_api_keys: 'org_api_keys',
     org_contact_details: 'org_contact_details',

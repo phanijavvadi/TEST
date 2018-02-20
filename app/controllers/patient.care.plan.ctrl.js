@@ -24,10 +24,22 @@ const operations = {
       },
       include: [{
         model: models.PatientCarePlanProblems,
-        as: 'carePlanProblems'
+        as: 'carePlanProblems',
+        attributes: {
+          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+        },
+        include: [
+          {
+            model: models.CareProblems,
+            as: 'careProblem',
+            attributes: {
+              exclude: ['deletedAt', 'createdAt', 'updatedAt','status','id']
+            },
+          }
+        ]
       }],
       attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
       }
     };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {

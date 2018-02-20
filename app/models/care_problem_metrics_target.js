@@ -2,17 +2,20 @@
 import constants from '../util/constants/constants';
 
 export default function (sequelize, DataTypes) {
-  const CareProblems = sequelize.define("CareProblems", {
+  const CareProblemMetricTarget = sequelize.define("CareProblemMetricTarget", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    problem: {
+    operator: {
+      type: DataTypes.STRING,
+    },
+    value: {
       type: DataTypes.STRING
     },
-    description: {
-      type: DataTypes.TEXT
+    uom: {
+      type: DataTypes.STRING,
     },
     status: {
       type: DataTypes.INTEGER,
@@ -23,16 +26,10 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('care_problems')
+    tableName: constants.getTableName('care_problem_metrics_target')
   });
-  CareProblems.associate = function (models) {
-    CareProblems.hasMany(models.CareProblemMetric, {
-      foreignKey: {
-        name: 'careProblemId',
-        allowNull: false
-      },
-      as: 'metrics'
-    });
+  CareProblemMetricTarget.associate = function (models) {
+
   };
-  return CareProblems;
+  return CareProblemMetricTarget;
 };
