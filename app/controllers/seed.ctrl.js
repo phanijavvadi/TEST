@@ -4,6 +4,9 @@ import logger from '../util/logger';
 import models from '../models';
 import user from "../models/user";
 
+const sequelize = models.sequelize;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 import constants from '../util/constants/constants';
 
 const operations = {
@@ -109,174 +112,281 @@ const operations = {
     });
   },
   importProblemsMasterData: (req, resp) => {
-    let userCats, userSubCats, userTypes, users, userroles;
+    const TEXT_BOX = '18386e21-28a5-4e81-b0f4-df76f99ceceb';
+    const SELECT_BOX = 'd3a48348-a632-4c58-8055-4532d7b99d0b';
+    const TEXT_AREA = '233dd98b-06f8-4991-b01e-b94aeb5daaf4';
 
-    const data=[{
+    const data = [{
       problem: 'Hypertension',
       description: 'Hypertension',
-      metrics: [
-        {
-          name: 'BP',
-          goal: 'Keep blood pressure within target range',
-          management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
-          frequency: 'PROBLEM_METRIC_FREQUENCY',
-          status: 1,
-          targets: [
-            {
-              operator: '<',
-              value: '140/90',
-              uom: null,
-              status: 1
-            },
-            {
-              operator: '>',
-              value: '120/60',
-              uom: null,
-              status: 1
-            }
-          ]
-        }, {
-          name: 'Weight',
-          goal: 'Keep weight within target range',
-          management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
-          frequency: 'PROBLEM_METRIC_FREQUENCY',
-          status: 1,
-          targets: [
-            {
-              operator: '<',
-              value: '50',
-              uom: 'KG',
-              status: 1
-            }
-          ]
-        }, {
-          name: 'Minutes Exercise',
-          goal: 'Maintain good activity levels',
-          management: 'Regular Exercise',
-          frequency: 'PROBLEM_METRIC_FREQUENCY',
-          status: 1,
-          targets: [
-            {
-              operator: '>',
-              value: '50',
-              uom: 'KG',
-              status: 1
-            }
-          ]
-        }
-      ]
     }];
-    const que=[];
-    data.forEach(a=>{
-      que.push(models.CareProblems.create(a,{include: [{
-        model: models.CareProblemMetric,
-        as: 'metrics',
-        include: [
-          {
-            model: models.CareProblemMetricTarget,
-            as: 'targets'
-          }
-        ]
-      }]
-      }))
-    });
+    const que = [];
 
-   Promise.all(que)
-    /*models.CareProblems.bulkCreate([
-      /!* {
-         problem: 'Asthma',
-         description: 'Asthma'
-       }, {
-         problem: 'Heart Failure',
-         description: 'Heart Failure'
-       }, {
-         problem: 'Ischaemic Heart Disease',
-         description: 'Ischaemic Heart Disease'
-       }, *!/{
-        problem: 'Hypertension',
-        description: 'Hypertension',
-        metrics: [
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+
+        data.forEach(a => {
+          que.push(models.CareProblems.create(a, {
+            transaction: transactionRef
+          }))
+        });
+        return Promise.all(que)
+      }).then(() => {
+      transactionRef.commit();
+      resp.send('seed completed successfully');
+    }).catch((err) => {
+      transactionRef.rollback();
+      logger.info(err);
+      resp.status(500).send('error');
+    });
+  },
+  importMetricsMasterData: (req, resp) => {
+    const TEXT_BOX = '18386e21-28a5-4e81-b0f4-df76f99ceceb';
+    const SELECT_BOX = 'd3a48348-a632-4c58-8055-4532d7b99d0b';
+    const TEXT_AREA = '233dd98b-06f8-4991-b01e-b94aeb5daaf4';
+
+    const data = [
+      {
+        name: 'BP',
+        goal: 'Keep blood pressure within target range',
+        management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
+        frequency: 'PROBLEM_METRIC_FREQUENCY',
+        status: 1,
+        targets: [
           {
-            name: 'BP',
-            goal: 'Keep blood pressure within target range',
-            management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
-            frequency: 'PROBLEM_METRIC_FREQUENCY',
-            status: 1,
-            targets: [
+            operator: '<',
+            value: '140/90',
+            uom: null,
+            status: 1
+          },
+          {
+            operator: '>',
+            value: '120/60',
+            uom: null,
+            status: 1
+          }
+        ],
+        actionPlans: [
+          {
+            title: 'If BP',
+            actionPlanInputs: [
               {
-                operator: '<',
-                value: '140/90',
-                uom: null,
-                status: 1
+                label: '<',
+                defVal: '140/90',
+                inputTypeMasterId: TEXT_BOX,
               },
               {
-                operator: '>',
-                value: '120/60',
-                uom: null,
-                status: 1
-              }
-            ]
-          }, {
-            name: 'Weight',
-            goal: 'Keep weight within target range',
-            management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
-            frequency: 'PROBLEM_METRIC_FREQUENCY',
-            status: 1,
-            targets: [
+                label: 'For >',
+                defVal: '3 Readings',
+                inputTypeMasterId: SELECT_BOX,
+                actionPlanInputOptions: [
+                  {
+                    name: '1 Reading',
+                  },
+                  {
+                    name: '2 Readings',
+                  },
+                  {
+                    name: '3 Readings',
+                  }
+                ]
+              },
               {
-                operator: '<',
-                value: '50',
-                uom: 'KG',
-                status: 1
+                label: 'Action',
+                defVal: null,
+                inputTypeMasterId: TEXT_BOX
               }
             ]
-          }, {
-            name: 'Minutes Exercise',
-            goal: 'Maintain good activity levels',
-            management: 'Regular Exercise',
-            frequency: 'PROBLEM_METRIC_FREQUENCY',
-            status: 1,
-            targets: [
-              {
-                operator: '>',
-                value: '50',
-                uom: 'KG',
-                status: 1
-              }
-            ]
-          }
-        ]
-      }/!*, {
-        problem: 'Diabetes',
-        description: 'Diabetes'
-      }, {
-        problem: 'Obesity/Overweight',
-        description: 'Obesity/Overweight'
-      }, {
-        problem: 'COPD',
-        description: 'COPD'
-      }, {
-        problem: 'Alcohol Excess',
-        description: 'Alcohol Excess'
-      }, {
-        problem: 'Smoking',
-        description: 'Smoking'
-      }*!/
-    ], {
-      individualHooks: true, include: [{
-        model: models.CareProblemMetric,
-        as: 'metrics',
-        include: [
+          },
           {
-            model: models.CareProblemMetricTarget,
-            as: 'targets'
+            title: 'If BP',
+            actionPlanInputs: [
+              {
+                label: '<',
+                defVal: '105/40',
+                inputTypeMasterId: TEXT_BOX,
+              },
+              {
+                label: 'For >',
+                defVal: '1 Readings',
+                inputTypeMasterId: SELECT_BOX,
+                actionPlanInputOptions: [
+                  {
+                    name: '1 Reading',
+                  },
+                  {
+                    name: '2 Readings',
+                  },
+                  {
+                    name: '3 Readings',
+                  }
+                ]
+              },
+              {
+                label: 'Action',
+                defVal: null,
+                inputTypeMasterId: TEXT_BOX
+              }
+            ]
+          },
+          {
+            title: 'Provider',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: SELECT_BOX,
+                actionPlanInputOptions: [
+                  {
+                    name: 'Doctor',
+                  },
+                  {
+                    name: 'Patient',
+                  },
+                  {
+                    name: 'Dietitian',
+                  }
+                ]
+              }
+            ]
           }
         ]
-      }]
-    })*/
-      .then(() => {
-        resp.send('seed completed successfully');
-      }).catch((err) => {
+      },
+      {
+        name: 'Weight',
+        goal: 'Keep weight within target range',
+        management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
+        frequency: 'PROBLEM_METRIC_FREQUENCY',
+        status: 1,
+        targets: [
+          {
+            operator: '<',
+            value: '50',
+            uom: 'KG',
+            status: 1
+          }
+        ],
+        actionPlans: [
+          {
+            title: 'Diet and exercise as advised',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: TEXT_AREA
+              }
+            ]
+          },
+          {
+            title: 'Dietician review and advice',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: TEXT_AREA
+              }
+            ]
+          },
+          {
+            title: 'Physiologist review and advice',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: TEXT_AREA
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Minutes Exercise',
+        goal: 'Maintain good activity levels',
+        management: 'Regular Exercise',
+        frequency: 'PROBLEM_METRIC_FREQUENCY',
+        status: 1,
+        targets: [
+          {
+            operator: '>',
+            value: '50',
+            uom: 'KG',
+            status: 1
+          }
+        ],
+        actionPlans: [
+          {
+            title: 'Advised',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: TEXT_AREA
+              }
+            ]
+          },
+          {
+            title: 'Provider',
+            actionPlanInputs: [
+              {
+                label: null,
+                defVal: '',
+                inputTypeMasterId: SELECT_BOX,
+                actionPlanInputOptions: [
+                  {
+                    name: 'Exercise Physiologist',
+                  },
+                  {
+                    name: 'Patient',
+                  }
+                ]
+              }
+            ]
+          }
+
+        ]
+      }
+    ];
+    const que = [];
+
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.forEach(a => {
+          que.push(models.CareProblemMetric.create(a, {
+            include: [
+              {
+                model: models.CareProblemMetricTarget,
+                as: 'targets'
+              },
+              {
+                model: models.CareProblemMetricActionPlan,
+                as: 'actionPlans',
+                include: [
+                  {
+                    model: models.CareProblemMetricActionPlanInput,
+                    as: 'actionPlanInputs',
+                    include: [
+                      {
+                        model: models.CareProblemMetricActionPlanInputOption,
+                        as: 'actionPlanInputOptions'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            transaction: transactionRef
+          }))
+        });
+        return Promise.all(que)
+      }).then(() => {
+      transactionRef.commit();
+      resp.send('seed completed successfully');
+    }).catch((err) => {
+      transactionRef.rollback();
       logger.info(err);
       resp.status(500).send('error');
     });
@@ -354,11 +464,33 @@ const operations = {
         order: 1,
         name: '1/min',
         value: '1_PER_MIN',
-      }, {
+      },
+      {
         key: 'UOM',
         order: 1,
         name: '/day',
         value: 'PER_DAY',
+      },
+      {
+        key: 'INPUT_TYPES',
+        order: 1,
+        name: 'Text Box',
+        value: 'TEXT_BOX',
+      }, {
+        key: 'INPUT_TYPES',
+        order: 1,
+        name: 'Free Text',
+        value: 'TEXT_AREA',
+      }, {
+        key: 'INPUT_TYPES',
+        order: 1,
+        name: 'Select Box',
+        value: 'SELECT_BOX',
+      }, {
+        key: 'INPUT_TYPES',
+        order: 1,
+        name: 'Radio button',
+        value: 'RADIO_BUTTON',
       },
     ], {individualHooks: true})
       .then(() => {

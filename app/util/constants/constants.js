@@ -34,6 +34,9 @@ export default {
     care_problem_metrics: 'care_problem_metrics',
     care_problem_metric_action_plans: 'care_problem_metric_action_plans',
     care_problem_metrics_target: 'care_problem_metrics_target',
+    care_problem_metrics_action_plans: 'care_problem_metrics_action_plans',
+    care_problem_metrics_action_plan_inputs: 'care_problem_metrics_action_plan_inputs',
+    care_problem_metrics_action_plan_input_options: 'care_problem_metrics_action_plan_input_options',
 
     org_health_problems_master: 'org_health_problems_master',
     org_api_keys: 'org_api_keys',

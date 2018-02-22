@@ -26,13 +26,6 @@ export default function (sequelize, DataTypes) {
     tableName: constants.getTableName('care_problems')
   });
   CareProblems.associate = function (models) {
-    CareProblems.hasMany(models.CareProblemMetric, {
-      foreignKey: {
-        name: 'careProblemId',
-        allowNull: false
-      },
-      as: 'metrics'
-    });
   };
   return CareProblems;
 };

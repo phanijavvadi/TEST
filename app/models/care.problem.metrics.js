@@ -39,6 +39,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'targets'
     });
+    CareProblemMetric.hasMany(models.CareProblemMetricActionPlan, {
+      foreignKey: {
+        name: 'metricId',
+        allowNull: false
+      },
+      as: 'actionPlans'
+    });
   };
   return CareProblemMetric;
 };
