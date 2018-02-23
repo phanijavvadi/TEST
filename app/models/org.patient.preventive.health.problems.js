@@ -21,9 +21,9 @@ export default function (sequelize, DataTypes) {
     ]
   });
   PreventativeHealthProblems.associate = function (models) {
-    PreventativeHealthProblems.belongsTo(models.CareProblems, {
+    PreventativeHealthProblems.belongsTo(models.ProblemsMaster, {
       foreignKey: {
-        name: 'careProblemId',
+        name: 'problemId',
         allowNull: true
       },
       as: 'careProblem'

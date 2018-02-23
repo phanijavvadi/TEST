@@ -2,10 +2,10 @@
 
 import models from '../models';
 
-const CareProblemMetricTarget = models.CareProblemMetricTarget;
+const ProblemMetricTargetMaster = models.ProblemMetricTargetMaster;
 
 export function findAll({limit = 150, offset = 0, ...otherOptions} = {}, options = {}) {
-  return CareProblemMetricTarget.findAndCountAll({
+  return ProblemMetricTargetMaster.findAndCountAll({
     limit: Number(limit),
     offset: Number(offset),
     where: {
@@ -15,7 +15,7 @@ export function findAll({limit = 150, offset = 0, ...otherOptions} = {}, options
 }
 
 export function getOptions() {
-  return CareProblemMetricTarget.findAll({
+  return ProblemMetricTargetMaster.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt', 'deletedAt']
     }
@@ -23,7 +23,7 @@ export function getOptions() {
 }
 
 export function findById(id, options = {}) {
-  return CareProblemMetricTarget.findOne({
+  return ProblemMetricTargetMaster.findOne({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     where: {
       id: id,
@@ -33,7 +33,7 @@ export function findById(id, options = {}) {
 }
 
 export function findOne(options = {}) {
-  return CareProblemMetricTarget.findOne({
+  return ProblemMetricTargetMaster.findOne({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     attributes: options.attributes || {},
     where: {
@@ -42,28 +42,28 @@ export function findOne(options = {}) {
   });
 }
 
-export function create(careProblemMetricTarget, {transaction = null, ...options} = {}) {
-  return CareProblemMetricTarget.create(careProblemMetricTarget, {transaction});
+export function create(problemMetricTargetMaster, {transaction = null, ...options} = {}) {
+  return ProblemMetricTargetMaster.create(problemMetricTargetMaster, {transaction});
 }
 
-export function update(careProblemMetricTarget, {transaction = null, ...options} = {}) {
-  return CareProblemMetricTarget.findById(careProblemMetricTarget.id, {
+export function update(problemMetricTargetMaster, {transaction = null, ...options} = {}) {
+  return ProblemMetricTargetMaster.findById(problemMetricTargetMaster.id, {
     attributes: {
       exclude: [],
     }
   }).then((p) => {
     if (p) {
-      return p.update(careProblemMetricTarget, {transaction});
+      return p.update(problemMetricTargetMaster, {transaction});
     } else {
       throw new Error('INVALID_PATIENT_PREV_HEALTH_ID');
     }
   });
 }
 
-export function destroy(careProblemMetricTarget) {
-  return CareProblemMetricTarget.destroy({
+export function destroy(problemMetricTargetMaster) {
+  return ProblemMetricTargetMaster.destroy({
     where: {
-      ...careProblemMetricTarget
+      ...problemMetricTargetMaster
     }
   });
 }

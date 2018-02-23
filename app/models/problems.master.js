@@ -2,13 +2,13 @@
 import constants from '../util/constants/constants';
 
 export default function (sequelize, DataTypes) {
-  const CareProblems = sequelize.define("CareProblems", {
+  const ProblemsMaster = sequelize.define("ProblemsMaster", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    problem: {
+    name: {
       type: DataTypes.STRING
     },
     description: {
@@ -23,9 +23,9 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('care_problems')
+    tableName: constants.getTableName('problems_master')
   });
-  CareProblems.associate = function (models) {
+  ProblemsMaster.associate = function (models) {
   };
-  return CareProblems;
+  return ProblemsMaster;
 };

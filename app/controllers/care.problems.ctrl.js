@@ -2,8 +2,8 @@
 
 import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
-import * as careProblemsService from '../services/care.problems.service';
-import * as careProblemMetricsService from '../services/care.problem.metrics.service';
+import * as problemsMasterService from '../services/problem.master.service';
+import * as problemMetricsMasterService from '../services/problem.metrics.master.service';
 import models from '../models';
 
 const sequelize = models.sequelize;
@@ -13,7 +13,7 @@ const Op = Sequelize.Op;
 
 const operations = {
   getOptions: (req, resp) => {
-    return careProblemsService
+    return problemsMasterService
       .getOptions()
       .then((data) => {
         if (data) {
@@ -30,10 +30,10 @@ const operations = {
         status: [1]
       },
       attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy','status']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
       }
     };
-    return careProblemMetricsService
+    return problemMetricsMasterService
       .findAll(options)
       .then((data) => {
         if (data) {
@@ -51,58 +51,59 @@ const operations = {
         id: metricId,
         status: [1]
       },
-      include: [{
-        model: models.CareProblemMetricTarget,
-        as: 'targets',
-        attributes: {
-          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
-        }
-      }, {
-        model: models.CareProblemMetricActionPlan,
-        as: 'actionPlans',
-        attributes: {
-          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
-        },
-        include: [
-          {
-            model: models.CareProblemMetricActionPlanInput,
-            as: 'actionPlanInputs',
-            attributes: {
-              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
-            },
-            include: [
-              {
-                model: models.CareProblemMetricActionPlanInputOption,
-                as: 'actionPlanInputOptions',
-                attributes: {
-                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'status']
-                }
-              },
-              {
-                model: models.MasterData,
-                as: 'inputType',
-                attributes: {
-                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'order', 'status']
-                }
-              },
-              {
-                model: models.MasterData,
-                as: 'uom',
-                attributes: {
-                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'order', 'status']
-                }
-              }
-
-            ]
+      include: [
+        {
+          model: models.CareProblemMetricTarget,
+          as: 'targets',
+          attributes: {
+            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
           }
-        ]
-      }],
+        }, {
+          model: models.CareProblemMetricActionPlan,
+          as: 'actionPlans',
+          attributes: {
+            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
+          },
+          include: [
+            {
+              model: models.CareProblemMetricActionPlanInput,
+              as: 'actionPlanInputs',
+              attributes: {
+                exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
+              },
+              include: [
+                {
+                  model: models.CareProblemMetricActionPlanInputOption,
+                  as: 'actionPlanInputOptions',
+                  attributes: {
+                    exclude: ['deletedAt', 'createdAt', 'updatedAt', 'status']
+                  }
+                },
+                {
+                  model: models.MasterData,
+                  as: 'inputType',
+                  attributes: {
+                    exclude: ['deletedAt', 'createdAt', 'updatedAt', 'order', 'status']
+                  }
+                },
+                {
+                  model: models.MasterData,
+                  as: 'uom',
+                  attributes: {
+                    exclude: ['deletedAt', 'createdAt', 'updatedAt', 'order', 'status']
+                  }
+                }
+
+              ]
+            }
+          ]
+        }],
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
       }
     };
-    return careProblemMetricsService
-      .findAll(options)
+    return problemMetricsMasterService
+      .findOne(options)
       .then((data) => {
         if (data) {
           resp.status(200).json(data);

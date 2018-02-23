@@ -2,10 +2,10 @@
 
 import models from '../models';
 
-const CareProblemMetric = models.CareProblemMetric;
+const ProblemMetricsMaster = models.ProblemMetricsMaster;
 
 export function findAll(options = {}) {
-  return CareProblemMetric.findAll({
+  return ProblemMetricsMaster.findAll({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     attributes: {
       exclude: ['createdAt', 'updatedAt', 'deletedAt']
@@ -17,7 +17,7 @@ export function findAll(options = {}) {
 }
 
 export function getOptions() {
-  return CareProblemMetric.findAll({
+  return ProblemMetricsMaster.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt', 'deletedAt']
     }
@@ -25,7 +25,7 @@ export function getOptions() {
 }
 
 export function findById(id, options = {}) {
-  return CareProblemMetric.findOne({
+  return ProblemMetricsMaster.findOne({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     where: {
       id: id,
@@ -35,7 +35,7 @@ export function findById(id, options = {}) {
 }
 
 export function findOne(options = {}) {
-  return CareProblemMetric.findOne({
+  return ProblemMetricsMaster.findOne({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     attributes: options.attributes || {},
     where: {
@@ -44,28 +44,28 @@ export function findOne(options = {}) {
   });
 }
 
-export function create(careProblemMetric, {transaction = null, ...options} = {}) {
-  return CareProblemMetric.create(careProblemMetric, {transaction});
+export function create(problemMetricsMaster, {transaction = null, ...options} = {}) {
+  return ProblemMetricsMaster.create(problemMetricsMaster, {transaction});
 }
 
-export function update(careProblemMetric, {transaction = null, ...options} = {}) {
-  return CareProblemMetric.findById(careProblemMetric.id, {
+export function update(problemMetricsMaster, {transaction = null, ...options} = {}) {
+  return ProblemMetricsMaster.findById(problemMetricsMaster.id, {
     attributes: {
       exclude: [],
     }
   }).then((p) => {
     if (p) {
-      return p.update(careProblemMetric, {transaction});
+      return p.update(problemMetricsMaster, {transaction});
     } else {
       throw new Error('INVALID_PATIENT_PREV_HEALTH_ID');
     }
   });
 }
 
-export function destroy(careProblemMetric) {
-  return CareProblemMetric.destroy({
+export function destroy(problemMetricsMaster) {
+  return ProblemMetricsMaster.destroy({
     where: {
-      ...careProblemMetric
+      ...problemMetricsMaster
     }
   });
 }

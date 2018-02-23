@@ -2,6 +2,8 @@
 
 const successMessage = {
 
+  CREATEED_SUCCESS: 'Created successfully',
+  UPDATED_SUCCESS: 'Updated successfully',
   CONTACT_MAIL_SENT_SUCCESS: 'Mail sent successfully',
   ///admin table service end
   // users table service start
@@ -53,10 +55,11 @@ const successMessage = {
   CARE_PLAN_CREATEED: 'Created successfully',
   CARE_PLAN_UPDATED: 'Updated successfully',
   CARE_PLAN_PROBLEM_CREATEED: 'Created successfully',
+  CARE_PLAN_PROBLEM_METRIC_CREATEED: 'Created successfully',
   CARE_PLAN_PUBLISHED: 'Published successfully',
   CARE_PLAN_PROBLEM_REMOVED: 'Removed successfully',
 
-// Care Plan
+// Prev Health
   PREV_HEALTH_CREATEED: 'Created successfully',
   PREV_HEALTH_UPDATED: 'Updated successfully',
   PREV_HEALTH_PROBLEM_CREATEED: 'Created successfully',

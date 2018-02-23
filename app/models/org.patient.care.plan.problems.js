@@ -16,17 +16,24 @@ export default function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['careProblemId', 'carePlanId']
+        fields: ['problemId', 'carePlanId']
       }
     ]
   });
   PatientCarePlanProblems.associate = function (models) {
-    PatientCarePlanProblems.belongsTo(models.CareProblems, {
+    PatientCarePlanProblems.belongsTo(models.ProblemsMaster, {
       foreignKey: {
-        name: 'careProblemId',
-        allowNull: true
+        name: 'problemId',
+        allowNull: false
       },
       as: 'careProblem'
+    });
+    PatientCarePlanProblems.hasMany(models.PatientCarePlanProblemMetric, {
+      foreignKey: {
+        name: 'cp_prob_id',
+        allowNull: false
+      },
+      as: 'metrics'
     });
 
     PatientCarePlanProblems.belongsTo(models.User, {

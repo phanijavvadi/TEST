@@ -105,21 +105,14 @@ const operations = {
           }
         ]);
       }).then(() => {
-      resp.send('seed completed successfully');
+      return resp.send('seed completed successfully');
     }).catch((err) => {
       logger.info(err);
       resp.status(500).send('error');
     });
   },
   importProblemsMasterData: (req, resp) => {
-    const TEXT_BOX = '18386e21-28a5-4e81-b0f4-df76f99ceceb';
-    const SELECT_BOX = 'd3a48348-a632-4c58-8055-4532d7b99d0b';
-    const TEXT_AREA = '233dd98b-06f8-4991-b01e-b94aeb5daaf4';
-
-    const data = [{
-      problem: 'Hypertension',
-      description: 'Hypertension',
-    }];
+    const data = req.body;
     const que = [];
 
     let transactionRef;
@@ -128,14 +121,14 @@ const operations = {
         transactionRef = t;
 
         data.forEach(a => {
-          que.push(models.CareProblems.create(a, {
+          que.push(models.ProblemsMaster.create(a, {
             transaction: transactionRef
           }))
         });
         return Promise.all(que)
       }).then(() => {
       transactionRef.commit();
-      resp.send('seed completed successfully');
+      return resp.send('seed completed successfully');
     }).catch((err) => {
       transactionRef.rollback();
       logger.info(err);
@@ -143,110 +136,110 @@ const operations = {
     });
   },
   importMetricsMasterData: (req, resp) => {
-    const TEXT_BOX = '18386e21-28a5-4e81-b0f4-df76f99ceceb';
-    const SELECT_BOX = 'd3a48348-a632-4c58-8055-4532d7b99d0b';
-    const TEXT_AREA = '233dd98b-06f8-4991-b01e-b94aeb5daaf4';
+    const TEXT_BOX = '1de3718f-6437-420a-9124-b4a78c257c56';
+    const SELECT_BOX = '1abe4624-e0f1-41de-b544-172a9acedb54';
+    const TEXT_AREA = 'aaeea354-fd06-4306-b2de-d4ade59c4f6b';
 
     const data = [
       {
-        name: 'BP',
-        goal: 'Keep blood pressure within target range',
-        management: 'Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/',
-        frequency: 'PROBLEM_METRIC_FREQUENCY',
-        status: 1,
-        targets: [
+        "name": "BP",
+        "goal": "Keep blood pressure within target range",
+        "management": "Take Medications as Prescribed; Web Resource : https://www.heartfoundation.org.au/",
+        "frequency": "PROBLEM_METRIC_FREQUENCY",
+        "status": 1,
+        "master_targets": [
           {
-            operator: '<',
-            value: '140/90',
-            uom: null,
-            status: 1
+            "operator": "<",
+            "defVal": "140/90",
+            "uom": null,
+            "status": 1
           },
           {
-            operator: '>',
-            value: '120/60',
-            uom: null,
-            status: 1
+            "operator": ">",
+            "defVal": "120/60",
+            "uom": null,
+            "status": 1
           }
         ],
-        actionPlans: [
+        "master_act_plans": [
           {
-            title: 'If BP',
-            actionPlanInputs: [
+            "title": "If BP",
+            "inputs_master": [
               {
-                label: '<',
-                defVal: '140/90',
-                inputTypeMasterId: TEXT_BOX,
+                "label": "<",
+                "defVal": "140/90",
+                "input_type_mid": TEXT_BOX,
               },
               {
-                label: 'For >',
-                defVal: '3 Readings',
-                inputTypeMasterId: SELECT_BOX,
-                actionPlanInputOptions: [
+                "label": "For >",
+                "defVal": "3 Readings",
+                "input_type_mid": SELECT_BOX,
+                "input_options_master": [
                   {
-                    name: '1 Reading',
+                    "name": "1 Reading"
                   },
                   {
-                    name: '2 Readings',
+                    "name": "2 Readings"
                   },
                   {
-                    name: '3 Readings',
+                    "name": "3 Readings"
                   }
                 ]
               },
               {
-                label: 'Action',
-                defVal: null,
-                inputTypeMasterId: TEXT_BOX
+                "label": "Action",
+                "defVal": null,
+                "input_type_mid": TEXT_BOX
               }
             ]
           },
           {
-            title: 'If BP',
-            actionPlanInputs: [
+            "title": "If BP",
+            "inputs_master": [
               {
-                label: '<',
-                defVal: '105/40',
-                inputTypeMasterId: TEXT_BOX,
+                "label": "<",
+                "defVal": "105/40",
+                "input_type_mid": TEXT_BOX
               },
               {
-                label: 'For >',
-                defVal: '1 Readings',
-                inputTypeMasterId: SELECT_BOX,
-                actionPlanInputOptions: [
+                "label": "For >",
+                "defVal": "1 Readings",
+                "input_type_mid": SELECT_BOX,
+                "input_options_master": [
                   {
-                    name: '1 Reading',
+                    "name": "1 Reading"
                   },
                   {
-                    name: '2 Readings',
+                    "name": "2 Readings"
                   },
                   {
-                    name: '3 Readings',
+                    "name": "3 Readings"
                   }
                 ]
               },
               {
-                label: 'Action',
-                defVal: null,
-                inputTypeMasterId: TEXT_BOX
+                "label": "Action",
+                "defVal": null,
+                "input_type_mid": TEXT_BOX
               }
             ]
           },
           {
-            title: 'Provider',
-            actionPlanInputs: [
+            "title": "Provider",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: SELECT_BOX,
-                actionPlanInputOptions: [
+                "label": null,
+                "defVal": "",
+                "input_type_mid": SELECT_BOX,
+                "input_options_master": [
                   {
-                    name: 'Doctor',
+                    "name": "Doctor"
                   },
                   {
-                    name: 'Patient',
+                    "name": "Patient"
                   },
                   {
-                    name: 'Dietitian',
+                    "name": "Dietitian"
                   }
                 ]
               }
@@ -255,90 +248,90 @@ const operations = {
         ]
       },
       {
-        name: 'Weight',
-        goal: 'Keep weight within target range',
-        management: 'Diet and exercise as advised; Web Resources www.makehealthynormal.com.au',
-        frequency: 'PROBLEM_METRIC_FREQUENCY',
-        status: 1,
-        targets: [
+        "name": "Weight",
+        "goal": "Keep weight within target range",
+        "management": "Diet and exercise as advised; Web Resources www.makehealthynormal.com.au",
+        "frequency": "PROBLEM_METRIC_FREQUENCY",
+        "status": 1,
+        "master_targets": [
           {
-            operator: '<',
-            value: '50',
-            uom: 'KG',
-            status: 1
+            "operator": "<",
+            "defVal": "50",
+            "uom": "KG",
+            "status": 1
           }
         ],
-        actionPlans: [
+        "master_act_plans": [
           {
-            title: 'Diet and exercise as advised',
-            actionPlanInputs: [
+            "title": "Diet and exercise as advised",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: TEXT_AREA
+                "label": null,
+                "defVal": "",
+                "input_type_mid": TEXT_AREA
               }
             ]
           },
           {
-            title: 'Dietician review and advice',
-            actionPlanInputs: [
+            "title": "Dietician review and advice",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: TEXT_AREA
+                "label": null,
+                "defVal": "",
+                "input_type_mid": TEXT_AREA
               }
             ]
           },
           {
-            title: 'Physiologist review and advice',
-            actionPlanInputs: [
+            "title": "Physiologist review and advice",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: TEXT_AREA
+                "label": null,
+                "defVal": "",
+                "input_type_mid": TEXT_AREA
               }
             ]
           }
         ]
       },
       {
-        name: 'Minutes Exercise',
-        goal: 'Maintain good activity levels',
-        management: 'Regular Exercise',
-        frequency: 'PROBLEM_METRIC_FREQUENCY',
-        status: 1,
-        targets: [
+        "name": "Minutes Exercise",
+        "goal": "Maintain good activity levels",
+        "management": "Regular Exercise",
+        "frequency": "PROBLEM_METRIC_FREQUENCY",
+        "status": 1,
+        "master_targets": [
           {
-            operator: '>',
-            value: '50',
-            uom: 'KG',
-            status: 1
+            "operator": ">",
+            "defVal": "50",
+            "uom": "KG",
+            "status": 1
           }
         ],
-        actionPlans: [
+        "master_act_plans": [
           {
-            title: 'Advised',
-            actionPlanInputs: [
+            "title": "Advised",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: TEXT_AREA
+                "label": null,
+                "defVal": "",
+                "input_type_mid": TEXT_AREA
               }
             ]
           },
           {
-            title: 'Provider',
-            actionPlanInputs: [
+            "title": "Provider",
+            "inputs_master": [
               {
-                label: null,
-                defVal: '',
-                inputTypeMasterId: SELECT_BOX,
-                actionPlanInputOptions: [
+                "label": null,
+                "defVal": "",
+                "input_type_mid": SELECT_BOX,
+                "input_options_master": [
                   {
-                    name: 'Exercise Physiologist',
+                    "name": "Exercise Physiologist"
                   },
                   {
-                    name: 'Patient',
+                    "name": "Patient"
                   }
                 ]
               }
@@ -355,23 +348,23 @@ const operations = {
       .then((t) => {
         transactionRef = t;
         data.forEach(a => {
-          que.push(models.CareProblemMetric.create(a, {
+          que.push(models.ProblemMetricsMaster.create(a, {
             include: [
               {
-                model: models.CareProblemMetricTarget,
-                as: 'targets'
+                model: models.ProblemMetricTargetMaster,
+                as: 'master_targets'
               },
               {
-                model: models.CareProblemMetricActionPlan,
-                as: 'actionPlans',
+                model: models.ProblemMetricActionPlanMaster,
+                as: 'master_act_plans',
                 include: [
                   {
-                    model: models.CareProblemMetricActionPlanInput,
-                    as: 'actionPlanInputs',
+                    model: models.ProblemMetricActionPlanInputMaster,
+                    as: 'inputs_master',
                     include: [
                       {
-                        model: models.CareProblemMetricActionPlanInputOption,
-                        as: 'actionPlanInputOptions'
+                        model: models.ProblemMetricActionPlanInputOptionMaster,
+                        as: 'input_options_master'
                       }
                     ]
                   }
@@ -384,7 +377,7 @@ const operations = {
         return Promise.all(que)
       }).then(() => {
       transactionRef.commit();
-      resp.send('seed completed successfully');
+      return resp.send('seed completed successfully');
     }).catch((err) => {
       transactionRef.rollback();
       logger.info(err);
@@ -494,7 +487,7 @@ const operations = {
       },
     ], {individualHooks: true})
       .then(() => {
-        resp.send('seed completed successfully');
+        return resp.send('seed completed successfully');
       }).catch((err) => {
       logger.info(err);
       resp.status(500).send('error');

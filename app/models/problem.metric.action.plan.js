@@ -2,13 +2,13 @@
 import constants from '../util/constants/constants';
 
 export default function (sequelize, DataTypes) {
-  const CareProblemMetricActionPlanInputOption = sequelize.define("CareProblemMetricActionPlanInputOption", {
+  const ProblemMetricActionPlanMaster = sequelize.define("ProblemMetricActionPlanMaster", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
     },
     status: {
@@ -20,16 +20,17 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('care_problem_metrics_action_plan_input_options')
+    tableName: constants.getTableName('problem_metrics_action_plan_master')
   });
-  CareProblemMetricActionPlanInputOption.associate = function (models) {
-    CareProblemMetricActionPlanInputOption.belongsTo(models.CareProblemMetricActionPlanInput, {
+  ProblemMetricActionPlanMaster.associate = function (models) {
+    ProblemMetricActionPlanMaster.hasMany(models.ProblemMetricActionPlanInputMaster, {
       foreignKey: {
-        name: 'actionPlanInputId',
+        name: 'act_plan_mid',
         allowNull: false
       },
-      as: 'actionPlanInputOption'
+      as: 'inputs_master'
     });
+
   };
-  return CareProblemMetricActionPlanInputOption;
+  return ProblemMetricActionPlanMaster;
 };

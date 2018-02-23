@@ -2,7 +2,7 @@
 import constants from '../util/constants/constants';
 
 export default function (sequelize, DataTypes) {
-  const CareProblemMetricTarget = sequelize.define("CareProblemMetricTarget", {
+  const ProblemMetricTargetMaster = sequelize.define("ProblemMetricTargetMaster", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -11,7 +11,7 @@ export default function (sequelize, DataTypes) {
     operator: {
       type: DataTypes.STRING,
     },
-    value: {
+    defVal: {
       type: DataTypes.STRING
     },
     uom: {
@@ -26,10 +26,10 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('care_problem_metrics_target')
+    tableName: constants.getTableName('problem_metrics_target_master')
   });
-  CareProblemMetricTarget.associate = function (models) {
+  ProblemMetricTargetMaster.associate = function (models) {
 
   };
-  return CareProblemMetricTarget;
+  return ProblemMetricTargetMaster;
 };

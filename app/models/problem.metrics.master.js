@@ -2,7 +2,7 @@
 import constants from '../util/constants/constants';
 
 export default function (sequelize, DataTypes) {
-  const CareProblemMetric = sequelize.define("CareProblemMetric", {
+  const ProblemMetricsMaster = sequelize.define("ProblemMetricsMaster", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -29,23 +29,23 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('care_problem_metrics')
+    tableName: constants.getTableName('problem_metrics_master')
   });
-  CareProblemMetric.associate = function (models) {
-    CareProblemMetric.hasMany(models.CareProblemMetricTarget, {
+  ProblemMetricsMaster.associate = function (models) {
+    ProblemMetricsMaster.hasMany(models.ProblemMetricTargetMaster, {
       foreignKey: {
-        name: 'metricId',
+        name: 'metric_mid',
         allowNull: false
       },
-      as: 'targets'
+      as: 'master_targets'
     });
-    CareProblemMetric.hasMany(models.CareProblemMetricActionPlan, {
+    ProblemMetricsMaster.hasMany(models.ProblemMetricActionPlanMaster, {
       foreignKey: {
-        name: 'metricId',
+        name: 'metric_mid',
         allowNull: false
       },
-      as: 'actionPlans'
+      as: 'master_act_plans'
     });
   };
-  return CareProblemMetric;
+  return ProblemMetricsMaster;
 };

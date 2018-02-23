@@ -1,5 +1,6 @@
 "use strict";
 import constants from "../util/constants/constants";
+
 export default function (sequelize, DataTypes) {
 
   const PatientCarePlan = sequelize.define("PatientCarePlan", {
@@ -37,7 +38,7 @@ export default function (sequelize, DataTypes) {
     });
     PatientCarePlan.belongsTo(models.User, {
       foreignKey: {
-        name:'createdBy',
+        name: 'createdBy',
         allowNull: true
       }
     });
