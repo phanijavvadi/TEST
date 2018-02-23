@@ -36,6 +36,9 @@ export default function (app) {
   patientRouter.route('/:patientId')
     .get([
       patientCarePlanCtrl.get]);
+  patientRouter.route('/metric/:metric_id/act-plan-inputs')
+    .get([
+      patientCarePlanCtrl.getActionPlanInputs]);
 
 
   router.route('/create')

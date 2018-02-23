@@ -136,9 +136,9 @@ const operations = {
     });
   },
   importMetricsMasterData: (req, resp) => {
-    const TEXT_BOX = '1de3718f-6437-420a-9124-b4a78c257c56';
-    const SELECT_BOX = '1abe4624-e0f1-41de-b544-172a9acedb54';
-    const TEXT_AREA = 'aaeea354-fd06-4306-b2de-d4ade59c4f6b';
+    const TEXT_BOX = '4a1fb1ec-b055-4ea4-9b36-5ea771df656e';
+    const SELECT_BOX = '8ce8c1ce-4cc6-48f1-9231-4a99d71848a5';
+    const TEXT_AREA = '022c5d03-b21e-4add-8097-e7fd6dc9217f';
 
     const data = [
       {
