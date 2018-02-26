@@ -31,14 +31,14 @@ export default function (sequelize, DataTypes) {
     });
     PatientCarePlan.hasMany(models.PatientCarePlanProblems, {
       foreignKey: {
-        name: 'carePlanId',
+        name: 'cp_id',
         allowNull: false
       },
-      as: 'carePlanProblems'
+      as: 'cp_problems'
     });
     PatientCarePlan.belongsTo(models.User, {
       foreignKey: {
-        name: 'createdBy',
+        name: 'created_by',
         allowNull: true
       }
     });

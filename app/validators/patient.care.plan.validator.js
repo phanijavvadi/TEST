@@ -17,31 +17,31 @@ const validators = {
     const body = req.body;
     let schema = {
       orgId: Joi.string().required(),
-      patientId: Joi.string().required()
+      patient_id: Joi.string().required()
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.checkCarePlanExist(body.patientId, req, resp, next);
+      validators.checkCarePlanExist(body.patient_id, req, resp, next);
     }
   },
   publishReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
       orgId: Joi.string().required(),
-      carePlanId: Joi.string().required(),
-      patientId: Joi.string().required(),
+      cp_id: Joi.string().required(),
+      patient_id: Joi.string().required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
-  checkCarePlanExist: (patientId, req, resp, next) => {
-    patientCarePlanService.findOne({where: {patientId, status: [1, 3]}})
+  checkCarePlanExist: (patient_id, req, resp, next) => {
+    patientCarePlanService.findOne({where: {patient_id, status: [1, 3]}})
       .then((data) => {
         if (data) {
           throw new Error('CARE_PLAN_EXIST');
@@ -54,11 +54,11 @@ const validators = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  isValidCarePlanId: (carePlanId, req, resp, next) => {
+  isValidCarePlanId: (cp_id, req, resp, next) => {
     const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
       where: {
-        id: carePlanId,
+        id: cp_id,
         status: 1
       },
       attributes: ['id']
@@ -66,7 +66,7 @@ const validators = {
 
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
-      options.where['patientId'] = tokenDecoded.id;
+      options.where['patient_id'] = tokenDecoded.id;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
@@ -111,42 +111,42 @@ const validators = {
     });
     let schema = {
       orgId: Joi.string().required(),
-      carePlanId: Joi.string().required(),
-      careProblems: Joi.array().items(subSchema).min(1).required(),
-      patientId: Joi.string().required(),
+      cp_id: Joi.string().required(),
+      problems_master: Joi.array().items(subSchema).min(1).unique((a, b) => a.id === b.id).required(),
+      patient_id: Joi.string().required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
   removeCarePlanProblemReqValidator: (req, resp, next) => {
     const body = req.body;
     const subSchema = Joi.object().keys({
       id: Joi.string().required(),
-      problemId: Joi.string().required(),
+      cp_prob_id: Joi.string().required(),
     });
     let schema = {
       orgId: Joi.string().required(),
-      carePlanId: Joi.string().required(),
-      patientId: Joi.string().required(),
-      careProblems: Joi.array().items(subSchema).min(1).required(),
+      cp_id: Joi.string().required(),
+      patient_id: Joi.string().required(),
+      cp_problems: Joi.array().items(subSchema).min(1).required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
   addProblemMetricReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
       orgId: Joi.string().required(),
-      carePlanId: Joi.string().required(),
-      patientId: Joi.string().required(),
+      cp_id: Joi.string().required(),
+      patient_id: Joi.string().required(),
       metric_mid: Joi.string().required(),
       cp_prob_id: Joi.string().required(),
     };
@@ -154,13 +154,13 @@ const validators = {
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
   saveMetricTargetReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      carePlanId: Joi.string().required(),
+      cp_id: Joi.string().required(),
       id: Joi.string().required(),
       response: Joi.string().required(),
     };
@@ -168,37 +168,37 @@ const validators = {
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
   saveMetricReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      carePlanId: Joi.string().required(),
+      cp_id: Joi.string().required(),
       id: Joi.string().required(),
       management: Joi.string().required(),
-      frequency: Joi.string().allow([null,'']),
+      frequency: Joi.string().allow([null, '']),
       goal: Joi.string().required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   },
   saveActionPlanInputReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {
-      carePlanId: Joi.string().required(),
+      cp_id: Joi.string().required(),
       id: Joi.string().required(),
-      response: Joi.string().allow([null,''])
+      response: Joi.string().allow([null, ''])
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.isValidCarePlanId(body.carePlanId, req, resp, next);
+      validators.isValidCarePlanId(body.cp_id, req, resp, next);
     }
   }
 };

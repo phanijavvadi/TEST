@@ -23,6 +23,13 @@ export default function (sequelize, DataTypes) {
     tableName: constants.getTableName('problem_metrics_action_plan_input_options_master')
   });
   ProblemMetricActionPlanInputOptionMaster.associate = function (models) {
+
+    ProblemMetricActionPlanInputOptionMaster.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
+    });
   };
   return ProblemMetricActionPlanInputOptionMaster;
 };

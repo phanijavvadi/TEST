@@ -36,7 +36,7 @@ export default function (sequelize, DataTypes) {
     });
     PatientCarePlanProblemMetricTarget.belongsTo(models.User, {
       foreignKey: {
-        name: 'createdBy',
+        name: 'created_by',
         allowNull: false
       }
     });

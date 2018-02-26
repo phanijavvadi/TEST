@@ -50,7 +50,7 @@
     "start": "node server.js",
     "start:dev": "nodemon server.js --exec babel-node",
     "prebuild": "npm run clean",
-    "build": "babel -d ./dist ./server.js ./app/**/*.js ./config/*.js ./config/**/*.js",
+    "build": "babel -d ./dist ./server.js ./app/**/*.js ./config/*.js ./config/**/*.js ./app/util/**/*.js",
     "test:unit": "mocha --compilers js:babel-register --plugins add-module-exports ./test/unit.test/"
   },
   "keywords": [],

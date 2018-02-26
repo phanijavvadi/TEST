@@ -10,23 +10,17 @@ export default function (sequelize, DataTypes) {
       defaultValue: DataTypes.UUIDV4
     }
   }, {
-    paranoid: false,
+    paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('org_patient_care_plan_problems'),
-    indexes: [
-      {
-        unique: true,
-        fields: ['problemId', 'carePlanId']
-      }
-    ]
+    tableName: constants.getTableName('org_patient_care_plan_problems')
   });
   PatientCarePlanProblems.associate = function (models) {
     PatientCarePlanProblems.belongsTo(models.ProblemsMaster, {
       foreignKey: {
-        name: 'problemId',
+        name: 'problem_mid',
         allowNull: false
       },
-      as: 'careProblem'
+      as: 'problem_master'
     });
     PatientCarePlanProblems.hasMany(models.PatientCarePlanProblemMetric, {
       foreignKey: {
@@ -38,7 +32,7 @@ export default function (sequelize, DataTypes) {
 
     PatientCarePlanProblems.belongsTo(models.User, {
       foreignKey: {
-        name: 'createdBy',
+        name: 'created_by',
         allowNull: true
       }
     });

@@ -30,6 +30,12 @@ export default function (sequelize, DataTypes) {
   });
   ProblemMetricTargetMaster.associate = function (models) {
 
+    ProblemMetricTargetMaster.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
+    });
   };
   return ProblemMetricTargetMaster;
 };

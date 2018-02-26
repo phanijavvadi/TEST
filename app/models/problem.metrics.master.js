@@ -20,6 +20,28 @@ export default function (sequelize, DataTypes) {
     frequency: {
       type: DataTypes.STRING
     },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUnique: function (value, next) {
+          const self = this;
+          ProblemMetricsMaster.find({
+            where: {type: value, problem_mid: self.problem_mid},
+            attributes: ['id', 'type']
+          })
+            .then(function (user) {
+              if (user && self.id !== user.id) {
+                return next('METRIC_TYPE_EXIST');
+              }
+              return next();
+            })
+            .catch(function (err) {
+              return next(err.message);
+            });
+        }
+      }
+    },
     status: {
       type: DataTypes.INTEGER,
       defaultValue: 1,
@@ -45,6 +67,12 @@ export default function (sequelize, DataTypes) {
         allowNull: false
       },
       as: 'master_act_plans'
+    });
+    ProblemMetricsMaster.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
     });
   };
   return ProblemMetricsMaster;

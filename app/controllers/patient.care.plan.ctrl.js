@@ -20,72 +20,48 @@ const Op = Sequelize.Op;
 
 const operations = {
   get: (req, resp) => {
-    const patientId = req.params.patientId;
+    const patient_id = req.params.patientId;
     const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
       where: {
-        patientId: patientId,
+        patient_id: patient_id,
         status: [1, 3]
       },
       include: [{
         model: models.PatientCarePlanProblems,
-        as: 'carePlanProblems',
+        as: 'cp_problems',
         attributes: {
-          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
         },
         include: [
           {
             model: models.PatientCarePlanProblemMetric,
             as: 'metrics',
             attributes: {
-              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
             },
             include: [
               {
                 model: models.PatientCarePlanProblemMetricTarget,
                 as: 'targets',
                 attributes: {
-                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
                 },
                 include: [
                   {
                     model: models.ProblemMetricTargetMaster,
                     as: 'metric_target_master',
                     attributes: {
-                      exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+                      exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
                     },
                   }
                 ]
-              }/*,
-              {
-                model: models.PatientCarePlanProblemMetricActionPlan,
-                as: 'act_plans',
-                attributes: ['id', 'title', 'act_plan_mid'],
-                include: [
-                  {
-                    model: models.PatientCarePlanProblemMetricActionPlanInput,
-                    as: 'inputs',
-                    attributes: ['id', 'defVal', 'response'],
-                    include: [{
-                      model: models.ProblemMetricActionPlanInputMaster,
-                      as: 'input_master',
-                      attributes: ['id', ['input_type_mid', 'intmid']],
-                      include: [
-                        {
-                          model: models.ProblemMetricActionPlanInputOptionMaster,
-                          as: 'input_options_master'
-                        }
-                      ]
-                    }]
-
-                  }
-                ]
-              }*/
+              }
             ]
           },
           {
             model: models.ProblemsMaster,
-            as: 'careProblem',
+            as: 'problem_master',
             attributes: {
               exclude: ['deletedAt', 'createdAt', 'updatedAt', 'status', 'id']
             },
@@ -93,7 +69,7 @@ const operations = {
         ]
       }],
       attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
       }
     };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
@@ -112,10 +88,10 @@ const operations = {
         if (data) {
           const resultObj = data.get({plain: true});
 
-          if (resultObj.carePlanProblems) {
-            resultObj.carePlanProblems = resultObj.carePlanProblems.map((carePlanProblem, i) => {
+          if (resultObj.cp_problems) {
+            resultObj.cp_problems = resultObj.cp_problems.map((cp_problem, i) => {
 
-              carePlanProblem.metrics = carePlanProblem.metrics.map(metric => {
+              cp_problem.metrics = cp_problem.metrics.map(metric => {
                 metric.targets = metric.targets.map(target => {
                   if (!target.response) {
                     target.response = target.defVal;
@@ -124,7 +100,7 @@ const operations = {
                 });
                 return metric;
               });
-              return carePlanProblem;
+              return cp_problem;
             });
           }
 
@@ -170,7 +146,7 @@ const operations = {
         }
       ],
       attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
       }
     };
 
@@ -268,27 +244,28 @@ const operations = {
     }
     const data = {
       orgId: body.orgId,
-      patientId: body.patientId,
-      createdBy: authenticatedUser.id,
+      patient_id: body.patient_id,
+      created_by: authenticatedUser.id,
       status: 1
     };
+    let transaction;
     return sequelize.transaction()
       .then((t) => {
+        transaction = t;
         return patientCarePlanService
-          .create(data, {transaction: t})
-          .then((res) => {
-            t.commit();
-            return resp.json({
-              success: true,
-              data: res,
-              message: successMessages.CARE_PLAN_CREATEED
-            });
-          })
-          .catch((err) => {
-            t.rollback();
-
-            commonUtil.handleException(err, req, resp, next);
-          });
+          .create(data, {transaction: transaction})
+      })
+      .then((res) => {
+        transaction.commit();
+        return resp.json({
+          success: true,
+          data: res,
+          message: successMessages.CARE_PLAN_CREATEED
+        });
+      })
+      .catch((err) => {
+        transaction.rollback();
+        commonUtil.handleException(err, req, resp, next);
       });
   },
   publish: (req, resp, next) => {
@@ -305,7 +282,7 @@ const operations = {
     }
     const data = {
       id: body.carePlanId,
-      patientId: body.patientId,
+      patient_id: body.patient_id,
       orgId: body.orgId,
       status: 3
     };
@@ -340,37 +317,155 @@ const operations = {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
     }
-    const data = body.careProblems.map(a => {
-      return {
-        carePlanId: body.carePlanId,
-        problemId: a.id,
-        patientId: body.patientId,
-        createdBy: authenticatedUser.id,
-      }
-    });
+    const created_by = authenticatedUser.id;
+
+    let transaction;
+    const cp_problems = [];
+    const cp_problems_index = {};
     return sequelize.transaction()
       .then((t) => {
-        return patientCarePlanProblemService
-          .bulkCreate(data, {transaction: t, individualHooks: true})
-          .then((res) => {
-            t.commit();
-            return resp.json({
-              success: true,
-              data: res,
-              message: successMessages.CARE_PLAN_PROBLEM_CREATEED
-            });
-          })
-          .catch((err) => {
-            t.rollback();
-            if (err && err.name === 'SequelizeUniqueConstraintError') {
-              return resp.status(403).send({
-                success: false,
-                code: 'CARE_PROBLEM_ALREADY_MAPPED',
-                message: errorMessages.CARE_PROBLEM_ALREADY_MAPPED
+        transaction = t;
+        const que = [];
+        body.problems_master.forEach((problem_master, index) => {
+          const cp_problem = {
+            cp_id: body.cp_id,
+            problem_mid: problem_master.id,
+            patient_id: body.patient_id,
+            created_by: created_by,
+            metrics: []
+          };
+          cp_problems.push(cp_problem);
+          cp_problems_index[problem_master.id] = index;
+
+          const options = {
+            where: {
+              problem_mid: problem_master.id,
+              status: [1]
+            },
+            include: [
+              {
+                model: models.ProblemMetricTargetMaster,
+                as: 'master_targets',
+                attributes: {
+                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status', 'metric_mid']
+                }
+              },
+              {
+                model: models.ProblemMetricActionPlanMaster,
+                as: 'master_act_plans',
+                attributes: {
+                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status', 'metric_mid']
+                },
+                include: [
+                  {
+                    model: models.ProblemMetricActionPlanInputMaster,
+                    as: 'inputs_master',
+                    attributes: {
+                      include: ['id', 'defVal']
+                    }
+                  }
+                ]
+              }],
+            attributes: {
+              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status']
+            }
+          };
+          que.push(careProblemMetricsService.findAll(options));
+        });
+        return Promise.all(que);
+      })
+      .spread((metricsMasterData) => {
+        if (metricsMasterData) {
+          metricsMasterData.forEach(metric_master => {
+            const carePlanMatricData = {
+              metric_mid: metric_master.id,
+              name: metric_master.name,
+              goal: metric_master.goal,
+              frequencyKey: metric_master.frequency,
+              management: metric_master.management,
+              created_by: created_by,
+              targets: [],
+              act_plans: []
+            };
+            if (metric_master.master_targets) {
+              metric_master.master_targets.forEach(master_target => {
+                const target = {
+                  defVal: master_target.defVal,
+                  uom: master_target.uom,
+                  operator: master_target.operator,
+                  created_by: created_by,
+                  metric_target_mid: master_target.id,
+                };
+                carePlanMatricData.targets.push(target);
               });
             }
-            commonUtil.handleException(err, req, resp, next);
+            if (metric_master.master_act_plans) {
+              metric_master.master_act_plans.forEach(master_act_plan => {
+                let act_plan = {
+                  title: master_act_plan.title,
+                  act_plan_mid: master_act_plan.id,
+                  created_by: created_by,
+                  inputs: []
+                };
+                act_plan.inputs = master_act_plan.inputs_master.map(inputMaster => {
+                  return {
+                    input_mid: inputMaster.id,
+                    defVal: inputMaster.defVal,
+                    created_by: created_by
+                  };
+                });
+                carePlanMatricData.act_plans.push(act_plan);
+              });
+            }
+            cp_problems[cp_problems_index[metric_master.problem_mid]].metrics.push(carePlanMatricData);
           });
+        }
+        const cp_problems_que = [];
+        cp_problems.forEach(cp_problem => {
+          cp_problems_que.push(patientCarePlanProblemService.create(cp_problem, {
+              transaction: transaction,
+              include: [{
+                model: models.PatientCarePlanProblemMetric,
+                as: 'metrics',
+                include: [
+                  {
+                    model: models.PatientCarePlanProblemMetricTarget,
+                    as: 'targets'
+                  },
+                  {
+                    model: models.PatientCarePlanProblemMetricActionPlan,
+                    as: 'act_plans',
+                    include: [
+                      {
+                        model: models.PatientCarePlanProblemMetricActionPlanInput,
+                        as: 'inputs'
+                      }
+                    ]
+                  }
+                ]
+              }]
+            }));
+        });
+        return Promise.all(cp_problems_que);
+      })
+      .then((res) => {
+        transaction.commit();
+        return resp.json({
+          success: true,
+          data: res,
+          message: successMessages.CARE_PLAN_PROBLEM_CREATEED
+        });
+      })
+      .catch((err) => {
+        transaction.rollback();
+        if (err && err.name === 'SequelizeUniqueConstraintError') {
+          return resp.status(403).send({
+            success: false,
+            code: 'CARE_PROBLEM_ALREADY_MAPPED',
+            message: errorMessages.CARE_PROBLEM_ALREADY_MAPPED
+          });
+        }
+        commonUtil.handleException(err, req, resp, next);
       });
   },
   removeProblem: (req, resp, next) => {
@@ -419,7 +514,7 @@ const operations = {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
     }
-    const createdBy = authenticatedUser.id;
+    const created_by = authenticatedUser.id;
     let transaction;
 
     const options = {
@@ -432,14 +527,14 @@ const operations = {
           model: models.ProblemMetricTargetMaster,
           as: 'master_targets',
           attributes: {
-            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status', 'metric_mid']
+            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status', 'metric_mid']
           }
         },
         {
           model: models.ProblemMetricActionPlanMaster,
           as: 'master_act_plans',
           attributes: {
-            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status', 'metric_mid']
+            exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status', 'metric_mid']
           },
           include: [
             {
@@ -452,7 +547,7 @@ const operations = {
           ]
         }],
       attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status']
       }
     };
     return sequelize.transaction()
@@ -472,7 +567,7 @@ const operations = {
           goal: metricData.goal,
           frequencyKey: metricData.frequency,
           management: metricData.management,
-          createdBy: createdBy,
+          created_by: created_by,
           targets: [],
           act_plans: []
         };
@@ -481,7 +576,7 @@ const operations = {
             defVal: master_target.defVal,
             uom: master_target.uom,
             operator: master_target.operator,
-            createdBy: createdBy,
+            created_by: created_by,
             metric_target_mid: master_target.id,
           };
           carePlanMatricData.targets.push(target);
@@ -490,14 +585,14 @@ const operations = {
           let act_plan = {
             title: master_act_plan.title,
             act_plan_mid: master_act_plan.id,
-            createdBy: createdBy,
+            created_by: created_by,
             inputs: []
           };
           act_plan.inputs = master_act_plan.inputs_master.map(inputMaster => {
             return {
               input_mid: inputMaster.id,
               defVal: inputMaster.defVal,
-              createdBy: createdBy
+              created_by: created_by
             };
           });
           carePlanMatricData.act_plans.push(act_plan);

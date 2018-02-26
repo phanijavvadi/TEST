@@ -26,6 +26,19 @@ export default function (sequelize, DataTypes) {
     tableName: constants.getTableName('problems_master')
   });
   ProblemsMaster.associate = function (models) {
+    ProblemsMaster.hasMany(models.ProblemMetricsMaster, {
+      foreignKey: {
+        name: 'problem_mid',
+        allowNull: false
+      },
+      as: 'problem_master'
+    });
+    ProblemsMaster.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
+    });
   };
   return ProblemsMaster;
 };

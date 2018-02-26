@@ -31,6 +31,13 @@ export default function (sequelize, DataTypes) {
       as: 'inputs_master'
     });
 
+    ProblemMetricActionPlanMaster.belongsTo(models.User, {
+      foreignKey: {
+        name: 'createdBy',
+        allowNull: false
+      }
+    });
+
   };
   return ProblemMetricActionPlanMaster;
 };

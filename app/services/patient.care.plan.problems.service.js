@@ -48,12 +48,8 @@ export function findOne(options = {}) {
   });
 }
 
-export function create(patientCarePlanProblem, {transaction = null, ...options} = {}) {
-  return PatientCarePlanProblems.create(patientCarePlanProblem, {transaction});
-}
-
-export function bulkCreate(patientCarePlanProblems, {transaction = null, ...options} = {}) {
-  return PatientCarePlanProblems.bulkCreate(patientCarePlanProblems, {transaction, individualHooks: true});
+export function create(patientCarePlanProblem, options = {}) {
+  return PatientCarePlanProblems.create(patientCarePlanProblem, options);
 }
 
 export function update(patientCarePlanProblem, {transaction = null, ...options} = {}) {

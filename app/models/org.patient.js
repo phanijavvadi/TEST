@@ -92,7 +92,7 @@ export default function (sequelize, DataTypes) {
 
     Patient.hasMany(models.PatientCarePlan, {
       foreignKey: {
-        name: 'patientId',
+        name: 'patient_id',
         allowNull: false
       },
       as: 'carePlan'

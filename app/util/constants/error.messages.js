@@ -1,6 +1,12 @@
 'use strict';
 
 const errorMessages = {
+
+  // Sequilize errors
+
+  SequelizeForeignKeyConstraintError: 'Invalid input',
+
+
   SERVER_ERROR: "Internal erver error",
   UNIQUE_CONSTRAINT_ERROR: "Fields unique key validation error",
   NOT_FOUND: "The submitted request can not be understood",
@@ -85,8 +91,10 @@ const errorMessages = {
   PREV_HEALTH_EXIST: 'Preventive health record exist',
   INVALID_PATIENT_PREV_HEALTH_PROBLEM_ID: 'Invalid input',
   INVALID_PATIENT_PREV_HEALTH_ID: 'Invalid input',
-  PREV_HEALTH_RECORD_EXIST: 'Preventive health record exist'
+  PREV_HEALTH_RECORD_EXIST: 'Preventive health record exist',
 
+
+  METRIC_CATEGORY_ALREADY_EXIST: 'Metric category already exist'
 
 };
 export default errorMessages;
