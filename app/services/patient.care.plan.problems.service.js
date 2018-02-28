@@ -4,6 +4,49 @@ import models from '../models';
 
 const PatientCarePlanProblems = models.PatientCarePlanProblems;
 
+export function getAll(options = {}) {
+  return PatientCarePlanProblems.findAll({
+    include: options.include || [
+      {
+        model: models.PatientCarePlanProblemMetric,
+        as: 'metrics',
+        attributes: {
+          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+        },
+        include: [
+          {
+            model: models.PatientCarePlanProblemMetricTarget,
+            as: 'targets',
+            attributes: {
+              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+            },
+            include: [
+              {
+                model: models.ProblemMetricTargetMaster,
+                as: 'metric_target_master',
+                attributes: {
+                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+                },
+              }
+            ]
+          }
+        ]
+      },
+      {
+        model: models.ProblemsMaster,
+        as: 'problem_master',
+        attributes: {
+          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'status', 'id']
+        },
+      }
+    ],
+    where: {
+      ...(options.where || {})
+    }
+  });
+}
+
+
 /**
  * Find all patientCarePlan in the db
  *

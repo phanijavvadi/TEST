@@ -16,7 +16,7 @@ export default function (app) {
     .get([
       problemsMasterCtrl.getOptions]);
 
-  router.route('/metrics')
+  router.route('/:problem_mid/metrics')
     .get([
       problemsMasterCtrl.getMetrics]);
 

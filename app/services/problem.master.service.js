@@ -24,9 +24,7 @@ export function findAll({limit = 150, offset = 0, ...otherOptions} = {}, options
  **/
 export function getOptions() {
   return ProblemsMaster.findAll({
-    attributes: {
-      exclude: ['createdAt', 'updatedAt', 'deletedAt']
-    }
+    attributes: ['id', 'name', 'description']
   });
 }
 
@@ -39,11 +37,11 @@ export function findById(id, options = {}) {
   });
 }
 
-export function create(problemsMaster,{transaction = null, ...options} = {}) {
+export function create(problemsMaster, {transaction = null, ...options} = {}) {
   return ProblemsMaster.create(problemsMaster, {transaction});
 }
 
-export function update(problemsMaster,{transaction = null, ...options} = {}) {
+export function update(problemsMaster, {transaction = null, ...options} = {}) {
   return ProblemsMaster.findById(problemsMaster.id, {
     attributes: {
       exclude: [],

@@ -45,6 +45,12 @@ export default function (app) {
     .post([
       patientCarePlanValidator.createReqValidator,
       patientCarePlanCtrl.create]);
+
+  router.route('/clone')
+    .post([
+      patientCarePlanValidator.cloneReqValidator,
+      patientCarePlanCtrl.cloneCarePlan]);
+
   router.route('/publish')
     .post([
       patientCarePlanValidator.publishReqValidator,
@@ -68,6 +74,14 @@ export default function (app) {
         patientCarePlanValidator.isValidCarePlanProblemId(cp_prob_id, req, resp, next)
       },
       patientCarePlanCtrl.addProblemMetric]);
+  router.route('/remove-problem-metric')
+    .delete([
+      patientCarePlanValidator.removeProblemMetricReqValidator,
+      (req, resp, next) => {
+        const cp_prob_id = req.body.cp_prob_id;
+        patientCarePlanValidator.isValidCarePlanProblemId(cp_prob_id, req, resp, next)
+      },
+      patientCarePlanCtrl.removeProblemMetric]);
 
   app.use('/api/org-user/private/care-plan', router);
   app.use('/api/patient/private/care-plan', patientRouter);

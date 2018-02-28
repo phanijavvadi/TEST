@@ -36,11 +36,18 @@ export default function (sequelize, DataTypes) {
       },
       as: 'cp_problems'
     });
+    PatientCarePlan.belongsTo(models.PatientCarePlan, {
+      foreignKey: {
+        name: 'cloned_from',
+        allowNull: true
+      }
+    });
     PatientCarePlan.belongsTo(models.User, {
       foreignKey: {
         name: 'created_by',
         allowNull: true
-      }
+      },
+      as:'createdBy'
     });
   };
   return PatientCarePlan;

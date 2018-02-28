@@ -50,18 +50,18 @@ export function findOne(options = {}) {
   });
 }
 
-export function create(patientCarePlan, {transaction = null, ...options} = {}) {
-  return PatientCarePlan.create(patientCarePlan, {transaction});
+export function create(patientCarePlan, options = {}) {
+  return PatientCarePlan.create(patientCarePlan, options);
 }
 
-export function update(patientCarePlan, {transaction = null, ...options} = {}) {
+export function update(patientCarePlan, options = {}) {
   return PatientCarePlan.findById(patientCarePlan.id, {
     attributes: {
       exclude: [],
     }
   }).then((p) => {
     if (p) {
-      return p.update(patientCarePlan, {transaction});
+      return p.update(patientCarePlan, options);
     } else {
       throw new Error('INVALID_PATIENT_CARE_PLAN_ID');
     }

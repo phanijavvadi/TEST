@@ -12,7 +12,25 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('org_patient_care_plan_problems')
+    tableName: constants.getTableName('org_patient_care_plan_problems'),
+    validate: {
+      isUnique: function (next) {
+        const self = this;
+        PatientCarePlanProblems.find({
+          where: {cp_id: self.cp_id, problem_mid: self.problem_mid},
+          attributes: ['id', 'cp_id']
+        })
+          .then(function (record) {
+            if (record && self.id !== record.id) {
+              return next('CARE_PROBLEM_ALREADY_MAPPED');
+            }
+            return next();
+          })
+          .catch(function (err) {
+            return next(err.message);
+          });
+      }
+    }
   });
   PatientCarePlanProblems.associate = function (models) {
     PatientCarePlanProblems.belongsTo(models.ProblemsMaster, {

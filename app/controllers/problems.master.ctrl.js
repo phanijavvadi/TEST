@@ -26,9 +26,11 @@ const operations = {
   },
   getMetrics: (req, resp) => {
     const {authenticatedUser, tokenDecoded} = req.locals;
+    const problem_mid = req.params.problem_mid;
     const options = {
       where: {
-        status: [1]
+        status: [1],
+        problem_mid
       },
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
@@ -216,15 +218,13 @@ const operations = {
         });
       })
       .catch(Sequelize.ValidationError, function (err) {
-        transactionRef.rollback();
-        let message = err.message;
+        let message = 'UNKNOWN_ERROR';
         if (err && err.errors &&
           err.errors.length > 0 &&
           err.errors[0].message === 'METRIC_TYPE_EXIST') {
           message = 'Metric type ' + err.errors[0].value + ' already exist';
         }
-        commonUtil.handleException({code: 422, message}, req, resp, next);
-        return null;
+        throw  new Error(message);
       })
       .catch((err) => {
         transactionRef.rollback();

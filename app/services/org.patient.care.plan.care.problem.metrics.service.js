@@ -42,10 +42,10 @@ export function update(carePlanProblemMetric, {transaction = null, ...options} =
   });
 }
 
-export function destroy(carePlanProblemMetric) {
+export function destroy(carePlanProblemMetric, options = {}) {
   return PatientCarePlanProblemMetric.destroy({
     where: {
       ...carePlanProblemMetric
     }
-  });
+  }, options);
 }

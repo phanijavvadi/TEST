@@ -12,6 +12,9 @@ export default function (sequelize, DataTypes) {
     name: {
       type: DataTypes.STRING
     },
+    type: {
+      type: DataTypes.STRING
+    },
     goal: {
       type: DataTypes.TEXT
     },
