@@ -657,11 +657,12 @@ const operations = {
         as: 'createdBy'
       }],
       attributes: {
-        exclude: ['deletedAt']
+        exclude: ['deletedAt','cloned_from']
       }
     };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
+      options.where['status'] = 3;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
