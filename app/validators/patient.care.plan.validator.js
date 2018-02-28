@@ -51,6 +51,25 @@ const validators = {
       }, req, resp, next);
     }
   },
+  downloadCarePlanReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      orgId: Joi.string().required(),
+      patient_id: Joi.string().required(),
+      cp_id: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      validators.isValidCarePlanId({
+        where: {
+          patient_id: body.patient_id,
+          id: body.cp_id,
+        }
+      }, req, resp, next);
+    }
+  },
   publishReqValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {

@@ -1,5 +1,8 @@
 'use strict';
 import * as _ from 'lodash';
+import * as ejs from 'ejs';
+import * as fs from 'fs';
+import * as htmlToText from 'html-to-text';
 import moment from 'moment';
 import models from '../models';
 import errorMessages from '../util/constants/error.messages';
@@ -228,6 +231,7 @@ const operations = {
               metric_master.master_targets.forEach(master_target => {
                 const target = {
                   defVal: master_target.defVal,
+                  response: master_target.defVal,
                   uom: master_target.uom,
                   operator: master_target.operator,
                   created_by: created_by,
@@ -248,6 +252,7 @@ const operations = {
                   return {
                     input_mid: inputMaster.id,
                     defVal: inputMaster.defVal,
+                    response: inputMaster.defVal,
                     created_by: created_by
                   };
                 });
@@ -414,6 +419,7 @@ const operations = {
         metricData.master_targets.forEach(master_target => {
           const target = {
             defVal: master_target.defVal,
+            response: master_target.defVal,
             uom: master_target.uom,
             operator: master_target.operator,
             created_by: created_by,
@@ -432,6 +438,7 @@ const operations = {
             return {
               input_mid: inputMaster.id,
               defVal: inputMaster.defVal,
+              response: inputMaster.defVal,
               created_by: created_by
             };
           });
@@ -640,6 +647,115 @@ const operations = {
         });
       })
       .catch((err) => {
+        transaction.rollback();
+        commonUtil.handleException(err, req, resp);
+      });
+  },
+  downloadCarePlan: (req, resp) => {
+    const body = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const created_by = authenticatedUser.id;
+    const options = {
+      where: {
+        id: body.cp_id,
+      },
+      include: [{
+        model: models.PatientCarePlanProblems,
+        as: 'cp_problems',
+        attributes: ['problem_mid'],
+        include: [
+          {
+            model: models.ProblemsMaster,
+            as: 'problem_master',
+            attributes: ['name', 'description'],
+          },
+          {
+            model: models.PatientCarePlanProblemMetric,
+            as: 'metrics',
+            attributes: ['name', 'type', 'goal', 'management', 'frequency', 'frequencyKey'],
+            include: [
+              {
+                model: models.PatientCarePlanProblemMetricTarget,
+                as: 'targets',
+                attributes: ['defVal', 'operator', 'uom', 'response'],
+              },
+              {
+                model: models.PatientCarePlanProblemMetricActionPlan,
+                as: 'act_plans',
+                attributes: ['title', 'act_plan_mid'],
+                include: [
+                  {
+                    model: models.PatientCarePlanProblemMetricActionPlanInput,
+                    as: 'inputs',
+                    attributes: ['defVal', 'response', 'input_mid'],
+                    include: [{
+                      model: models.ProblemMetricActionPlanInputMaster,
+                      as: 'input_master',
+                      attributes: ['label']
+                    }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }, {
+        model: models.User,
+        attributes: ['firstName', 'lastName', 'id'],
+        as: 'createdBy'
+      }, {
+        model: models.Patient,
+        attributes: ['firstName', 'surName', 'patientNumber', 'mobileNo', 'email'],
+        as: 'patient'
+      }],
+      attributes: ['createdAt', 'updatedAt']
+    };
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      options.where['orgId'] = tokenDecoded.orgId;
+    } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.where['orgId'] = userOrgIds;
+    }
+
+
+    let transaction, filename;
+    return patientCarePlanService.findOne(options)
+      .then((data) => {
+        if (data) {
+          const resultObj = data.get({plain: true});
+          filename = resultObj.patient.firstName + '_' + resultObj.patient.surName + '_' + resultObj.patient.patientNumber + '_careplan.txt';
+          resultObj.createdOn = moment(resultObj.createdAt, 'YYYY-MM-DD HH:ss').format('DD,MMM YYYY @hh:ss A');
+
+          let html = fs.readFileSync(__dirname + '/../templates/care-plan-tmpl.html', 'utf8');
+          html = ejs.render(html, {
+            carePlan: resultObj
+          });
+          return htmlToText.fromString(html);
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((content) => {
+        resp.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        resp.setHeader('Content-type', 'text/plain');
+        resp.setHeader('filename', filename);
+        resp.setHeader('Access-Control-Expose-Headers', 'filename');
+        resp.charset = 'UTF-8';
+        resp.write(content);
+        resp.end();
+        /*return resp.json({
+          success: true,
+          data: res,
+          message: successMessages.CARE_PLAN_CREATEED
+        });*/
+      })
+      .catch((err) => {
+        // transaction.rollback();
         commonUtil.handleException(err, req, resp);
       });
   },
@@ -657,7 +773,8 @@ const operations = {
         as: 'createdBy'
       }],
       attributes: {
-        exclude: ['deletedAt','cloned_from']
+        include:[['cloned_from', 'prev_cp_id']],
+        exclude: ['deletedAt']
       }
     };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {

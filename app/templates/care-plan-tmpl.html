@@ -1,0 +1,103 @@
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+<table>
+  <tr>
+    <td>
+      <h2>Care Plan</h2>
+      <hr/>
+      <p class="normal-space small">
+      Patient Name: <%= carePlan.patient.firstName %> <%= carePlan.patient.surName %><br />
+        Patient Number: <%= carePlan.patient.patientNumber %>
+     <% if(carePlan.patient.mobileNo){ %><br />Mob <%= carePlan.patient.mobileNo %> <% } %>
+        <% if(carePlan.patient.email){ %><br />
+      E-Mail: <a href="<%= carePlan.patient.email %>"><%= carePlan.patient.email %></a>
+       <% } %>
+    </p>
+
+    </td>
+    <td></td>
+  </tr>
+  <% carePlan.cp_problems.forEach(function(cp_problem){ %>
+  <tr>
+    <td>
+      <hr/>
+      <h2><%= cp_problem.problem_master.name %></h2>
+    </td>
+    <td></td>
+  </tr>
+  <% cp_problem.metrics.forEach(function(metric){ %>
+  <tr>
+    <td colspan="2">
+      <table class="address">
+        <tr>
+
+        </tr>
+        <tr>
+          <td align="left" colspan="2">
+            <p>Metric : <%= metric.name%>
+
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" colspan="2">
+            <p>Frequency : <%= metric.frequency%>
+            </p>
+          </td>
+
+        </tr>
+        <tr>
+          <td align="left" colspan="2">
+            <p>Goal : <%= metric.goal%>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" colspan="2">
+            <p>Management : <%= metric.management%>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" colspan="2">
+            <p>Target :  <% metric.targets.forEach(function(target){ %>
+            <%= target.operator%>  <%= target.response %>  <%= target.uom %>
+            <% }) %>
+            </p>
+          </td>
+        </tr>
+        <% metric.act_plans.forEach(function(act_plan){ %>
+        <tr>
+          <td align="left" colspan="2">
+            <p> <%= act_plan.title %> :
+              <% act_plan.inputs.forEach(function(input){ %>
+            <%= input.input_master.label %>  <%= input.response %>
+              <% }) %>
+            </p>
+          </td>
+        </tr>
+        <% }) %>
+        <tr>
+          <td align="left" colspan="2"><p>-----------------------</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <% }) %>
+  <% }); %>
+  <tr>
+    <td>
+      <hr/>
+      <h2>History</h2>
+      <p class="normal-space small"><%= carePlan.createdOn %> by <%= carePlan.createdBy.firstName %> <%= carePlan.createdBy.lastName %>
+      </p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

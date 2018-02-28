@@ -29,6 +29,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'organisation'
     });
+    PatientCarePlan.belongsTo(models.Patient, {
+      foreignKey: {
+        name: 'patient_id',
+        allowNull: false
+      },
+      as: 'patient'
+    });
     PatientCarePlan.hasMany(models.PatientCarePlanProblems, {
       foreignKey: {
         name: 'cp_id',

@@ -5,6 +5,7 @@ import patientCarePlanValidator from '../validators/patient.care.plan.validator'
  */
 import express from 'express';
 import patientCarePlanCtrl from '../controllers/patient.care.plan.ctrl';
+import cors from 'cors';
 
 const router = express.Router();
 const patientRouter = express.Router();
@@ -50,6 +51,10 @@ export default function (app) {
     .post([
       patientCarePlanValidator.cloneReqValidator,
       patientCarePlanCtrl.cloneCarePlan]);
+  router.route('/download')
+    .post([
+      patientCarePlanValidator.downloadCarePlanReqValidator,
+      patientCarePlanCtrl.downloadCarePlan]);
 
   router.route('/publish')
     .post([
