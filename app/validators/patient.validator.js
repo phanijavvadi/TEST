@@ -1,14 +1,14 @@
 'use strict';
 import * as Joi from 'joi';
 import logger from '../util/logger';
-
 import errorMessages from '../util/constants/error.messages';
+import * as patientService from '../services/patient.service';
+import * as attachmentValidator from './attachment.validator';
+import commonUtil from "../util/common.util";
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-import * as patientService from '../services/patient.service';
-import * as attachmentValidator from './attachment.validator';
 
 const validators = {
 
@@ -258,6 +258,19 @@ const validators = {
     } else {
       next();
     }
+  },
+  isValidPatientId: (options, req, resp, next) => {
+    patientService.findOne(options)
+      .then(data => {
+        if (data) {
+          next();
+          return null;
+        } else {
+          throw new Error('INVALID_INPUT')
+        }
+      }).catch(err => {
+      commonUtil.handleException(err, req, resp);
+    })
   },
 }
 export default validators;

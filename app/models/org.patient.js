@@ -47,7 +47,7 @@ export default function (sequelize, DataTypes) {
     },
     status: {
       type: DataTypes.INTEGER,
-      defaultValue: 2,
+      defaultValue: 1,
       allowNull: false,
       comment: "1=>Active,2=>In Active"
     }
@@ -117,6 +117,13 @@ export default function (sequelize, DataTypes) {
         allowNull: false
       },
       as: 'medications'
+    });
+    Patient.hasMany(models.PatientDevice, {
+      foreignKey: {
+        name: 'patient_id',
+        allowNull: false
+      },
+      as: 'devices'
     });
     Patient.belongsTo(models.Attachment, {
       foreignKey: {

@@ -3,7 +3,6 @@
 import logger from '../util/logger';
 import models from '../models';
 import user from "../models/user";
-
 const sequelize = models.sequelize;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -219,7 +218,57 @@ const operations = {
       logger.info(err);
       resp.status(500).send('error');
     });
-  }
+  },
+  /*sendNotification: (req, resp) => {
+
+    axios({
+      method: 'post',
+      url: 'https://fcm.googleapis.com/fcm/send',
+      headers: {
+        "Authorization": "key=AAAAEi8MZQI:APA91bEBMhY-GVvaSzdovSQnK2Zj_c1-XI0WTVC3Bb3vssZl__IIi_xwSDJegtD5ZwBHTl-hBtUNhfnDjamO1l1weVWJbCpajfMIPSN1DjR54nBZBs0_RJb3CSH1NGhdh4jBhciRQlt_",
+        "Content-Type": "application/json"
+      },
+      data: {
+        "to": "cm_b1hYwTXo:APA91bEmj_r4spUpwVjoeyvnys_DukMvoxqvNKF7eEhnK0bUxNznzGmeBnnbjpTGpWhnOgWeSCI8gU90XUGYcZ4gxZcrMiFt_qh1IUEpPQmqyB3AOJYimftWloNd2BueasqnddwAJKJl",
+        "collapse_key": "type_a",
+        "notification": {
+          "body": "First Notification",
+          "title": "Collapsing A"
+        },
+        "data": {
+          "body": "First Notification",
+          "title": "Collapsing A",
+          "key_1": "Data for key one",
+          "key_2": "Hellowww"
+        }
+      }
+    }).then((response) => {
+      return resp.status(200).json(response.data);
+    }).catch((err) => {
+      logger.info(err);
+      resp.status(500).send('error');
+    });
+  },
+  sendIOSNotification: (req, resp) => {
+    const token = '8a6273c2d81a97e643a085625fd47379c36d0cdb62fe3ef4a7700c35b2071b2a';
+    let bn = new BasicNotification(token, 'Hello, World', {
+      badge: 4,
+      sound: "ping.aiff",
+      data: {
+        userId: '12345'
+      }
+    });
+
+    client.send(bn).then((result) => {
+      // sent successfully
+      return resp.status(200).json(result);
+    })
+      .catch(err => {
+        logger.info(err);
+        resp.status(500).json(err);
+      });
+
+  }*/
 };
 
 export default operations;
