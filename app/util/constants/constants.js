@@ -53,6 +53,7 @@ export default {
     org_patient_health_insurance: 'org_patient_health_insurance',
     org_patients: 'org_patients',
     org_patient_devices: 'org_patient_devices',
+    org_patient_notifications: 'org_patient_notifications',
     org_patient_medical_history: 'org_patient_medical_history',
     org_patient_medications: 'org_patient_medications',
     org_patient_preventative_health: 'org_patient_preventative_health',

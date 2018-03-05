@@ -33,6 +33,7 @@ export default function (app) {
             return resp.status(200).json(data);
           } else {
             next();
+            return null;
           }
         }).catch(err => {
           commonUtil.handleException(err, req, resp);
