@@ -1,6 +1,7 @@
 'use strict';
 import * as Joi from 'joi';
-
+import * as problemMetricsMasterService from '../services/problem.metrics.master.service';
+import commonUtil from "../util/common.util";
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const validators = {
@@ -62,6 +63,19 @@ const validators = {
     } else {
       next();
     }
-  }
+  },
+  isValidProblemMetric: (options, req, resp, next) => {
+    problemMetricsMasterService.findOne(options)
+      .then(data => {
+        if (data) {
+          next();
+          return null;
+        } else {
+          throw new Error('INVALID_INPUT')
+        }
+      }).catch(err => {
+      commonUtil.handleException(err, req, resp);
+    })
+  },
 };
 export default validators;

@@ -13,9 +13,13 @@ const Op = Sequelize.Op;
 
 
 const operations = {
-  getOptions: (req, resp) => {
+  getOptions: (req, resp, next) => {
     return problemsMasterService
-      .getOptions()
+      .getOptions({
+        where: {
+          status: 1
+        }
+      })
       .then((data) => {
         if (data) {
           resp.status(200).json(data);
@@ -24,7 +28,7 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMetrics: (req, resp) => {
+  getMetrics: (req, resp, next) => {
     const {authenticatedUser, tokenDecoded} = req.locals;
     const problem_mid = req.params.problem_mid;
     const options = {
@@ -46,7 +50,31 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMetric: (req, resp) => {
+  getDistinctMetrics: (req, resp, next) => {
+    const options = {
+      where: {
+        status: [1]
+      },
+      include: [
+        {
+          model: models.ProblemMetricTargetMaster,
+          as: 'master_targets',
+          attributes: ['operator','defVal','uom']
+        }
+      ],
+      attributes: [Sequelize.literal('DISTINCT ON(type) 1'),'id', 'name', 'goal', 'management','type']
+    };
+    return problemMetricsMasterService
+      .findAll(options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  getMetric: (req, resp, next) => {
     const metricId = req.params.metricId;
     const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
@@ -56,12 +84,13 @@ const operations = {
       },
       include: [
         {
-          model: models.CareProblemMetricTarget,
+          model: models.ProblemMetricTargetMaster,
           as: 'targets',
           attributes: {
             exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
           }
-        }, {
+        },
+        {
           model: models.CareProblemMetricActionPlan,
           as: 'actionPlans',
           attributes: {
@@ -69,15 +98,15 @@ const operations = {
           },
           include: [
             {
-              model: models.CareProblemMetricActionPlanInput,
-              as: 'actionPlanInputs',
+              model: models.ProblemMetricActionPlanInputMaster,
+              as: 'inputs_master',
               attributes: {
                 exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy', 'status']
               },
               include: [
                 {
-                  model: models.CareProblemMetricActionPlanInputOption,
-                  as: 'actionPlanInputOptions',
+                  model: models.ProblemMetricActionPlanInputOptionMaster,
+                  as: 'input_options_master',
                   attributes: {
                     exclude: ['deletedAt', 'createdAt', 'updatedAt', 'status']
                   }
@@ -115,7 +144,7 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  savePoblemsMasterData: (req, resp) => {
+  savePoblemsMasterData: (req, resp, next) => {
     const data = req.body.problems;
     const {authenticatedUser, tokenDecoded} = req.locals;
     const que = [];

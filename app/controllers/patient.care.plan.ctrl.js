@@ -938,7 +938,7 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
 
-  },
+  }
 };
 
 export default operations;

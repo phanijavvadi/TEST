@@ -7,7 +7,7 @@ const ProblemMetricsMaster = models.ProblemMetricsMaster;
 export function findAll(options = {}) {
   return ProblemMetricsMaster.findAll({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
-    attributes: {
+    attributes: options.attributes || {
       exclude: ['createdAt', 'updatedAt', 'deletedAt']
     },
     where: {

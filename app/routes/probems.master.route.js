@@ -8,6 +8,7 @@ import problemsMasterValidator from '../validators/problems.master.validator';
 
 const router = express.Router();
 const adminRouter = express.Router();
+const patientRouter = express.Router();
 
 export default function (app) {
 
@@ -19,6 +20,13 @@ export default function (app) {
   router.route('/:problem_mid/metrics')
     .get([
       problemsMasterCtrl.getMetrics]);
+
+  router.route('/distinct-metrics')
+    .get([
+      problemsMasterCtrl.getDistinctMetrics]);
+  patientRouter.route('/distinct-metrics')
+    .get([
+      problemsMasterCtrl.getDistinctMetrics])
 
   router.route('/metric/:metricId')
     .get([
@@ -37,4 +45,7 @@ export default function (app) {
   app.use('/api/admin/private/care-problems', router);
   app.use('/api/admin/private/care-problems', adminRouter);
   app.use('/api/org-user/private/care-problems', router);
+
+
+  app.use('/api/patient/private/care-problems', patientRouter)
 }

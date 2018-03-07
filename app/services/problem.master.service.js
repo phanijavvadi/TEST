@@ -22,9 +22,12 @@ export function findAll({limit = 150, offset = 0, ...otherOptions} = {}, options
  * Find all problemsMasters in the db
  *
  **/
-export function getOptions() {
+export function getOptions(options = {}) {
   return ProblemsMaster.findAll({
-    attributes: ['id', 'name', 'description']
+    attributes: ['id', 'name', 'description'],
+    where: {
+      ...(options.where || {})
+    }
   });
 }
 
