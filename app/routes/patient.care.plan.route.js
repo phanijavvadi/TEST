@@ -1,10 +1,10 @@
 'use strict';
-import patientCarePlanValidator from '../validators/patient.care.plan.validator';
 /**
  * Module dependencies.
  */
 import express from 'express';
 import patientCarePlanCtrl from '../controllers/patient.care.plan.ctrl';
+import patientCarePlanValidator from '../validators/patient.care.plan.validator';
 import cors from 'cors';
 
 const router = express.Router();

@@ -28,7 +28,16 @@ const operations = {
       }).catch((err) => {
         commonUtil.handleException(err, req, resp, next);
       });
-  }
+  },
+  importMasterData: (req, resp) => {
+    models.MasterData.bulkCreate(req.body.data, {individualHooks: true})
+      .then(() => {
+        return resp.send('import completed successfully');
+      }).catch((err) => {
+      logger.info(err);
+      resp.status(500).send('error');
+    });
+  },
 };
 
 export default operations;

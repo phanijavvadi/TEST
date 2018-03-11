@@ -23,7 +23,7 @@ export default {
   errorCodes: {
     INVALID_ORG_USER_TYPE: 'INVALID_ORG_USER_TYPE',
   },
-  getTableName: function(tableKey){
+  getTableName: function (tableKey) {
     return this.tables.prefix + this.tables[tableKey];
   },
   tables: {
@@ -44,10 +44,10 @@ export default {
     org_imported_data: 'org_imported_data',
     org_patient_care_plan: 'org_patient_care_plan',
     org_patient_care_plan_problems: 'org_patient_care_plan_problems',
-    org_patient_care_plan_problem_metrics:'org_patient_care_plan_problem_metrics',
-    org_patient_care_plan_problem_metric_targets:'org_patient_care_plan_problem_metric_targets',
-    org_patient_care_plan_problem_metric_action_plan:'org_patient_care_plan_problem_metric_action_plan',
-    org_patient_care_plan_problem_metric_action_plan_input:'org_patient_care_plan_problem_metric_action_plan_input',
+    org_patient_care_plan_problem_metrics: 'org_patient_care_plan_problem_metrics',
+    org_patient_care_plan_problem_metric_targets: 'org_patient_care_plan_problem_metric_targets',
+    org_patient_care_plan_problem_metric_action_plan: 'org_patient_care_plan_problem_metric_action_plan',
+    org_patient_care_plan_problem_metric_action_plan_input: 'org_patient_care_plan_problem_metric_action_plan_input',
 
     org_patient_family_history: 'org_patient_family_history',
     org_patient_health_insurance: 'org_patient_health_insurance',
@@ -69,5 +69,12 @@ export default {
     user_sub_categories: 'user_sub_categories',
     user_types: 'user_types',
     user_verifications: 'user_verifications',
+
+
+    //preventive activity
+
+    preventive_activity_category_master: 'preventive_activity_category_master',
+    preventive_activities_master: 'preventive_activities_master',
+    preventive_activity_metrics_master: 'preventive_activity_metrics_master',
   }
 };
