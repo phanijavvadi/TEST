@@ -57,8 +57,6 @@ export default {
     org_patient_notifications: 'org_patient_notifications',
     org_patient_medical_history: 'org_patient_medical_history',
     org_patient_medications: 'org_patient_medications',
-    org_patient_preventative_health: 'org_patient_preventative_health',
-    org_patient_preventative_health_problems: 'org_patient_preventative_health_problems',
     org_patients_social_history: 'org_patients_social_history',
     org_subscriptions: 'org_subscriptions',
     org_subscription_types: 'org_subscription_types',
@@ -72,6 +70,9 @@ export default {
 
 
     //preventive activity
+    org_patient_preventive_health: 'org_patient_preventive_health',
+    org_patient_preventive_activities: 'org_patient_preventive_activities',
+    org_patient_preventive_activity_metrics: 'org_patient_preventive_activity_metrics',
 
     preventive_activity_category_master: 'preventive_activity_category_master',
     preventive_activities_master: 'preventive_activities_master',

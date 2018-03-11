@@ -12,24 +12,27 @@ const Patient = models.Patient;
 export function getOrgPatientList({limit = 50, offset = 0, ...otherOptions} = {}, options = {}) {
   return Patient.findAndCountAll({
     attributes: {
-      exclude: ['createdBy', 'deletedAt', 'password','registered'],
+      exclude: ['createdBy', 'deletedAt', 'password', 'registered'],
     },
+    include: options.include || [],
     limit: Number(limit),
     offset: Number(offset),
+    distinct:'id',
     where: {
       ...(options.where || {})
     }
   })
     ;
 };
+
 /**
  * get patients
  *
  **/
 export function getPatients(options = {}) {
   return Patient.findAll({
-    attributes:options.attributes ||  {
-      exclude: ['createdBy', 'deletedAt', 'password','registered'],
+    attributes: options.attributes || {
+      exclude: ['createdBy', 'deletedAt', 'password', 'registered'],
     },
     where: {
       ...(options.where || {})
@@ -44,8 +47,8 @@ export function getPatients(options = {}) {
  **/
 export function findById(id, options = {includeAll: false}) {
   return Patient.findById(id, {
-    attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt','registered']},
-    include: options.includeAll ? [{all: true}] : [],
+    attributes: options.attributes || {exclude: ['password', 'createdAt', 'deletedAt', 'updatedAt', 'registered']},
+    include: options.include || [],
     where: {
       ...(options.where || {})
     }
@@ -74,6 +77,7 @@ export function findOne(options = {includeAll: false}) {
 export function create(patient, {transaction = null, ...options} = {}) {
   return Patient.create(patient, {transaction});
 };
+
 /**
  * Create a new patients
  **/

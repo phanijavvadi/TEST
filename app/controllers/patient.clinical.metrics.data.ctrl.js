@@ -46,7 +46,7 @@ const operations = {
         patient_id: req.params.patient_id,
       },
       attributes: ['measurement', 'id', 'source', 'on_date'],
-      order: [['on_date', 'DESC']]
+      order: [['metric_type', 'DESC'],['on_date', 'DESC']]
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
@@ -55,9 +55,9 @@ const operations = {
     patientClinicalMetricsDataService.findAndCountAll(options)
       .then(res => {
         const resObj = {
-          count: res.count
+          // count: res.count
         };
-        let rows = res.rows;
+        let rows = res;
         rows = rows.map(a => {
           if (a.on_date) {
             a.on_date = moment(a.on_date).format('YYYY-MM-DD');
@@ -81,6 +81,7 @@ const operations = {
         patient_id: req.params.patient_id,
       },
       attributes: [Sequelize.literal('DISTINCT ON(metric_type) metric_type'), 'measurement', 'id', 'source', 'on_date'],
+      order: [['metric_type', 'DESC'],['on_date', 'DESC']]
       /*include: [{
         model: models.ProblemMetricsMaster,
         as: 'metrics_master',
@@ -96,9 +97,8 @@ const operations = {
     patientClinicalMetricsDataService.findAndCountAll(options)
       .then(res => {
         const resObj = {
-          count: res.count
         };
-        let rows = res.rows;
+        let rows = res;
         rows = rows.map(a => {
           if (a.on_date) {
             a.on_date = moment(a.on_date).format('YYYY-MM-DD');

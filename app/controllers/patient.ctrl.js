@@ -29,7 +29,43 @@ const operations = {
   getOrgPatientList: (req, resp, next) => {
     logger.info('About to get organisation patient list');
     const {authenticatedUser} = req.locals;
-    const options = {};
+    const options = {
+      include: [{
+        model: models.PatientCarePlan,
+        as: 'carePlan',
+        include: [
+          {
+            model: models.PatientCarePlanProblems,
+            as: 'cp_problems',
+            attributes: ['id'],
+            include: [
+              {
+                model: models.PatientCarePlanProblemMetric,
+                as: 'metrics',
+                attributes: ['name', 'goal','type'],
+                include: [
+                  {
+                    model: models.PatientCarePlanProblemMetricTarget,
+                    as: 'targets',
+                    attributes: ['operator', 'response']
+                  }
+                ]
+              },
+              {
+                model: models.ProblemsMaster,
+                as: 'problem_master',
+                attributes: ['name'],
+              }
+            ]
+          }
+        ],
+        where: {
+          status: [3]
+        },
+        attributes: ['id'],
+        required: false
+      }]
+    };
     options.where = {};
     if (req.query.status) {
       options.where.status = +req.query.status;
@@ -75,7 +111,9 @@ const operations = {
     const id = req.params.id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     logger.info('About to get patient ', id);
-    const options = {where: {}};
+    const options = {
+      where: {}
+    };
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
       options.where['orgId'] = tokenDecoded.orgId;
     } else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {

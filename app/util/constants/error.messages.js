@@ -94,7 +94,10 @@ const errorMessages = {
   PREV_HEALTH_RECORD_EXIST: 'Preventive health record exist',
 
 
-  METRIC_CATEGORY_ALREADY_EXIST: 'Metric category already exist'
+  METRIC_CATEGORY_ALREADY_EXIST: 'Metric category already exist',
+  INVALID_PATIENT_PH_ID: 'Invalid preventive health id',
+  PH_EXIST:'Preventive health record already exist',
+  INVALID_PH_ACT_ID:'Invalid input'
 
 };
 export default errorMessages;

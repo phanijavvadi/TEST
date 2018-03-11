@@ -4,6 +4,7 @@ const successMessage = {
 
   CREATEED_SUCCESS: 'Created successfully',
   UPDATED_SUCCESS: 'Updated successfully',
+  REMOVED_SUCCESS: 'Removed successfully',
   CONTACT_MAIL_SENT_SUCCESS: 'Mail sent successfully',
   ///admin table service end
   // users table service start

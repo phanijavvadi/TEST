@@ -97,6 +97,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'carePlan'
     });
+    Patient.hasMany(models.PatientClinicalMetricData, {
+      foreignKey: {
+        name: 'patient_id',
+        allowNull: false
+      },
+      as: 'clinicalData'
+    });
     Patient.hasMany(models.PatientMedicalHistory, {
       foreignKey: {
         name: 'patientId',

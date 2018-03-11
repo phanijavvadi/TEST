@@ -25,11 +25,11 @@ export function findOne(options = {}) {
 }
 
 export function findAndCountAll(options = {}) {
-  return PatientClinicalMetricData.findAndCountAll({
+  return PatientClinicalMetricData.findAll({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],
     attributes: options.attributes || {},
-    limit: Number(options.limit || 10),
-    offset: Number(options.offset || 0),
+    // limit: Number(options.limit || 10),
+    // offset: Number(options.offset || 0),
     where: {
       ...options.where || {}
     },
