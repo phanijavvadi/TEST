@@ -22,6 +22,7 @@ export default function (sequelize, DataTypes) {
     dob: {type: DataTypes.DATEONLY},
     gender: {
       type: DataTypes.INTEGER,
+      defaultValue: null,
       comment: "1=>Male,2=>Female,3=>Others"
     },
     address1: DataTypes.TEXT,

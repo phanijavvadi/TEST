@@ -23,13 +23,33 @@ const validators = {
   },
   savePreventiveActsMasterDataReqValidator: (req, resp, next) => {
     const body = req.body;
-    let act_schema = {
+    let age_group_schema = {
+      from: Joi.number().required().allow([null]),
+      to: Joi.number().required().allow([null]),
+    };
+
+    const preventive_metrics_master_schema = Joi.object().keys({
       name: Joi.string().required(),
       notes: Joi.string().allow(['', null]),
+      frequency_master_key: Joi.string().required(),
+    });
+
+    let act_schema = {
+      name: Joi.string().required(),
+      gender: Joi.number().required().allow([null]),
+      notes: Joi.string().allow(['', null]),
+      age_groups: Joi.array().items(age_group_schema).min(0).required(),
+      preventive_metrics_master: Joi.array().items(preventive_metrics_master_schema)
+        .unique((a, b) => {
+          return a.name === b.name
+        }),
     };
-    let schema = {
+    let acts_schema = {
       preventive_act_cat_mid: Joi.string().required(),
       acts: Joi.array().items(act_schema).min(1).unique((a, b) => a.name === b.name).required(),
+    };
+    let schema = {
+      data: Joi.array().items(acts_schema).min(1).unique((a, b) => a.preventive_act_cat_mid === b.preventive_act_cat_mid).required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: false});
     if (result && result.error) {
@@ -48,7 +68,9 @@ const validators = {
     });
     let schema = {
 
-      metrics: Joi.array().items(preventive_metrics_master_schema).unique((a, b) =>{ return a.preventive_act_mid===b.preventive_act_mid && a.name === b.name}),
+      metrics: Joi.array().items(preventive_metrics_master_schema).unique((a, b) => {
+        return a.preventive_act_mid === b.preventive_act_mid && a.name === b.name
+      }),
     };
     let result = Joi.validate(body, schema, {allowUnknown: false});
     if (result && result.error) {

@@ -1,10 +1,103 @@
 'use strict';
 import * as Joi from 'joi';
 import * as problemMetricsMasterService from '../services/problem.metrics.master.service';
+import * as problemMasterService from '../services/problem.master.service';
 import commonUtil from "../util/common.util";
+import constants from "../util/constants/constants";
+
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const validators = {
+  createProblemMasterReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const schemaObj = {
+      name: Joi.string().required(),
+      description: Joi.string().required()
+    };
+
+    const {authenticatedUser} = req.locals;
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      schemaObj.orgId = Joi.string().required();
+    }
+    const schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  createProblemMetricReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const schemaObj = {
+      problem_mid: Joi.string().required(),
+      name: Joi.string().required(),
+      type: Joi.string().required(),
+      goal: Joi.string().required(),
+      management: Joi.string().required()
+    };
+    const {authenticatedUser} = req.locals;
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      // schemaObj.orgId = Joi.string().required();
+    }
+    let schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  createProblemMetricTargetReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const schemaObj = {
+      metric_mid: Joi.string().required(),
+      operator: Joi.string().required(),
+      defVal: Joi.string().required(),
+      uom: Joi.string().required().allow([null]),
+    };
+    let schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  createProblemMetricActionPlanReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const schemaObj = {
+      metric_mid: Joi.string().required(),
+      title: Joi.string().required(),
+    };
+    let schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  createProblemMetricActionPlanInputReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const input_options_master_schema = Joi.object().keys({
+      name: Joi.string().required(),
+    });
+    const schemaObj = {
+      act_plan_mid: Joi.string().required(),
+      label: Joi.string().allow([null]),
+      defVal: Joi.string().allow([null]),
+      input_type_mid: Joi.string().required(),
+      input_options_master: Joi.array().items(input_options_master_schema)
+    };
+    let schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
   savePoblemsMasterDataReqValidator: (req, resp, next) => {
     const body = req.body;
     const problems_schema = Joi.object().keys({
@@ -54,7 +147,7 @@ const validators = {
       master_act_plans: Joi.array().items(master_act_plans_schema)
     };
     let schema = {
-      problem_mid:Joi.string().required(),
+      problem_mid: Joi.string().required(),
       metrics: Joi.array().items(metric_schema).min(1).unique((a, b) => a.type === b.type).required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: false});
@@ -76,6 +169,20 @@ const validators = {
       }).catch(err => {
       commonUtil.handleException(err, req, resp);
     })
+  },
+  isValidProblemId: (options, req, resp, next) => {
+    problemMasterService.findOne(options)
+      .then(data => {
+        if (data) {
+          next();
+          return null;
+        } else {
+          throw new Error('INVALID_INPUT')
+        }
+      })
+      .catch(err => {
+        commonUtil.handleException(err, req, resp);
+      })
   },
 };
 export default validators;

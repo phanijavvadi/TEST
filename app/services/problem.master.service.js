@@ -8,10 +8,10 @@ const ProblemsMaster = models.ProblemsMaster;
  * Find all problemsMasters in the db
  *
  **/
-export function findAll({limit = 150, offset = 0, ...otherOptions} = {}, options = {}) {
+export function findAll(options = {}) {
   return ProblemsMaster.findAndCountAll({
-    limit: Number(limit),
-    offset: Number(offset),
+    limit: Number(options.limit || 25),
+    offset: Number(options.offset || 0),
     where: {
       ...(options.where || {})
     }
@@ -35,6 +35,13 @@ export function findById(id, options = {}) {
   return ProblemsMaster.findOne({
     where: {
       id: id,
+      ...options.where || {}
+    }
+  });
+}
+export function findOne(options = {}) {
+  return ProblemsMaster.findOne({
+    where: {
       ...options.where || {}
     }
   });

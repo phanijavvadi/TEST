@@ -12,6 +12,10 @@ const Op = Sequelize.Op;
 
 const operations = {
   getOptions: (req, resp, next) => {
+    const gender = [];
+    if (req.params.gender) {
+      gender.push(Number(req.params.gender));
+    }
     return models.PreventiveActivityCategoryMaster
       .findAll({
         where: {
@@ -23,6 +27,12 @@ const operations = {
             as: 'activities',
             attributes: ['id', 'name', 'notes'],
             where: {
+              gender: {
+                [Op.or]: [
+                  null,
+                  gender
+                ]
+              },
               status: 1
             }
           }
@@ -95,21 +105,43 @@ const operations = {
       });
   },
   savePreventiveActsMasterData: (req, resp, next) => {
-    const acts = req.body.acts;
-    const preventive_act_cat_mid = req.body.preventive_act_cat_mid;
     const que = [];
     const {authenticatedUser, tokenDecoded} = req.locals;
     let transactionRef;
     sequelize.transaction()
       .then((t) => {
         transactionRef = t;
-        acts.forEach(a => {
-          a.createdBy = authenticatedUser.id;
-          a.preventive_act_cat_mid = preventive_act_cat_mid;
-          que.push(models.PreventiveActivityMaster.create(a, {
-            transaction: transactionRef,
-            individualHooks: true
-          }))
+        req.body.data.forEach(data => {
+          const acts = data.acts;
+          const preventive_act_cat_mid = data.preventive_act_cat_mid;
+          acts.forEach(a => {
+            a.createdBy = authenticatedUser.id;
+            a.preventive_act_cat_mid = preventive_act_cat_mid;
+            if (a.age_groups) {
+              a.age_groups = (a.age_groups || []).map(age_group => {
+                age_group.createdBy = authenticatedUser.id;
+                return age_group;
+              });
+            }
+            if (a.preventive_metrics_master) {
+              a.preventive_metrics_master = (a.preventive_metrics_master || []).map(metric_master => {
+                metric_master.createdBy = authenticatedUser.id;
+                return metric_master;
+              });
+            }
+            que.push(models.PreventiveActivityMaster.create(a, {
+              transaction: transactionRef,
+              individualHooks: true,
+              include: [{
+                model: models.PreventiveActivityAgeGroupMaster,
+                as: 'age_groups'
+              },
+                {
+                  model: models.PreventiveActivityMetricMaster,
+                  as: 'preventive_metrics_master'
+                }]
+            }))
+          });
         });
         return Promise.all(que)
       })
@@ -128,6 +160,7 @@ const operations = {
           err.errors[0].message === 'ACTIVITY_NAME_EXIST') {
           message = 'Duplicate Activity name ' + err.errors[0].value;
         }
+        logger.info(err);
         throw  new Error(message);
       })
       .catch((err) => {

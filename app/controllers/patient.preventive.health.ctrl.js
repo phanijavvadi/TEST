@@ -6,6 +6,7 @@ import * as htmlToText from 'html-to-text';
 import moment from 'moment';
 import models from '../models';
 import errorMessages from '../util/constants/error.messages';
+import * as patientService from '../services/patient.service';
 import * as commonUtil from '../util/common.util';
 import successMessages from '../util/constants/success.messages';
 import constants from '../util/constants/constants';
@@ -103,29 +104,131 @@ const operations = {
         return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
       }
     }
+    const created_by = authenticatedUser.id;
     const data = {
       orgId: body.orgId,
       patient_id: body.patient_id,
-      created_by: authenticatedUser.id,
+      created_by,
       status: 1
     };
     let transaction;
     let ph_record;
+    let patient_record;
+    let acts_master = [];
+    const ph_acts = [];
+    const ph_acts_index = {};
     return sequelize.transaction()
       .then((t) => {
         transaction = t;
-        return patientPreventiveHealthModel
-          .create(data, {transaction: transaction})
+        return patientService
+          .findById(body.patient_id, {
+            attributes: ['dob', 'gender'],
+            where: {
+              id: body.patient_id
+            }
+          })
       })
-      .then((res) => {
-        ph_record = res;
-        return ph_record;
+      .then(patient => {
+        if (!patient) {
+          throw new Error('INVALID_INPUT');
+        }
+        patient_record = patient;
+        const gender = [];
+        if (patient.gender) {
+          gender.push(patient.gender);
+        }
+        let patient_age;
+        let age_groups_where_condition = {};
+        if (patient.dob) {
+          patient_age = moment().diff(moment(patient.dob, 'YYYY-MM-DD'), 'years', false);
+          age_groups_where_condition = Sequelize.literal(`((${patient_age} between "age_groups"."from"  and "age_groups"."to") or ("age_groups"."to" is null and "age_groups"."from"<=${patient_age}) or ("age_groups"."from" is null and "age_groups"."to">=${patient_age}))`);
+        }
+        return preventiveActivityMasterModel.findAll({
+          where: {
+            gender: {
+              [Op.or]: [
+                null,
+                gender
+              ]
+            },
+            status: 1
+          },
+          include: [
+            {
+              model: models.PreventiveActivityAgeGroupMaster,
+              as: 'age_groups',
+              attributes: ['preventive_act_mid'],
+              where: age_groups_where_condition
+            }
+          ],
+          attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('"PreventiveActivityMaster"."id"')), 'id']],
+          raw: true
+        })
       })
-      .then((res) => {
+      .then(res => {
+        acts_master = res;
+        return patientPreventiveHealthModel.create(data, {transaction: transaction})
+      })
+      .then(ph => {
+        ph_record = ph;
+        const que = [];
+        acts_master.forEach((act_master, index) => {
+          const ph_act = {
+            ph_id: ph.id,
+            preventive_act_mid: act_master.id,
+            patient_id: body.patient_id,
+            created_by,
+            metrics: []
+          };
+          ph_acts.push(ph_act);
+          ph_acts_index[act_master.id] = index;
+
+          const options = {
+            where: {
+              preventive_act_mid: act_master.id,
+              status: [1]
+            },
+            attributes: {
+              exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by', 'status']
+            },
+            raw: true
+          };
+          que.push(preventiveActivityMetricMasterModel.findAll(options));
+        });
+        return Promise.all(que);
+      })
+      .then((act_metrics_data) => {
+        if (act_metrics_data) {
+          act_metrics_data.forEach(metrics_master => {
+            (metrics_master || []).forEach(metric_master => {
+              const phMatricData = {
+                preventive_metric_mid: metric_master.id,
+                name: metric_master.name,
+                notes: metric_master.notes,
+                frequencyKey: metric_master.frequency_master_key,
+                created_by: created_by
+              };
+              ph_acts[ph_acts_index[metric_master.preventive_act_mid]].metrics.push(phMatricData);
+            });
+          });
+        }
+        const ph_acts_que = [];
+        ph_acts.forEach(ph_act => {
+          ph_acts_que.push(patientPreventiveActivitiesModel.create(ph_act, {
+            transaction: transaction,
+            include: [{
+              model: models.PatientPrevetiveActivityMetric,
+              as: 'metrics'
+            }]
+          }));
+        });
+        return Promise.all(ph_acts_que);
+      })
+      .then((ph_acts) => {
         transaction.commit();
         return resp.json({
           success: true,
-          data: res,
+          data: ph_record,
           message: successMessages.CREATEED_SUCCESS
         });
       })
@@ -179,17 +282,19 @@ const operations = {
         });
         return Promise.all(que);
       })
-      .spread((metricsMasterData) => {
-        if (metricsMasterData) {
-          metricsMasterData.forEach(metric_master => {
-            const phMatricData = {
-              preventive_metric_mid: metric_master.id,
-              name: metric_master.name,
-              notes: metric_master.notes,
-              frequencyKey: metric_master.frequency_master_key,
-              created_by: created_by
-            };
-            ph_acts[ph_acts_index[metric_master.preventive_act_mid]].metrics.push(phMatricData);
+      .then((act_metrics_data) => {
+        if (act_metrics_data) {
+          act_metrics_data.forEach(metrics_master => {
+            (metrics_master || []).forEach(metric_master => {
+              const phMatricData = {
+                preventive_metric_mid: metric_master.id,
+                name: metric_master.name,
+                notes: metric_master.notes,
+                frequencyKey: metric_master.frequency_master_key,
+                created_by: created_by
+              };
+              ph_acts[ph_acts_index[metric_master.preventive_act_mid]].metrics.push(phMatricData);
+            });
           });
         }
         const ph_acts_que = [];

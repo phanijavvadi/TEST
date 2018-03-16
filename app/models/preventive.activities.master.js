@@ -30,6 +30,11 @@ export default function (sequelize, DataTypes) {
           }
         }
       },
+      gender: {
+        type: DataTypes.SMALLINT,
+        defaultValue: null,
+        comment: "1=>Male,2=>Female,3=>Others"
+      },
       notes: {
         type: DataTypes.TEXT
       },
@@ -52,6 +57,13 @@ export default function (sequelize, DataTypes) {
         allowNull: false,
       },
       as: 'preventive_metrics_master'
+    });
+    PreventiveActivityMaster.hasMany(models.PreventiveActivityAgeGroupMaster, {
+      foreignKey: {
+        name: 'preventive_act_mid',
+        allowNull: false,
+      },
+      as: 'age_groups'
     });
     PreventiveActivityMaster.belongsTo(models.PreventiveActivityCategoryMaster, {
       foreignKey: {

@@ -33,6 +33,12 @@ export default function (sequelize, DataTypes) {
       },
       as: 'problem_master'
     });
+    ProblemsMaster.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: true
+      }
+    });
     ProblemsMaster.belongsTo(models.User, {
       foreignKey: {
         name: 'createdBy',

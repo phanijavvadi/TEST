@@ -4,6 +4,20 @@ import models from '../models';
 
 const ProblemMetricsMaster = models.ProblemMetricsMaster;
 
+export function findAndCountAll(options = {}) {
+  return ProblemMetricsMaster.findAndCountAll({
+    include: options.include || [],
+    limit: Number(options.limit || 25),
+    offset: Number(options.offset || 0),
+    attributes: options.attributes || {
+      exclude: ['createdAt', 'updatedAt', 'deletedAt']
+    },
+    where: {
+      ...(options.where || {})
+    }
+  });
+}
+
 export function findAll(options = {}) {
   return ProblemMetricsMaster.findAll({
     include: options.includeAll ? [{all: true}] : (options.include) ? options.include : [],

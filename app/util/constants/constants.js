@@ -76,6 +76,7 @@ export default {
 
     preventive_activity_category_master: 'preventive_activity_category_master',
     preventive_activities_master: 'preventive_activities_master',
+    preventive_activity_age_groups_master: 'preventive_activity_age_groups_master',
     preventive_activity_metrics_master: 'preventive_activity_metrics_master',
   }
 };
