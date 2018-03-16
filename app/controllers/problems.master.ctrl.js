@@ -86,8 +86,8 @@ const operations = {
       type: body.type,
       goal: body.goal,
       management: body.management,
-      frequency: 'PROBLEM_METRIC_FREQUENCY',
-      status: 1
+      status: body.status,
+      frequency: 'PROBLEM_METRIC_FREQUENCY'
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
     let transactionRef;
@@ -115,28 +115,32 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  createProblemMetricTarget: (req, resp, next) => {
+  updateProblemMetric: (req, resp, next) => {
     const body = req.body;
-    const {authenticatedUser} = req.locals;
-    const createdBy = authenticatedUser.id;
     const data = {
-      metric_mid: body.metric_mid,
-      operator: body.operator,
-      defVal: body.defVal,
-      uom: body.uom,
-      status: 1,
-      createdBy
-
+      problem_mid: body.problem_mid,
+      name: body.name,
+      type: body.type,
+      goal: body.goal,
+      management: body.management,
+      status: body.status,
     };
+    const {authenticatedUser, tokenDecoded} = req.locals;
     let transactionRef;
     sequelize.transaction()
       .then((t) => {
         transactionRef = t;
-        data.createdBy = authenticatedUser.id;
-        return models.ProblemMetricTargetMaster.create(data, {
-          transaction: transactionRef,
-          individualHooks: true
-        })
+        return models.ProblemMetricsMaster.findById(body.id);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
       })
       .then((res) => {
         transactionRef.commit();
@@ -145,89 +149,7 @@ const operations = {
             id: res.id,
           },
           success: true,
-          message: successMessage.CREATEED_SUCCESS
-        });
-      })
-      .catch((err) => {
-        transactionRef.rollback();
-        commonUtil.handleException(err, req, resp, next);
-      });
-  },
-  createProblemMetricActionPlan: (req, resp, next) => {
-    const body = req.body;
-    const {authenticatedUser} = req.locals;
-    const createdBy = authenticatedUser.id;
-    const data = {
-      metric_mid: body.metric_mid,
-      title: body.title,
-      status: 1,
-      createdBy
-    };
-    let transactionRef;
-    sequelize.transaction()
-      .then((t) => {
-        transactionRef = t;
-        data.createdBy = authenticatedUser.id;
-        return models.ProblemMetricActionPlanMaster.create(data, {
-          transaction: transactionRef,
-          individualHooks: true
-        })
-      })
-      .then((res) => {
-        transactionRef.commit();
-        return resp.send({
-          data: {
-            id: res.id,
-          },
-          success: true,
-          message: successMessage.CREATEED_SUCCESS
-        });
-      })
-      .catch((err) => {
-        transactionRef.rollback();
-        commonUtil.handleException(err, req, resp, next);
-      });
-  },
-  createProblemMetricActionPlanInput: (req, resp, next) => {
-    const body = req.body;
-    const {authenticatedUser} = req.locals;
-    const createdBy = authenticatedUser.id;
-    const data = {
-      act_plan_mid: body.act_plan_mid,
-      label: body.label,
-      defVal: body.defVal,
-      input_type_mid: body.input_type_mid,
-      status: 1,
-      createdBy
-    };
-    if (body.input_options_master) {
-      data.input_options_master = (body.input_options_master || []).map(a => {
-        a.createdBy = createdBy;
-        return a;
-      })
-    }
-    let transactionRef;
-    sequelize.transaction()
-      .then((t) => {
-        transactionRef = t;
-        data.createdBy = authenticatedUser.id;
-        return models.ProblemMetricActionPlanInputMaster.create(data, {
-          transaction: transactionRef,
-          individualHooks: true,
-          include: [{
-            model: models.ProblemMetricActionPlanInputOptionMaster,
-            as: 'input_options_master'
-          }]
-        })
-      })
-      .then((res) => {
-        transactionRef.commit();
-        return resp.send({
-          data: {
-            id: res.id,
-          },
-          success: true,
-          message: successMessage.CREATEED_SUCCESS
+          message: successMessage.UPDATED_SUCCESS
         });
       })
       .catch((err) => {
@@ -240,7 +162,6 @@ const operations = {
     const problem_mid = req.params.problem_mid;
     const options = {
       where: {
-        status: [1, 2],
         problem_mid
       },
       attributes: {
@@ -303,6 +224,342 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
+
+
+  createProblemMetricTarget: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      metric_mid: body.metric_mid,
+      operator: body.operator,
+      defVal: body.defVal,
+      status: body.status,
+      uom: body.uom,
+      createdBy
+
+    };
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.ProblemMetricTargetMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true
+        })
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updateProblemMetricTarget: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const data = {
+      metric_mid: body.metric_mid,
+      operator: body.operator,
+      defVal: body.defVal,
+      status: body.status,
+      uom: body.uom
+
+    };
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.ProblemMetricTargetMaster.findById(body.id)
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.UPDATED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  getMetricTargets: (req, resp, next) => {
+    const metric_mid = req.params.metric_mid;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const options = {
+      where: {
+        metric_mid: metric_mid,
+      },
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+      }
+    };
+    return models.ProblemMetricTargetMaster
+      .findAll(options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+  createProblemMetricActionPlan: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      metric_mid: body.metric_mid,
+      title: body.title,
+      status: body.status,
+      createdBy
+    };
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.ProblemMetricActionPlanMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true
+        })
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updateProblemMetricActionPlan: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      metric_mid: body.metric_mid,
+      title: body.title,
+      status: body.status,
+    };
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.ProblemMetricActionPlanMaster.findById(body.id)
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.UPDATED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  getMetricActionPlans: (req, resp, next) => {
+    const metric_mid = req.params.metric_mid;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const options = {
+      where: {
+        metric_mid: metric_mid
+      },
+      include: [{
+        model: models.ProblemMetricActionPlanInputMaster,
+        as: 'inputs_master',
+        include: [{
+          model: models.MasterData,
+          as: 'input_type_master'
+        }, {
+          model: models.ProblemMetricActionPlanInputOptionMaster,
+          as: 'input_options_master'
+        }]
+      }],
+      attributes: {
+        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
+      }
+    };
+    return models.ProblemMetricActionPlanMaster
+      .findAll(options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+  createProblemMetricActionPlanInput: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      act_plan_mid: body.act_plan_mid,
+      label: body.label,
+      defVal: body.defVal,
+      input_type_mid: body.input_type_mid,
+      status: body.status,
+      createdBy
+    };
+    if (body.input_options_master) {
+      data.input_options_master = (body.input_options_master || []).map(a => {
+        a.createdBy = createdBy;
+        return a;
+      })
+    }
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.ProblemMetricActionPlanInputMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true,
+          include: [{
+            model: models.ProblemMetricActionPlanInputOptionMaster,
+            as: 'input_options_master'
+          }]
+        })
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updateProblemMetricActionPlanInput: (req, resp, next) => {
+    const body = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      act_plan_mid: body.act_plan_mid,
+      label: body.label,
+      defVal: body.defVal,
+      input_type_mid: body.input_type_mid,
+      status: body.status,
+      createdBy
+    };
+    if (body.input_options_master) {
+      data.input_options_master = (body.input_options_master || []).map(a => {
+        a.createdBy = createdBy;
+        return a;
+      })
+    }
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.ProblemMetricActionPlanInputMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true,
+          include: [{
+            model: models.ProblemMetricActionPlanInputOptionMaster,
+            as: 'input_options_master'
+          }]
+        })
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  getMetricActionPlanInputs: (req, resp, next) => {
+    const act_plan_mid = req.params.act_plan_mid;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const options = {
+      where: {
+        act_plan_mid: act_plan_mid,
+      },
+      include: [{
+        model: models.MasterData,
+        as: 'input_type_master',
+        attributes: ['name', 'value']
+      }, {
+        model: models.ProblemMetricActionPlanInputOptionMaster,
+        as: 'input_options_master',
+        required: false,
+        attributes: ['name', 'id']
+      }],
+      attributes: ['id', 'act_plan_mid', 'defVal', 'label']
+    };
+    return models.ProblemMetricActionPlanInputMaster
+      .findAll(options)
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
   getMetric: (req, resp, next) => {
     const metric_mid = req.params.metric_mid;
     const {authenticatedUser, tokenDecoded} = req.locals;
@@ -373,91 +630,8 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMetricTargets: (req, resp, next) => {
-    const metric_mid = req.params.metric_mid;
-    const {authenticatedUser, tokenDecoded} = req.locals;
-    const options = {
-      where: {
-        metric_mid: metric_mid,
-        status: [1]
-      },
-      attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
-      }
-    };
-    return models.ProblemMetricTargetMaster
-      .findAll(options)
-      .then((data) => {
-        if (data) {
-          resp.status(200).json(data);
-        }
-      }).catch((err) => {
-        commonUtil.handleException(err, req, resp, next);
-      });
-  },
-  getMetricActionPlans: (req, resp, next) => {
-    const metric_mid = req.params.metric_mid;
-    const {authenticatedUser, tokenDecoded} = req.locals;
-    const options = {
-      where: {
-        metric_mid: metric_mid,
-        status: [1]
-      },
-      include: [{
-        model: models.ProblemMetricActionPlanInputMaster,
-        as: 'inputs_master',
-        include: [{
-          model: models.MasterData,
-          as: 'input_type_master'
-        }, {
-          model: models.ProblemMetricActionPlanInputOptionMaster,
-          as: 'input_options_master'
-        }]
-      }],
-      attributes: {
-        exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
-      }
-    };
-    return models.ProblemMetricActionPlanMaster
-      .findAll(options)
-      .then((data) => {
-        if (data) {
-          resp.status(200).json(data);
-        }
-      }).catch((err) => {
-        commonUtil.handleException(err, req, resp, next);
-      });
-  },
-  getMetricActionPlanInputs: (req, resp, next) => {
-    const act_plan_mid = req.params.act_plan_mid;
-    const {authenticatedUser, tokenDecoded} = req.locals;
-    const options = {
-      where: {
-        act_plan_mid: act_plan_mid,
-        status: [1]
-      },
-      include: [{
-        model: models.MasterData,
-        as: 'input_type_master',
-        attributes:['name','value']
-      }, {
-        model: models.ProblemMetricActionPlanInputOptionMaster,
-        as: 'input_options_master',
-        required:false,
-        attributes:['name','id']
-      }],
-      attributes: ['id','act_plan_mid','defVal','label']
-    };
-    return models.ProblemMetricActionPlanInputMaster
-      .findAll(options)
-      .then((data) => {
-        if (data) {
-          resp.status(200).json(data);
-        }
-      }).catch((err) => {
-        commonUtil.handleException(err, req, resp, next);
-      });
-  },
+
+
   createPoblemMasterData: (req, resp, next) => {
     const body = req.body;
     const data = req.body;
@@ -497,7 +671,6 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-
   savePoblemsMasterData: (req, resp, next) => {
     const data = req.body.problems;
     const {authenticatedUser, tokenDecoded} = req.locals;

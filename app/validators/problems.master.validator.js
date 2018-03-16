@@ -30,11 +30,13 @@ const validators = {
   createProblemMetricReqValidator: (req, resp, next) => {
     const body = req.body;
     const schemaObj = {
+      id: Joi.string(),
       problem_mid: Joi.string().required(),
       name: Joi.string().required(),
       type: Joi.string().required(),
       goal: Joi.string().required(),
-      management: Joi.string().required()
+      management: Joi.string().required(),
+      status: Joi.number().required()
     };
     const {authenticatedUser} = req.locals;
     if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
@@ -51,10 +53,12 @@ const validators = {
   createProblemMetricTargetReqValidator: (req, resp, next) => {
     const body = req.body;
     const schemaObj = {
+      id: Joi.string(),
       metric_mid: Joi.string().required(),
       operator: Joi.string().required(),
       defVal: Joi.string().required(),
       uom: Joi.string().required().allow([null]),
+      status: Joi.number().required()
     };
     let schema = Joi.object().keys(schemaObj);
     let result = Joi.validate(body, schema, {allowUnknown: false});
@@ -67,8 +71,10 @@ const validators = {
   createProblemMetricActionPlanReqValidator: (req, resp, next) => {
     const body = req.body;
     const schemaObj = {
+      id: Joi.string(),
       metric_mid: Joi.string().required(),
       title: Joi.string().required(),
+      status: Joi.number().required()
     };
     let schema = Joi.object().keys(schemaObj);
     let result = Joi.validate(body, schema, {allowUnknown: false});
@@ -85,10 +91,12 @@ const validators = {
     });
     const schemaObj = {
       act_plan_mid: Joi.string().required(),
+      id: Joi.string(),
       label: Joi.string().allow([null]),
       defVal: Joi.string().allow([null]),
       input_type_mid: Joi.string().required(),
-      input_options_master: Joi.array().items(input_options_master_schema)
+      input_options_master: Joi.array().items(input_options_master_schema),
+      status: Joi.number().required()
     };
     let schema = Joi.object().keys(schemaObj);
     let result = Joi.validate(body, schema, {allowUnknown: false});

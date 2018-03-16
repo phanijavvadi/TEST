@@ -64,11 +64,24 @@ export default function (app) {
         }
         problemsMasterValidator.isValidProblemId(options, req, resp, next);
       },
-      problemsMasterCtrl.createProblemMetric]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          problemsMasterCtrl.updateProblemMetric(req, resp, next)
+        } else {
+          problemsMasterCtrl.createProblemMetric(req, resp, next)
+        }
+      }]);
   router.route('/metric/target/create')
     .post([
       problemsMasterValidator.createProblemMetricTargetReqValidator,
-      problemsMasterCtrl.createProblemMetricTarget]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          problemsMasterCtrl.updateProblemMetricTarget(req, resp, next)
+        } else {
+          problemsMasterCtrl.createProblemMetricTarget(req, resp, next)
+        }
+      }
+    ]);
 
 
   router.route('/metric/:metric_mid/action-plans')
@@ -78,15 +91,27 @@ export default function (app) {
   router.route('/metric/action-plan/create')
     .post([
       problemsMasterValidator.createProblemMetricActionPlanReqValidator,
-      problemsMasterCtrl.createProblemMetricActionPlan]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          problemsMasterCtrl.updateProblemMetricActionPlan(req, resp, next)
+        } else {
+          problemsMasterCtrl.createProblemMetricActionPlan(req, resp, next)
+        }
+      }]);
 
   router.route('/action-plan/:act_plan_mid/inputs')
     .get([
       problemsMasterCtrl.getMetricActionPlanInputs]);
-router.route('/metric/action-plan/input/create')
+  router.route('/metric/action-plan/input/create')
     .post([
       problemsMasterValidator.createProblemMetricActionPlanInputReqValidator,
-      problemsMasterCtrl.createProblemMetricActionPlanInput]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          problemsMasterCtrl.updateProblemMetricActionPlanInput(req, resp, next)
+        } else {
+          problemsMasterCtrl.createProblemMetricActionPlanInput(req, resp, next)
+        }
+      }]);
 
   adminRouter.route('/save-metrics')
     .post([
