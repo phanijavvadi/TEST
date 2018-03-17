@@ -59,7 +59,7 @@ const errorMessages = {
 
   // Subscriptions
   SUBSCRIPTION_TYPE_NOT_FOUND: 'Subscription type is not found',
-  ORG_NOT_HAS_VALID_SUBSCRIPTION: 'Organisation don\'t has valid subscription',
+  ORG_NOT_HAS_VALID_SUBSCRIPTION: 'Organisation doesn\'t have a valid subscription',
 
   //Org subscriptions
 
