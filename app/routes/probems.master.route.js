@@ -102,6 +102,7 @@ export default function (app) {
   router.route('/action-plan/:act_plan_mid/inputs')
     .get([
       problemsMasterCtrl.getMetricActionPlanInputs]);
+
   router.route('/metric/action-plan/input/create')
     .post([
       problemsMasterValidator.createProblemMetricActionPlanInputReqValidator,

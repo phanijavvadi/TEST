@@ -4,6 +4,9 @@ import logger from '../util/logger';
 import * as commonUtil from '../util/common.util';
 import models from '../models';
 import successMessage from "../util/constants/success.messages";
+import constants from "../util/constants/constants";
+import errorMessages from "../util/constants/error.messages";
+import _ from 'lodash';
 
 const sequelize = models.sequelize;
 const Sequelize = require('sequelize');
@@ -62,6 +65,93 @@ const operations = {
           resp.status(200).json(data);
         }
       }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  createPreventiveCategoryMasterData: (req, resp, next) => {
+    const data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const que = [];
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (userOrgIds.indexOf(data.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+    }
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.PreventiveActivityCategoryMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: res,
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch(Sequelize.ValidationError, function (err) {
+        let message = 'UNKNOWN_ERROR';
+        if (err && err.errors &&
+          err.errors.length > 0 &&
+          err.errors[0].message === 'ACTIVITY_CATEGORY_NAME_EXIST') {
+          message = 'Duplicate activity category ' + err.errors[0].value;
+        }
+        throw  new Error(message);
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updatePreventiveCategoryMasterData: (req, resp, next) => {
+    const data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const que = [];
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.PreventiveActivityCategoryMaster.findById(data.id);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: res,
+          success: true,
+          message: successMessage.UPDATED_SUCCESS
+        });
+      })
+      .catch(Sequelize.ValidationError, function (err) {
+        let message = 'UNKNOWN_ERROR';
+        if (err && err.errors &&
+          err.errors.length > 0 &&
+          err.errors[0].message === 'ACTIVITY_CATEGORY_NAME_EXIST') {
+          message = 'Duplicate activity category ' + err.errors[0].value;
+        }
+        throw  new Error(message);
+      })
+      .catch((err) => {
+        transactionRef.rollback();
         commonUtil.handleException(err, req, resp, next);
       });
   },

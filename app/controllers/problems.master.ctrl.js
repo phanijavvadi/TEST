@@ -62,9 +62,6 @@ const operations = {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
-      if (userOrgIds.indexOf(body.orgId) === -1) {
-        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
-      }
       options.orgId = [...userOrgIds, null];
     }
     return problemsMasterService

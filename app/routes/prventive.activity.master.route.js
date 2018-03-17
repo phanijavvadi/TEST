@@ -13,7 +13,6 @@ const patientRouter = express.Router();
 export default function (app) {
 
 
-
   router.route('/options')
     .get([
       preventiveActivitiesMasterCtrl.getOptions]);
@@ -22,17 +21,17 @@ export default function (app) {
     .get([
       preventiveActivitiesMasterCtrl.getMetricOptions]);
 
-/*  router.route('/distinct-metrics')
-    .get([
-      preventiveActivitiesMasterCtrl.getDistinctMetrics]);
-  patientRouter.route('/distinct-metrics')
-    .get([
-      preventiveActivitiesMasterCtrl.getDistinctMetrics])
 
-  router.route('/metric/:metricId')
-    .get([
-      preventiveActivitiesMasterCtrl.getMetric]);
-*/
+  router.route('/category')
+    .post([
+      preventiveActivityMasterValidator.createOrUpdatePreventiveCategoryMasterDataReqValidator,
+      (req, resp, next) => {
+        if (req.body.id) {
+          preventiveActivitiesMasterCtrl.updatePreventiveCategoryMasterData(req, resp, next);
+        } else {
+          preventiveActivitiesMasterCtrl.createPreventiveCategoryMasterData(req, resp, next);
+        }
+      }]);
 
   adminRouter.route('/save-category')
     .post([

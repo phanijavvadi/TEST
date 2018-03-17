@@ -10,7 +10,7 @@ export default function (sequelize, DataTypes) {
       },
       name: {
         type: DataTypes.STRING,
-        allowNull:false,
+        allowNull: false,
         validate: {
           isUnique: function (value, next) {
             const self = this;
@@ -48,7 +48,13 @@ export default function (sequelize, DataTypes) {
         name: 'preventive_act_cat_mid',
         allowNull: false
       },
-      as:'activities'
+      as: 'activities'
+    });
+    PreventiveActivityCategoryMaster.belongsTo(models.Organisation, {
+      foreignKey: {
+        name: 'orgId',
+        allowNull: true
+      }
     });
     PreventiveActivityCategoryMaster.belongsTo(models.User, {
       foreignKey: {
