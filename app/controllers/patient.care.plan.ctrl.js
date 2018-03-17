@@ -221,7 +221,7 @@ const operations = {
               name: metric_master.name,
               type: metric_master.type,
               goal: metric_master.goal,
-              frequencyKey: metric_master.frequency,
+              frequency: metric_master.frequency,
               management: metric_master.management,
               created_by: created_by,
               targets: [],

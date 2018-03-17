@@ -47,7 +47,14 @@ export default function (app) {
   router.route('/create')
     .post([
       problemsMasterValidator.createProblemMasterReqValidator,
-      problemsMasterCtrl.createPoblemMasterData]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          problemsMasterCtrl.updatePoblemMasterData(req, resp, next)
+        } else {
+
+          problemsMasterCtrl.createPoblemMasterData(req, resp, next)
+        }
+      }]);
 
   router.route('/metric/create')
     .post([

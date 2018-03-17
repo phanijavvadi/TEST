@@ -11,8 +11,10 @@ const validators = {
   createProblemMasterReqValidator: (req, resp, next) => {
     const body = req.body;
     const schemaObj = {
+      id: Joi.string(),
       name: Joi.string().required(),
-      description: Joi.string().required()
+      description: Joi.string().required(),
+      status: Joi.number().required()
     };
 
     const {authenticatedUser} = req.locals;
@@ -36,6 +38,7 @@ const validators = {
       type: Joi.string().required(),
       goal: Joi.string().required(),
       management: Joi.string().required(),
+      frequency: Joi.string().required(),
       status: Joi.number().required()
     };
     const {authenticatedUser} = req.locals;

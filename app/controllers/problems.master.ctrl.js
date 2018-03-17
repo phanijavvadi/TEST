@@ -20,7 +20,7 @@ const operations = {
     const options = {
       ...req.query,
       where: {
-        status: 1
+        // status: 1
       }
     };
     if (req.query.searchText) {
@@ -84,7 +84,7 @@ const operations = {
       goal: body.goal,
       management: body.management,
       status: body.status,
-      frequency: 'PROBLEM_METRIC_FREQUENCY'
+      frequency: body.frequency
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
     let transactionRef;
@@ -121,6 +121,7 @@ const operations = {
       goal: body.goal,
       management: body.management,
       status: body.status,
+      frequency: body.frequency
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
     let transactionRef;
@@ -652,6 +653,52 @@ const operations = {
           transaction: transactionRef,
           individualHooks: true
         })
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: {
+            id: res.id,
+          },
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updatePoblemMasterData: (req, resp, next) => {
+    const body = req.body;
+    const data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (userOrgIds.indexOf(body.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      data.orgId = body.orgId
+    }
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.ProblemsMaster.findById(data.id);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
       })
       .then((res) => {
         transactionRef.commit();
