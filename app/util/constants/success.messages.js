@@ -8,7 +8,7 @@ const successMessage = {
   CONTACT_MAIL_SENT_SUCCESS: 'Mail sent successfully',
   ///admin table service end
   // users table service start
-  USER_LOGIN_SUCCESS: 'Login Successfully',
+  USER_LOGIN_SUCCESS: 'Login Successful',
   USER_USER_CREATED_SCUCCESS: 'Admin User created successfully',
   USER_USER_UPDATED_SCUCCESS: 'Admin User updated successfully',
   //Organization services start
@@ -43,7 +43,7 @@ const successMessage = {
   PATIENT_MEDICATIONS_IMPORTED_SUCCESS: 'Imported Successfully',
   PATIENT_UPDATED_SUCCESS: 'Updated Successfully',
   PATIENT_SIGNUP_SUCCESS: 'Registered Successfully',
-  PATIENT_LOGIN_SUCCESS: 'Login Successfully',
+  PATIENT_LOGIN_SUCCESS: 'Login Successful',
   PATIENT_INVALID_LOGIN_CREDENTIALS: 'Login Successfully',
   PATIENT_INVITATION_SENT_SUCCESS: 'SMS sent Successfully',
 
