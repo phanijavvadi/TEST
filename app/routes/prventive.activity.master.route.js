@@ -22,6 +22,10 @@ export default function (app) {
       preventiveActivitiesMasterCtrl.getMetricOptions]);
 
 
+  router.route('/category-list')
+    .get([
+      preventiveActivitiesMasterCtrl.getCategoriesList,
+    ]);
   router.route('/category')
     .post([
       preventiveActivityMasterValidator.createOrUpdatePreventiveCategoryMasterDataReqValidator,
@@ -32,6 +36,39 @@ export default function (app) {
           preventiveActivitiesMasterCtrl.createPreventiveCategoryMasterData(req, resp, next);
         }
       }]);
+
+  router.route('/:preventive_act_cat_mid/activities-list')
+    .get([
+      preventiveActivitiesMasterCtrl.getActivitiesList,
+    ]);
+  router.route('/activity')
+    .post([
+      preventiveActivityMasterValidator.createOrUpdatePreventiveActivityReqValidator,
+      (req, resp, next) => {
+        preventiveActivityMasterValidator.isValidPrevCatMid(req.body.preventive_act_cat_mid, req, resp, next);
+      },
+      (req, resp, next) => {
+        if (req.body.id) {
+          preventiveActivitiesMasterCtrl.updatePreventiveActivity(req, resp, next);
+        } else {
+          preventiveActivitiesMasterCtrl.createPreventiveActivity(req, resp, next);
+        }
+      }
+    ]);
+  router.route('/activity/:preventive_act_mid/age-groups')
+    .get([
+      preventiveActivitiesMasterCtrl.getActivityAgeGroups,
+    ]);
+  router.route('/activity/add-age-groups')
+    .post([
+      preventiveActivityMasterValidator.saveActivityAgeGroupsReqValidator,
+      preventiveActivitiesMasterCtrl.saveActivityAgeGroups,
+    ]);
+  router.route('/activity/delete-age-group')
+    .post([
+      preventiveActivityMasterValidator.deleteActivityAgeGroupReqValidator,
+      preventiveActivitiesMasterCtrl.deleteActivityAgeGroup,
+    ]);
 
   adminRouter.route('/save-category')
     .post([

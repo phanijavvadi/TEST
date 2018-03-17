@@ -11,24 +11,6 @@ export default function (sequelize, DataTypes) {
       name: {
         type: DataTypes.TEXT,
         allowNull: false,
-        validate: {
-          isUnique: function (value, next) {
-            const self = this;
-            PreventiveActivityMaster.find({
-              where: {name: value, preventive_act_cat_mid: self.preventive_act_cat_mid},
-              attributes: ['id', 'name']
-            })
-              .then(function (res) {
-                if (res && self.id !== res.id) {
-                  return next('ACTIVITY_NAME_EXIST');
-                }
-                return next();
-              })
-              .catch(function (err) {
-                return next(err.message);
-              });
-          }
-        }
       },
       gender: {
         type: DataTypes.SMALLINT,
@@ -48,7 +30,29 @@ export default function (sequelize, DataTypes) {
     {
       paranoid: true,
       freezeTableName: true,
-      tableName: constants.getTableName('preventive_activities_master')
+      tableName: constants.getTableName('preventive_activities_master'),
+      validate: {
+        isUnique: function (next) {
+          const self = this;
+          const where = {name: self.name, preventive_act_cat_mid: self.preventive_act_cat_mid}
+          if (self.orgId) {
+            where.orgId = self.orgId;
+          }
+          PreventiveActivityMaster.find({
+            where: where,
+            attributes: ['id', 'name']
+          })
+            .then(function (record) {
+              if (record && self.id !== record.id) {
+                return next('ACTIVITY_NAME_EXIST');
+              }
+              return next();
+            })
+            .catch(function (err) {
+              return next(err.message);
+            });
+        }
+      }
     });
   PreventiveActivityMaster.associate = function (models) {
     PreventiveActivityMaster.hasMany(models.PreventiveActivityMetricMaster, {

@@ -19,11 +19,19 @@ const operations = {
     if (req.params.gender) {
       gender.push(Number(req.params.gender));
     }
+    const where = {
+      status: 1
+    };
+    const {authenticatedUser} = req.locals;
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      where.orgId = [...userOrgIds];
+    }
     return models.PreventiveActivityCategoryMaster
       .findAll({
-        where: {
-          status: 1
-        },
+        where: where,
         include: [
           {
             model: models.PreventiveActivityMaster,
@@ -40,7 +48,8 @@ const operations = {
             }
           }
         ],
-        attributes: ['id', 'name']
+        attributes: ['id', 'name'],
+        order: ['name']
       })
       .then((data) => {
         if (data) {
@@ -50,15 +59,22 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
-  getMetricOptions: (req, resp, next) => {
-    const preventive_act_mid = req.params.preventive_act_mid;
-    return models.PreventiveActivityMetricMaster
-      .findAll({
-        where: {
-          status: 1,
-          preventive_act_mid
-        },
-        attributes: ['id', 'name', 'notes', 'frequency_master_key']
+  getCategoriesList: (req, resp, next) => {
+    const where = {
+      // status: 1
+    };
+    const {authenticatedUser} = req.locals;
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      where.orgId = [...userOrgIds];
+    }
+    return models.PreventiveActivityCategoryMaster
+      .findAndCountAll({
+        where: where,
+        attributes: ['id', 'name', 'status', 'orgId'],
+        order: ['name']
       })
       .then((data) => {
         if (data) {
@@ -103,7 +119,7 @@ const operations = {
         if (err && err.errors &&
           err.errors.length > 0 &&
           err.errors[0].message === 'ACTIVITY_CATEGORY_NAME_EXIST') {
-          message = 'Duplicate activity category ' + err.errors[0].value;
+          message = 'Duplicate activity category ' + err.errors[0].instance.get('name');
         }
         throw  new Error(message);
       })
@@ -120,8 +136,16 @@ const operations = {
     sequelize.transaction()
       .then((t) => {
         transactionRef = t;
-        data.createdBy = authenticatedUser.id;
-        return models.PreventiveActivityCategoryMaster.findById(data.id);
+        const options = {
+          where: {}
+        };
+        if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+          let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+            return role.orgId;
+          });
+          options.where.orgId = [...userOrgIds];
+        }
+        return models.PreventiveActivityCategoryMaster.findById(data.id, options);
       })
       .then((p) => {
         if (p) {
@@ -146,12 +170,233 @@ const operations = {
         if (err && err.errors &&
           err.errors.length > 0 &&
           err.errors[0].message === 'ACTIVITY_CATEGORY_NAME_EXIST') {
-          message = 'Duplicate activity category ' + err.errors[0].value;
+          message = 'Duplicate activity category ' + err.errors[0].instance.get('name');
         }
         throw  new Error(message);
       })
       .catch((err) => {
         transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+
+  getActivitiesList: (req, resp, next) => {
+    const preventive_act_cat_mid = req.params.preventive_act_cat_mid;
+    const {authenticatedUser} = req.locals;
+    const where = {
+      preventive_act_cat_mid
+    };
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      where.orgId = [...userOrgIds];
+    }
+    return models.PreventiveActivityMaster
+      .findAndCountAll({
+        where: where,
+        attributes: ['id', 'name', 'gender', 'notes', 'status'],
+        order: ['name']
+      })
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  createPreventiveActivity: (req, resp, next) => {
+    const data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const que = [];
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (userOrgIds.indexOf(data.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+    }
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        data.createdBy = authenticatedUser.id;
+        return models.PreventiveActivityMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: res,
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch(Sequelize.ValidationError, function (err) {
+        let message = 'UNKNOWN_ERROR';
+        if (err && err.errors &&
+          err.errors.length > 0 &&
+          err.errors[0].message === 'ACTIVITY_NAME_EXIST') {
+          message = 'Duplicate activity name ' + err.errors[0].instance.get('name');
+        }
+        throw  new Error(message);
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updatePreventiveActivity: (req, resp, next) => {
+    const data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const que = [];
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        const options = {
+          where: {}
+        };
+        if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+          let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+            return role.orgId;
+          });
+          options.where.orgId = [...userOrgIds];
+        }
+        return models.PreventiveActivityMaster.findById(data.id, options);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          data: res,
+          success: true,
+          message: successMessage.UPDATED_SUCCESS
+        });
+      })
+      .catch(Sequelize.ValidationError, function (err) {
+        let message = 'UNKNOWN_ERROR';
+        if (err && err.errors &&
+          err.errors.length > 0 &&
+          err.errors[0].message === 'ACTIVITY_NAME_EXIST') {
+          message = 'Duplicate activity name ' + err.errors[0].instance.get('name');
+        }
+        throw  new Error(message);
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+  getActivityAgeGroups: (req, resp, next) => {
+    const preventive_act_mid = req.params.preventive_act_mid;
+    const {authenticatedUser} = req.locals;
+    const where = {
+      preventive_act_mid
+    };
+    return models.PreventiveActivityAgeGroupMaster
+      .findAll({
+        where: where,
+        attributes: ['id', 'from', 'to']
+      })
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  saveActivityAgeGroups: (req, resp, next) => {
+    let age_groups = req.body.age_groups;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const createdBy = authenticatedUser.id;
+    age_groups = age_groups.map(age_group => {
+      age_group.preventive_act_mid = req.body.preventive_act_mid;
+      age_group.createdBy = createdBy;
+      return age_group;
+    });
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityAgeGroupMaster.bulkCreate(age_groups, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  deleteActivityAgeGroup: (req, resp, next) => {
+    let age_group = req.body;
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityAgeGroupMaster.destroy({
+          where: {
+            id: age_group.id
+          }
+        }, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.REMOVED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+  getMetricOptions: (req, resp, next) => {
+    const preventive_act_mid = req.params.preventive_act_mid;
+    return models.PreventiveActivityMetricMaster
+      .findAll({
+        where: {
+          status: 1,
+          preventive_act_mid
+        },
+        attributes: ['id', 'name', 'notes', 'frequency_master_key']
+      })
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
         commonUtil.handleException(err, req, resp, next);
       });
   },

@@ -3,6 +3,8 @@ import * as Joi from 'joi';
 import * as problemMetricsMasterService from '../services/problem.metrics.master.service';
 import commonUtil from "../util/common.util";
 import constants from "../util/constants/constants";
+import _ from 'lodash';
+import models from '../models';
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -27,6 +29,7 @@ const validators = {
     const schemaObj = {
       id: Joi.string(),
       name: Joi.string().required(),
+      status: Joi.number().required(),
     };
     const {authenticatedUser} = req.locals;
     if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
@@ -39,6 +42,85 @@ const validators = {
     } else {
       next();
     }
+  },
+  saveActivityAgeGroupsReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let age_group_schema = {
+      from: Joi.number().required().allow([null]),
+      to: Joi.number()
+        .required()
+        .allow([null]),
+    };
+    const schema = Joi.object().keys({
+      preventive_act_mid: Joi.string().required(),
+      age_groups: Joi.array().items(age_group_schema).min(0).required(),
+    });
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  deleteActivityAgeGroupReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  createOrUpdatePreventiveActivityReqValidator: (req, resp, next) => {
+    const body = req.body;
+    const schemaObj = {
+      id: Joi.string(),
+      preventive_act_cat_mid: Joi.string().required(),
+      name: Joi.string().required(),
+      notes: Joi.string(),
+      gender: Joi.number().allow([null, 1, 2, 3]),
+      status: Joi.number().required(),
+    };
+    const {authenticatedUser} = req.locals;
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      schemaObj.orgId = Joi.string().required();
+    }
+    const schema = Joi.object().keys(schemaObj);
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  isValidPrevCatMid(preventive_act_cat_mid, req, resp, next) {
+    const {authenticatedUser} = req.locals;
+    const where = {
+      id: preventive_act_cat_mid
+    };
+    if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      where.orgId = [...userOrgIds];
+    }
+    return models.PreventiveActivityCategoryMaster
+      .findOne({
+        where: where,
+        attributes: ['id']
+      })
+      .then((data) => {
+        if (data) {
+          return next();
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
   },
   savePreventiveActsMasterDataReqValidator: (req, resp, next) => {
     const body = req.body;

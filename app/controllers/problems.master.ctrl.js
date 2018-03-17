@@ -38,7 +38,7 @@ const operations = {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
-      options.orgId = [...userOrgIds, null];
+      options.where.orgId = [...userOrgIds];
     }
     return problemsMasterService
       .findAll(options)
@@ -62,7 +62,7 @@ const operations = {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
-      options.orgId = [...userOrgIds, null];
+      options.where.orgId = [...userOrgIds];
     }
     return problemsMasterService
       .getOptions(options)

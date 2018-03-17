@@ -11,7 +11,7 @@ export default function (sequelize, DataTypes) {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
+        /*validate: {
           isUnique: function (value, next) {
             const self = this;
             PreventiveActivityCategoryMaster.find({
@@ -28,7 +28,7 @@ export default function (sequelize, DataTypes) {
                 return next(err.message);
               });
           }
-        }
+        }*/
       },
       status: {
         type: DataTypes.INTEGER,
@@ -40,7 +40,29 @@ export default function (sequelize, DataTypes) {
     {
       paranoid: true,
       freezeTableName: true,
-      tableName: constants.getTableName('preventive_activity_category_master')
+      tableName: constants.getTableName('preventive_activity_category_master'),
+      validate: {
+        isUnique: function (next) {
+          const self = this;
+          const where = {name: self.name};
+          if (self.orgId) {
+            where.orgId = self.orgId;
+          }
+          PreventiveActivityCategoryMaster.find({
+            where: where,
+            attributes: ['id', 'name']
+          })
+            .then(function (record) {
+              if (record && self.id !== record.id) {
+                return next('ACTIVITY_CATEGORY_NAME_EXIST');
+              }
+              return next();
+            })
+            .catch(function (err) {
+              return next(err.message);
+            });
+        }
+      }
     });
   PreventiveActivityCategoryMaster.associate = function (models) {
     PreventiveActivityCategoryMaster.hasMany(models.PreventiveActivityMaster, {
