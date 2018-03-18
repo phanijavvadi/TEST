@@ -17,7 +17,8 @@ export function getOrgPatientList({limit = 50, offset = 0, ...otherOptions} = {}
     include: options.include || [],
     limit: Number(limit),
     offset: Number(offset),
-    distinct:'id',
+    distinct: 'id',
+    order: ['firstName'],
     where: {
       ...(options.where || {})
     }

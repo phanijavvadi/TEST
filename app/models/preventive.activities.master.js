@@ -62,6 +62,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'preventive_metrics_master'
     });
+    PreventiveActivityMaster.hasMany(models.PreventiveActivityHealthChecksMaster, {
+      foreignKey: {
+        name: 'preventive_act_mid',
+        allowNull: false,
+      },
+      as: 'activity_health_checks'
+    });
     PreventiveActivityMaster.belongsTo(models.Organisation, {
       foreignKey: {
         name: 'orgId',

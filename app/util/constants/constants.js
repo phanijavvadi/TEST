@@ -70,12 +70,15 @@ export default {
 
 
     //preventive activity
+    org_health_checks_master: 'org_health_checks_master',
     org_patient_preventive_health: 'org_patient_preventive_health',
+    org_patient_preventive_health_checks: 'org_patient_preventive_health_checks',
     org_patient_preventive_activities: 'org_patient_preventive_activities',
     org_patient_preventive_activity_metrics: 'org_patient_preventive_activity_metrics',
 
     preventive_activity_category_master: 'preventive_activity_category_master',
     preventive_activities_master: 'preventive_activities_master',
+    preventive_activity_health_checks_master: 'preventive_activity_health_checks_master',
     preventive_activity_age_groups_master: 'preventive_activity_age_groups_master',
     preventive_activity_metrics_master: 'preventive_activity_metrics_master',
     preventive_activity_metrics_frequency_master: 'preventive_activity_metrics_frequency_master',

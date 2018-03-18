@@ -21,6 +21,10 @@ export default function (app) {
     .get([
       patientPreventiveHealthCtrl.get]);
 
+  patientRouter.route('/:ph_id/health_checks')
+    .get([
+      patientPreventiveHealthCtrl.getHealthChecks]);
+
   router.route('/create')
     .post([
       patientPreventiveHealthValidator.createReqValidator,

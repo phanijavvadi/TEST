@@ -197,7 +197,12 @@ const operations = {
       .findAndCountAll({
         where: where,
         attributes: ['id', 'name', 'gender', 'notes', 'status'],
-        order: ['name']
+        order: ['name'],
+        include: [{
+          model: models.PreventiveActivityHealthChecksMaster,
+          as: 'activity_health_checks',
+          attributes: ['id', 'hc_mid'],
+        }]
       })
       .then((data) => {
         if (data) {
@@ -208,8 +213,25 @@ const operations = {
       });
   },
   createPreventiveActivity: (req, resp, next) => {
-    const data = req.body;
+    const body = req.body;
+
     const {authenticatedUser, tokenDecoded} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      preventive_act_cat_mid: body.preventive_act_cat_mid,
+      name: body.name,
+      notes: body.notes,
+      gender: body.gender,
+      status: body.status,
+    };
+    if (body.health_checks && body.health_checks.length > 0) {
+      data.activity_health_checks = body.health_checks.map(a => {
+        return {
+          createdBy,
+          hc_mid: a.id
+        };
+      })
+    }
     const que = [];
     if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
@@ -223,10 +245,14 @@ const operations = {
     sequelize.transaction()
       .then((t) => {
         transactionRef = t;
-        data.createdBy = authenticatedUser.id;
+        data.createdBy = createdBy;
         return models.PreventiveActivityMaster.create(data, {
           transaction: transactionRef,
-          individualHooks: true
+          individualHooks: true,
+          include: [{
+            model: models.PreventiveActivityHealthChecksMaster,
+            as: 'activity_health_checks'
+          }]
         });
       })
       .then((res) => {
@@ -252,15 +278,34 @@ const operations = {
       });
   },
   updatePreventiveActivity: (req, resp, next) => {
-    const data = req.body;
+    const body = req.body;
     const {authenticatedUser, tokenDecoded} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const data = {
+      name: body.name,
+      id: body.id,
+      notes: body.notes,
+      gender: body.gender,
+      status: body.status,
+    };
+    let activity_health_checks = [];
+    if (body.health_checks && body.health_checks.length > 0) {
+      activity_health_checks = body.health_checks.map(a => {
+        return {
+          createdBy,
+          hc_mid: a.id,
+          preventive_act_mid: data.id
+        };
+      })
+    }
     const que = [];
     let transactionRef;
     sequelize.transaction()
       .then((t) => {
         transactionRef = t;
         const options = {
-          where: {}
+          where: {},
+          attributes: ['id', 'name', 'gender', 'notes', 'status']
         };
         if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
           let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
@@ -280,10 +325,22 @@ const operations = {
           throw new Error('INVALID_INPUT');
         }
       })
+      .then(res => {
+        return models.PreventiveActivityHealthChecksMaster.destroy({
+          where: {preventive_act_mid: data.id}
+        }, {
+          transaction: transactionRef,
+        });
+      })
+      .then(res => {
+        return models.PreventiveActivityHealthChecksMaster.bulkCreate(activity_health_checks, {
+          transaction: transactionRef,
+        })
+      })
       .then((res) => {
         transactionRef.commit();
         return resp.send({
-          data: res,
+          // data: res,
           success: true,
           message: successMessage.UPDATED_SUCCESS
         });
@@ -392,7 +449,7 @@ const operations = {
     return models.PreventiveActivityMetricMaster
       .findAll({
         where: where,
-        attributes: ['id', 'name', 'status','frequency']
+        attributes: ['id', 'name', 'status', 'frequency']
       })
       .then((data) => {
         if (data) {
@@ -475,9 +532,9 @@ const operations = {
     const where = {
       preventive_act_metric_mid
     };
-   /* if (req.query.status) {
-      where.status = +req.query.status;
-    }*/
+    /* if (req.query.status) {
+       where.status = +req.query.status;
+     }*/
     return models.PreventiveActivityMetricsFrequencyMaster
       .findAll({
         where: where,

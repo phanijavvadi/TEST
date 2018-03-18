@@ -129,12 +129,16 @@ const validators = {
   },
   createOrUpdatePreventiveActivityReqValidator: (req, resp, next) => {
     const body = req.body;
+    const health_checks_schema = Joi.object().keys({
+      id: Joi.string().required()
+    });
     const schemaObj = {
       id: Joi.string(),
       preventive_act_cat_mid: Joi.string().required(),
       name: Joi.string().required(),
       notes: Joi.string(),
       gender: Joi.number().allow([null, 1, 2, 3]),
+      health_checks: Joi.array().items(health_checks_schema).min(0).unique((a, b) => a.id === b.id),
       status: Joi.number().required(),
     };
     const {authenticatedUser} = req.locals;

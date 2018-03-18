@@ -43,6 +43,13 @@ export default function (sequelize, DataTypes) {
       },
       as: 'ph_acts'
     });
+    PatientPreventiveHealth.hasMany(models.PatientPreventiveHealthChecks, {
+      foreignKey: {
+        name: 'ph_id',
+        allowNull: false
+      },
+      as: 'ph_health_checks'
+    });
     PatientPreventiveHealth.belongsTo(models.User, {
       foreignKey: {
         name: 'created_by',
