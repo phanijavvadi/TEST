@@ -234,6 +234,7 @@ const operations = {
     }
     const que = [];
     if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      data.orgId = body.orgId;
       let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
         return role.orgId;
       });
