@@ -122,7 +122,7 @@ const operations = {
         transaction = t;
         return patientService
           .findById(body.patient_id, {
-            attributes: ['dob', 'gender'],
+            attributes: ['dob', 'gender', 'orgId'],
             where: {
               id: body.patient_id
             }
@@ -151,7 +151,8 @@ const operations = {
                 gender
               ]
             },
-            status: 1
+            status: 1,
+            orgId: patient.orgId
           },
           include: [
             {
@@ -205,7 +206,7 @@ const operations = {
                 preventive_metric_mid: metric_master.id,
                 name: metric_master.name,
                 notes: metric_master.notes,
-                frequencyKey: metric_master.frequency_master_key,
+                frequency: metric_master.frequency,
                 created_by: created_by
               };
               ph_acts[ph_acts_index[metric_master.preventive_act_mid]].metrics.push(phMatricData);
@@ -290,7 +291,7 @@ const operations = {
                 preventive_metric_mid: metric_master.id,
                 name: metric_master.name,
                 notes: metric_master.notes,
-                frequencyKey: metric_master.frequency_master_key,
+                frequency: metric_master.frequency,
                 created_by: created_by
               };
               ph_acts[ph_acts_index[metric_master.preventive_act_mid]].metrics.push(phMatricData);

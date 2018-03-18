@@ -74,6 +74,59 @@ const validators = {
       next();
     }
   },
+
+
+  saveActivityMetricsReqValidator: (req, resp, next) => {
+    const body = req.body;
+    let frequency_options_schema = {
+      name: Joi.string().required()
+    };
+    const schema = Joi.object().keys({
+      preventive_act_mid: Joi.string().required(),
+      id: Joi.string(),
+      name: Joi.string().required(),
+      frequency: Joi.string().required(),
+      status: Joi.number().required(),
+      frequency_options_master: Joi.array().items(frequency_options_schema).min(0).unique((a, b) => {
+        return a.name === b.name
+      }),
+    });
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  saveActivityMetricFrequencyOptionsValidator: (req, resp, next) => {
+    const body = req.body;
+    let frequency_options_schema = {
+      name: Joi.string().required()
+    };
+    const schema = Joi.object().keys({
+      preventive_act_metric_mid: Joi.string().required(),
+      frequency_options_master: Joi.array().items(frequency_options_schema).min(0).required(),
+    });
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
+  deleteActivityMetricFrequencyOptionsValidator: (req, resp, next) => {
+    const body = req.body;
+    const schema = Joi.object().keys({
+      preventive_act_metric_mid: Joi.string().required(),
+      id: Joi.string().required(),
+    });
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
   createOrUpdatePreventiveActivityReqValidator: (req, resp, next) => {
     const body = req.body;
     const schemaObj = {

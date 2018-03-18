@@ -30,7 +30,7 @@ export default function (sequelize, DataTypes) {
           }
         }
       },
-      frequency_master_key: {
+      frequency: {
         type: DataTypes.STRING
       },
       notes: {
@@ -55,6 +55,13 @@ export default function (sequelize, DataTypes) {
         allowNull: false,
       },
       as: 'preventive_act_master'
+    });
+    PreventiveActivityMetricMaster.hasMany(models.PreventiveActivityMetricsFrequencyMaster, {
+      foreignKey: {
+        name: 'preventive_act_metric_mid',
+        allowNull: false,
+      },
+      as: 'frequency_options_master'
     });
     PreventiveActivityMetricMaster.belongsTo(models.User, {
       foreignKey: {

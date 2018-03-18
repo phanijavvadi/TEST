@@ -70,6 +70,38 @@ export default function (app) {
       preventiveActivitiesMasterCtrl.deleteActivityAgeGroup,
     ]);
 
+
+  router.route('/activity/:preventive_act_mid/metrics')
+    .get([
+      preventiveActivitiesMasterCtrl.getActivityMetrics,
+    ]);
+  router.route('/activity/add-metric')
+    .post([
+      preventiveActivityMasterValidator.saveActivityMetricsReqValidator,
+      (req, resp, next) => {
+        if (req.body.id) {
+          preventiveActivitiesMasterCtrl.updateActivityMetrics(req, resp, next);
+        } else {
+          preventiveActivitiesMasterCtrl.saveActivityMetrics(req, resp, next);
+        }
+      }
+    ]);
+
+  router.route('/activity/metric/:preventive_act_metric_mid/frequency-list')
+    .get([
+      preventiveActivitiesMasterCtrl.getActivityMetricFrequencyList,
+    ]);
+  router.route('/activity/metric/frequency')
+    .post([
+      preventiveActivityMasterValidator.saveActivityMetricFrequencyOptionsValidator,
+      preventiveActivitiesMasterCtrl.saveActivityMetricFrequencyOptions
+    ]);
+  router.route('/activity/metric/delete-frequency')
+    .post([
+      preventiveActivityMasterValidator.deleteActivityMetricFrequencyOptionsValidator,
+      preventiveActivitiesMasterCtrl.deleteActivityMetricFrequency
+    ]);
+
   adminRouter.route('/save-category')
     .post([
       preventiveActivityMasterValidator.savePreventiveCategoryMasterDataReqValidator,

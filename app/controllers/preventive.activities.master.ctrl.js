@@ -382,15 +382,17 @@ const operations = {
       });
   },
 
-  getMetricOptions: (req, resp, next) => {
+
+  getActivityMetrics: (req, resp, next) => {
     const preventive_act_mid = req.params.preventive_act_mid;
+    const {authenticatedUser} = req.locals;
+    const where = {
+      preventive_act_mid
+    };
     return models.PreventiveActivityMetricMaster
       .findAll({
-        where: {
-          status: 1,
-          preventive_act_mid
-        },
-        attributes: ['id', 'name', 'notes', 'frequency_master_key']
+        where: where,
+        attributes: ['id', 'name', 'status','frequency']
       })
       .then((data) => {
         if (data) {
@@ -400,6 +402,175 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
   },
+  saveActivityMetrics: (req, resp, next) => {
+    let data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const createdBy = authenticatedUser.id;
+    data.createdBy = createdBy;
+    data.frequency_options_master = (data.frequency_options_master || []).map(frequency_option => {
+      frequency_option.createdBy = createdBy;
+      return frequency_option;
+    });
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityMetricMaster.create(data, {
+          transaction: transactionRef,
+          individualHooks: true,
+          include: [{
+            model: models.PreventiveActivityMetricsFrequencyMaster,
+            as: 'frequency_options_master'
+          }]
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  updateActivityMetrics: (req, resp, next) => {
+    let data = req.body;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityMetricMaster.findById(data.id);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transactionRef,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.UPDATED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  getActivityMetricFrequencyList: (req, resp, next) => {
+    const preventive_act_metric_mid = req.params.preventive_act_metric_mid;
+    const {authenticatedUser} = req.locals;
+    const where = {
+      preventive_act_metric_mid
+    };
+   /* if (req.query.status) {
+      where.status = +req.query.status;
+    }*/
+    return models.PreventiveActivityMetricsFrequencyMaster
+      .findAll({
+        where: where,
+        attributes: ['id', 'name']
+      })
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  saveActivityMetricFrequencyOptions: (req, resp, next) => {
+    let data = req.body;
+    const {authenticatedUser} = req.locals;
+    const createdBy = authenticatedUser.id;
+    const frequency_options_master = [];
+    data.frequency_options_master = (data.frequency_options_master || []).forEach(frequency_option => {
+      frequency_option.createdBy = createdBy;
+      frequency_option.preventive_act_metric_mid = data.preventive_act_metric_mid;
+      frequency_options_master.push(frequency_option);
+    });
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityMetricsFrequencyMaster.bulkCreate(frequency_options_master, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.CREATEED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+  deleteActivityMetricFrequency: (req, resp, next) => {
+    let data = req.body;
+    let transactionRef;
+    sequelize.transaction()
+      .then((t) => {
+        transactionRef = t;
+        return models.PreventiveActivityMetricsFrequencyMaster.destroy({
+          where: {
+            id: data.id
+          }
+        }, {
+          transaction: transactionRef,
+          individualHooks: true
+        });
+      })
+      .then((res) => {
+        transactionRef.commit();
+        return resp.send({
+          // data: res,
+          success: true,
+          message: successMessage.REMOVED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transactionRef.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
+  getMetricOptions: (req, resp, next) => {
+    const preventive_act_mid = req.params.preventive_act_mid;
+    return models.PreventiveActivityMetricMaster
+      .findAll({
+        where: {
+          status: 1,
+          preventive_act_mid
+        },
+        attributes: ['id', 'name', 'notes', 'frequency']
+      })
+      .then((data) => {
+        if (data) {
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp, next);
+      });
+  },
+
   savePreventiveCategoryMasterData: (req, resp, next) => {
     const data = req.body.categories;
     const {authenticatedUser, tokenDecoded} = req.locals;
