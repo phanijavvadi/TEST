@@ -9,8 +9,8 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    due_date: {
-      type: DataTypes.DATE
+    name: {
+      type: DataTypes.STRING
     }
   }, {
     paranoid: true,
@@ -24,6 +24,13 @@ export default function (sequelize, DataTypes) {
         allowNull: false
       },
       as: 'health_check_master'
+    });
+    PatientPreventiveHealthChecks.hasMany(models.PatientPreventiveHealthChecksData, {
+      foreignKey: {
+        name: 'hc_id',
+        allowNull: false
+      },
+      as: 'health_check_data'
     });
     PatientPreventiveHealthChecks.belongsTo(models.User, {
       foreignKey: {

@@ -5,7 +5,9 @@ import commonUtil from "../util/common.util";
 import errorMessages from '../util/constants/error.messages';
 import constants from '../util/constants/constants';
 import _ from 'lodash';
+// import * as Extension from 'joi-date-extensions';
 
+// const extJoi = Joi.extend(Extension);
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 import models from '../models';
@@ -21,6 +23,24 @@ const validators = {
     let schema = {
       orgId: Joi.string().required(),
       patient_id: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      validators.checkPhExist({
+        where: {
+          patient_id: body.patient_id,
+          status: [1]
+        }
+      }, req, resp, next);
+    }
+  },
+  saveHealthCheckDataValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      hc_id: Joi.string().required(),
+      due_date: Joi.date().required()
     };
     let result = Joi.validate(body, schema, {allowUnknown: false});
     if (result && result.error) {

@@ -10,9 +10,12 @@ import * as config from '../../config/config';
 const sequelize = models.sequelize;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+import moment from 'moment';
 
 const axios = require("axios");
 import * as fs from 'fs';
+import constants from "../util/constants/constants";
+import errorMessages from "../util/constants/error.messages";
 
 const path = require('path');
 const APNS = require('apns2');
@@ -46,6 +49,7 @@ const operations = {
       });
 
   },
+
   sendInAppMessage: (req, resp, next) => {
     const body = req.body;
 
@@ -116,6 +120,42 @@ const operations = {
       })
       .catch((err) => {
         transaction.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+
+  },
+  getMessages: (req, resp, next) => {
+    const queryParams = req.query;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      if (queryParams.patient_id !== tokenDecoded.id) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_INPUT});
+      }
+    }
+    else if (authenticatedUser.userCategory.value === constants.userCategoryTypes.ORG_USER) {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+    }
+
+    models.PatientNotification.findAndCountAll({
+      where: {patient_id: queryParams.patient_id},
+      limit: Number(queryParams.limit || 25),
+      offset: Number(queryParams.limit || 0),
+      attributes: ['id', 'message', 'createdAt'],
+      raw: true
+    })
+      .then(data => {
+        data.rows = data.rows.map(a => {
+          a.createdAt = moment(a.createdAt).format('YYYY-MM-DD HH:ss');
+          return a;
+        });
+        return resp.json(data);
+      })
+      .catch((err) => {
         commonUtil.handleException(err, req, resp, next);
       });
 

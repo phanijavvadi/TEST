@@ -51,6 +51,22 @@ export default function (app) {
       },
       pushNotificationCtrl.sendInAppMessage]);
 
+  router.route('/get-messages')
+    .get([
+      pushNotificationValidator.getMessagesReqValidator,
+      (req, resp, next) => {
+        patientValidator.isValidPatientId({
+          id: req.query.patient_id,
+          orgId: req.query.orgId
+        }, req, resp, next);
+      },
+      pushNotificationCtrl.getMessages]);
+
+  patientRouter.route('/get-messages')
+    .get([
+      pushNotificationValidator.getMessagesReqValidator,
+      pushNotificationCtrl.getMessages]);
+
   app.use('/api/org-user/private/notification', router);
   app.use('/api/patient/private/notification', patientRouter);
 }

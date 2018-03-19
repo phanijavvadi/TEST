@@ -92,21 +92,43 @@ const operations = {
         commonUtil.handleException(err, req, resp);
       });
   },
-  getHealthChecks: (req, resp) => {
+  getHealthChecks: (req, resp, next) => {
     const ph_id = req.params.ph_id;
     const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
       where: {
         ph_id: ph_id
       },
-      attributes: [Sequelize.literal('DISTINCT ON(hc_mid) hc_mid'), 'id', 'due_date'],
+      attributes: ['id', 'name'],
+      include: [{
+        model: models.PatientPreventiveHealthChecksData,
+        as: 'health_check_data',
+        attributes: ['id', 'due_date', 'checkup_date', 'hc_id'],
+        order: ['createdAt'],
+        limit: 1,
+        separate: true
+      }],
+      // raw: true
     };
     models.PatientPreventiveHealthChecks.findAll(options)
       .then(res => {
+
+        res = res.map(a => {
+          a = a.get({plain: true});
+          a.health_check_data = a.health_check_data.map(b => {
+            if (b.due_date) {
+              b.due_date = moment(b.due_date).format('DD,MMM YYYY')
+            }
+            if (b.checkup_date) {
+              b.checkup_date = moment(b.checkup_date).format('DD,MMM YYYY')
+            }
+            return b;
+          });
+          return a;
+        });
         return resp.json(res);
       })
       .catch((err) => {
-        transaction.rollback();
         commonUtil.handleException(err, req, resp, next);
       });
   },
@@ -251,6 +273,11 @@ const operations = {
               preventive_act_mid: act_mids
             },
             attributes: [Sequelize.literal('DISTINCT ON(hc_mid) hc_mid'), 'preventive_act_mid'],
+            include: [{
+              model: models.HealthChecksMaster,
+              as: 'hc_master',
+              attributes: [['name', 'hc_master_name']]
+            }],
             raw: true
           };
           return models.PreventiveActivityHealthChecksMaster.findAll(options);
@@ -265,6 +292,7 @@ const operations = {
           const activity_health_checks = [];
           (healthChecks || []).forEach(hc => {
             activity_health_checks.push(models.PatientPreventiveHealthChecks.create({
+              name: hc['hc_master.hc_master_name'],
               hc_mid: hc.hc_mid,
               ph_id: ph_record.id,
               created_by
@@ -359,16 +387,33 @@ const operations = {
           }));
         });
         return Promise.all(ph_acts_que);
-      })
-      .then(res => {
+      }).then(res => {
         ph_acts = res;
+        return models.PatientPreventiveHealthChecks.findAll({
+          where: {
+            ph_id: body.ph_id
+          },
+          attributes: ['hc_mid'],
+          raw: true
+        })
+      })
+      .then(existingHealthCheckIds => {
+        const extHcIds = (existingHealthCheckIds || []).map(a => a.hc_mid);
         const act_mids = body.acts_master.map(a => a.id);
         if (act_mids && act_mids.length > 0) {
           const options = {
             where: {
-              preventive_act_mid: act_mids
+              preventive_act_mid: act_mids,
+              hc_mid: {
+                [Op.notIn]: extHcIds
+              }
             },
             attributes: [Sequelize.literal('DISTINCT ON(hc_mid) hc_mid'), 'preventive_act_mid'],
+            include: [{
+              model: models.HealthChecksMaster,
+              as: 'hc_master',
+              attributes: ['name']
+            }],
             raw: true
           };
           return models.PreventiveActivityHealthChecksMaster.findAll(options);
@@ -385,10 +430,9 @@ const operations = {
             activity_health_checks.push(models.PatientPreventiveHealthChecks.create({
               hc_mid: hc.hc_mid,
               ph_id: body.ph_id,
+              name: hc['hc_master.name'],
               created_by
-            }, {
-              transaction: transaction
-            }));
+            }, {transaction}));
           });
           return Promise.all(activity_health_checks)
         }
@@ -589,6 +633,35 @@ const operations = {
         return resp.json({
           success: true,
           message: successMessages.UPDATED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transaction.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
+
+  },
+  saveHealthCheckData: (req, resp, next) => {
+    const data = req.body;
+    let transaction;
+    let {authenticatedUser, tokenDecoded} = req.locals;
+    data.created_by = authenticatedUser.id;
+    sequelize.transaction()
+      .then((t) => {
+        transaction = t;
+        return models.PatientPreventiveHealthChecksData.create(data, {transaction});
+      })
+      .then(res => {
+        const resObj = {
+          id: res.id,
+          due_date: moment(res.due_date).format('DD,MMM YYYY'),
+          checkup_date: (res.checkup_date) ? moment(res.checkup_date).format('DD,MMM YYYY') : null
+        };
+        transaction.commit();
+        return resp.json({
+          success: true,
+          data: resObj,
+          message: successMessages.CREATEED_SUCCESS
         });
       })
       .catch((err) => {

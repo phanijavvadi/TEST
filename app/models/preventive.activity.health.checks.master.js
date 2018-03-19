@@ -25,7 +25,8 @@ export default function (sequelize, DataTypes) {
       foreignKey: {
         name: 'hc_mid',
         allowNull: false
-      }
+      },
+      as:'hc_master'
     });
     PreventiveActivityHealthChecksMaster.belongsTo(models.User, {
       foreignKey: {

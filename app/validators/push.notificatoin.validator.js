@@ -20,7 +20,7 @@ const validators = {
       manufacturer: Joi.string().allow(['', null]),
       serial: Joi.string().allow(['', null]),
     };
-    let result = Joi.validate(body, schema, {allowUnknown: true});
+    let result = Joi.validate(body, schema, {allowUnknown: false});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
@@ -34,6 +34,20 @@ const validators = {
       orgId: Joi.string().required(),
       patient_id: Joi.string().required(),
       message: Joi.string().required(),
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+      return null;
+    }
+  },
+  getMessagesReqValidator: (req, resp, next) => {
+    const body = req.query;
+    let schema = {
+      orgId: Joi.string().required(),
+      patient_id: Joi.string().required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
     if (result && result.error) {

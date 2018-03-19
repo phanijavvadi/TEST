@@ -73,6 +73,7 @@ export default {
     org_health_checks_master: 'org_health_checks_master',
     org_patient_preventive_health: 'org_patient_preventive_health',
     org_patient_preventive_health_checks: 'org_patient_preventive_health_checks',
+    org_patient_preventive_health_checks_data: 'org_patient_preventive_health_checks_data',
     org_patient_preventive_activities: 'org_patient_preventive_activities',
     org_patient_preventive_activity_metrics: 'org_patient_preventive_activity_metrics',
 
