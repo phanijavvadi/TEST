@@ -46,12 +46,20 @@ const validators = {
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {
-      validators.checkPhExist({
-        where: {
-          patient_id: body.patient_id,
-          status: [1]
-        }
-      }, req, resp, next);
+      next();
+    }
+  },
+  updateHealthCheckDataValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      checkup_date: Joi.date().required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
     }
   },
   checkPhExist: (options, req, resp, next) => {

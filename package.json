@@ -59,7 +59,9 @@
     "start": "node server.js",
     "start:dev": "nodemon server.js --exec babel-node",
     "prebuild": "npm run clean",
+    "predist": "npm run clean",
     "build": "babel -d ./dist ./server.js ./app/**/*.js ./config/*.js ./config/**/*.js ./app/util/**/*.js",
+    "dist": "babel app --out-dir dist/app --copy-files && babel config --out-dir dist/config --copy-files && babel server.js --out-dir dist --copy-files",
     "test:unit": "mocha --compilers js:babel-register --plugins add-module-exports ./test/unit.test/"
   },
   "keywords": [],

@@ -52,7 +52,7 @@ const operations = {
 
   sendInAppMessage: (req, resp, next) => {
     const body = req.body;
-
+    const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
       orgId: body.orgId,
       patient_id: body.patientId,
@@ -105,7 +105,7 @@ const operations = {
                 "collapse_key": "type_a",
                 "data": {
                   "body": body.message,
-                  "title": "Collapsing A"
+                  "title": authenticatedUser.firstName + authenticatedUser.lastName
                 }
               }
             }).then((response) => {
@@ -146,6 +146,7 @@ const operations = {
       limit: Number(queryParams.limit || 25),
       offset: Number(queryParams.limit || 0),
       attributes: ['id', 'message', 'createdAt'],
+      order: [['updatedAt', 'DESC']],
       raw: true
     })
       .then(data => {

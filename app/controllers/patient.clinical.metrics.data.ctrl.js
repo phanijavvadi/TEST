@@ -46,7 +46,7 @@ const operations = {
         patient_id: req.params.patient_id,
       },
       attributes: ['measurement', 'id', 'source', 'on_date'],
-      order: [['metric_type', 'DESC'], ['on_date', 'DESC']],
+      order: [['on_date', 'ASC']],
       raw:true
     };
     const {authenticatedUser, tokenDecoded} = req.locals;

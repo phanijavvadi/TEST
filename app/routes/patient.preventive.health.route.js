@@ -32,6 +32,10 @@ export default function (app) {
     .post([
       patientPreventiveHealthValidator.saveHealthCheckDataValidator,
       patientPreventiveHealthCtrl.saveHealthCheckData]);
+  router.route('/update-health-check-data')
+    .post([
+      patientPreventiveHealthValidator.updateHealthCheckDataValidator,
+      patientPreventiveHealthCtrl.updateHealthCheckData]);
 
   router.route('/create')
     .post([

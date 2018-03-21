@@ -104,7 +104,7 @@ const operations = {
         model: models.PatientPreventiveHealthChecksData,
         as: 'health_check_data',
         attributes: ['id', 'due_date', 'checkup_date', 'hc_id'],
-        order: ['createdAt'],
+        order: [['updatedAt', 'DESC']],
         limit: 1,
         separate: true
       }],
@@ -669,6 +669,38 @@ const operations = {
         commonUtil.handleException(err, req, resp, next);
       });
 
+  },
+  updateHealthCheckData: (req, resp, next) => {
+    const data = req.body;
+    let transaction;
+    let {authenticatedUser, tokenDecoded} = req.locals;
+    // data.created_by = authenticatedUser.id;
+    sequelize.transaction()
+      .then((t) => {
+        transaction = t;
+        return models.PatientPreventiveHealthChecksData.findById(data.id);
+      })
+      .then((p) => {
+        if (p) {
+          return p.update(data, {
+            transaction: transaction,
+            individualHooks: true
+          });
+        } else {
+          throw new Error('INVALID_INPUT');
+        }
+      })
+      .then(res => {
+        transaction.commit();
+        return resp.json({
+          success: true,
+          message: successMessages.UPDATED_SUCCESS
+        });
+      })
+      .catch((err) => {
+        transaction.rollback();
+        commonUtil.handleException(err, req, resp, next);
+      });
   }
 };
 
