@@ -47,7 +47,7 @@ const operations = {
       },
       attributes: ['measurement', 'id', 'source', 'on_date'],
       order: [['on_date', 'ASC']],
-      raw:true
+      raw: true
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
     if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
@@ -72,6 +72,47 @@ const operations = {
         });
         resObj.rows = rows;
         resObj.count = res.count;
+        return resObj;
+        /*return models.PatientClinicalMetricData.PatientCarePlan.findOne({
+          where: {
+            patient_id: patient_id,
+            status: [3]
+          },
+          include:[
+            {
+              model:models.models.PatientCarePlanProblems,
+              as:'cp_problems',
+              attributes:['id'],
+              include:[{
+                model: models.PatientCarePlanProblemMetric,
+                as: 'metrics',
+                attributes: {
+                  exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+                },
+                include: [
+                  {
+                    model: models.PatientCarePlanProblemMetricTarget,
+                    as: 'targets',
+                    attributes: {
+                      exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+                    },
+                    include: [
+                      {
+                        model: models.ProblemMetricTargetMaster,
+                        as: 'metric_target_master',
+                        attributes: {
+                          exclude: ['deletedAt', 'createdAt', 'updatedAt', 'created_by']
+                        },
+                      }
+                    ]
+                  }
+                ]
+              }]
+            }
+          ]
+        })*/
+      })
+      .then(resObj => {
         return resp.json({
           success: true,
           data: resObj,
