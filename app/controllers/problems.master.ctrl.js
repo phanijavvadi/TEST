@@ -310,6 +310,7 @@ const operations = {
     const options = {
       where: {
         metric_mid: metric_mid,
+        status: [1],
       },
       attributes: {
         exclude: ['deletedAt', 'createdAt', 'updatedAt', 'createdBy']
@@ -406,7 +407,8 @@ const operations = {
     const {authenticatedUser, tokenDecoded} = req.locals;
     const options = {
       where: {
-        metric_mid: metric_mid
+        metric_mid: metric_mid,
+        status: [1],
       },
       include: [{
         model: models.ProblemMetricActionPlanInputMaster,

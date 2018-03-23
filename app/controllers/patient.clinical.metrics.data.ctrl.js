@@ -45,8 +45,8 @@ const operations = {
         metric_type: req.params.metric_type,
         patient_id: req.params.patient_id,
       },
-      attributes: ['measurement', 'id', 'source', 'on_date'],
-      order: [['on_date', 'ASC']],
+      attributes: ['measurement', 'id', 'source', 'on_date','createdAt'],
+      order: [['on_date', 'DESC'],['createdAt', 'DESC']],
       raw: true
     };
     const {authenticatedUser, tokenDecoded} = req.locals;
@@ -67,6 +67,7 @@ const operations = {
         rows = rows.map(a => {
           if (a.on_date) {
             a.on_date = moment(a.on_date).format('YYYY-MM-DD');
+            a.createdAt = moment(a.createdAt).format('YYYY-MM-DD HH:mm');
           }
           return a;
         });
