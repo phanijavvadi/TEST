@@ -56,7 +56,6 @@ const operations = {
     const options = {
       orgId: body.orgId,
       patient_id: body.patientId,
-      createdBy:authenticatedUser.id
     };
     let transaction;
     let devices;
@@ -73,6 +72,7 @@ const operations = {
         return patientNotificationService.create({
           patient_id: body.patient_id,
           message: body.message,
+          createdBy:authenticatedUser.id,
           type: 'IN_APP_MESSAGE'
         }, {transaction});
       })
