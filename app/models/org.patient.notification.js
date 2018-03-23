@@ -27,7 +27,7 @@ export default function (sequelize, DataTypes) {
     PatientNotification.belongsTo(models.User, {
       foreignKey: {
         name: 'createdBy',
-        allowNull: false
+        allowNull: true
       }
     });
   };

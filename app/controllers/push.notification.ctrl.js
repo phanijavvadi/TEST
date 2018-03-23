@@ -56,6 +56,7 @@ const operations = {
     const options = {
       orgId: body.orgId,
       patient_id: body.patientId,
+      createdBy:authenticatedUser.id
     };
     let transaction;
     let devices;
