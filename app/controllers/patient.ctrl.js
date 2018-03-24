@@ -42,7 +42,7 @@ const operations = {
               {
                 model: models.PatientCarePlanProblemMetric,
                 as: 'metrics',
-                attributes: ['name', 'goal','type'],
+                attributes: ['name', 'goal', 'type'],
                 include: [
                   {
                     model: models.PatientCarePlanProblemMetricTarget,
@@ -301,13 +301,14 @@ const operations = {
         patientResult = data.get({plain: true});
         const payload = {
           id: patientResult.id,
+          patientInternalId: patientResult.patientInternalId,
           orgId: patientResult.orgId,
           context: constants.contexts.PATIENT,
           email: patientResult.email,
           firstName: patientResult.firstName,
           surName: patientResult.surName,
           middleName: patientResult.middleName
-        }
+        };
         return payload;
       })
       .then(payload => {
