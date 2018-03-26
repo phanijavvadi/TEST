@@ -42,6 +42,7 @@ export default {
     org_api_keys: 'org_api_keys',
     org_contact_details: 'org_contact_details',
     org_imported_data: 'org_imported_data',
+    org_patient_care_team: 'org_patient_care_team',
     org_patient_care_plan: 'org_patient_care_plan',
     org_patient_care_plan_problems: 'org_patient_care_plan_problems',
     org_patient_care_plan_problem_metrics: 'org_patient_care_plan_problem_metrics',

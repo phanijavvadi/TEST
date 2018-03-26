@@ -47,7 +47,7 @@ const validators = {
       password: Joi.string().required(),
       patientNumber: Joi.string().required()
     };
-    let result = Joi.validate(body, schema, {allowUnknown: true});
+    let result = Joi.validate(body, schema, {allowUnknown: false});
     if (result && result.error) {
       resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
     } else {

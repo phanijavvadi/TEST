@@ -1,5 +1,6 @@
 "use strict";
 import constants from "../util/constants/constants";
+
 export default function (sequelize, DataTypes) {
   const UserType = sequelize.define("UserType", {
     id: {
@@ -17,7 +18,27 @@ export default function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     freezeTableName: true,
-    tableName: constants.getTableName('user_types')
+    tableName: constants.getTableName('user_types'),
+    validate: {
+      isUnique: function (next) {
+        const self = this;
+        const where = {name: self.name};
+
+        UserType.find({
+          where: where,
+          attributes: ['id', 'name']
+        })
+          .then(function (record) {
+            if (record && self.id !== record.id) {
+              return next('USER_TYPE_NAME_EXIST');
+            }
+            return next();
+          })
+          .catch(function (err) {
+            return next(err.message);
+          });
+      }
+    }
   });
   UserType.associate = function (models) {
     UserType.belongsTo(models.UserCategory, {
