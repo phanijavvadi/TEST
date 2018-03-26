@@ -23,7 +23,7 @@ export default function (sequelize, DataTypes) {
     gender: {
       type: DataTypes.INTEGER,
       defaultValue: null,
-      comment: "1=>Male,2=>Female,3=>Others"
+      comment: "1=>Female,2=>Male,3=>Others"
     },
     address1: DataTypes.TEXT,
     address2: DataTypes.TEXT,

@@ -15,7 +15,7 @@ export default function (sequelize, DataTypes) {
       gender: {
         type: DataTypes.SMALLINT,
         defaultValue: null,
-        comment: "1=>Male,2=>Female,3=>Others"
+        comment: "1=>Female,2=>Male,3=>Others"
       },
       notes: {
         type: DataTypes.TEXT
