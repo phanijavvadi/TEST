@@ -2,6 +2,7 @@
 import * as Joi from 'joi';
 import logger from '../util/logger';
 import * as _ from 'lodash';
+import * as attachmentValidator from './attachment.validator';
 
 
 const Sequelize = require('sequelize');
@@ -25,6 +26,7 @@ const validators = {
       otherUserRoles: Joi.array().items(Joi.string()).unique(),
       regNo: Joi.string().allow(''),
       orgId: Joi.string().required(),
+      profilePic: Joi.string(),
       status: Joi.number().valid([1, 2]).label('Status'),
     }).or('practitionerType', 'otherUserRoles')
       .with('practitionerType', 'regNo');
@@ -116,7 +118,8 @@ const validators = {
       firstName: Joi.string().min(3).required(),
       lastName: Joi.string().min(1).required(),
       phoneNo: Joi.string().required(),
-      orgId: Joi.string().required()
+      orgId: Joi.string().required(),
+      profilePic: Joi.string()
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
@@ -211,7 +214,7 @@ const validators = {
   },*/
   validateOrgId: (req, resp, next) => {
     const {orgId} = req.body;
-    logger.info('About to validate orgid',orgId);
+    logger.info('About to validate orgid', orgId);
     orgService.findById(orgId)
       .then((data) => {
         if (data) {
@@ -307,7 +310,7 @@ const validators = {
     let schema = {
       userId: Joi.string().required(),
       orgId: Joi.string().required(),
-      status: Joi.string().required().valid([1,2])
+      status: Joi.string().required().valid([1, 2])
     };
     let result = Joi.validate(body, schema);
     if (result && result.error) {
@@ -328,6 +331,20 @@ const validators = {
     } else {
       next();
     }
-  }
+
+  },
+  updateProfilePicValidator: (req, resp, next) => {
+    const body = req.body;
+    let schema = {
+      id: Joi.string().required(),
+      profilePic: Joi.string().required(),
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: false});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      attachmentValidator.validateAttachmentId(body.profilePic, req, resp, next);
+    }
+  },
 }
 export default validators;

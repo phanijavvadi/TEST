@@ -34,6 +34,14 @@ export default function (sequelize, DataTypes) {
       as: 'patient'
     });
 
+    PatientCareTeam.belongsTo(models.UserType, {
+      foreignKey: {
+        name: 'provider_type_id',
+        allowNull: false,
+        comment: 'User Type '
+      },
+      as: 'providerType'
+    });
     PatientCareTeam.belongsTo(models.User, {
       foreignKey: {
         name: 'provider_id',

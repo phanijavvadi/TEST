@@ -17,9 +17,16 @@ export default function (app) {
 
   router.route('/org/list').get([
     userCtrl.getOrgUserList]);
+  router.route('/org/options').get([
+    userCtrl.getOrgUserOptions]);
 
   router.route('/org/:id').get([
     userCtrl.get]);
+
+  router.route('/update-profile-pic')
+    .put([
+      userValidator.updateProfilePicValidator,
+      userCtrl.updateProfilePic]);
 
   router.route('/org/create').post([
     userValidator.orgUserCreateReqValidator,

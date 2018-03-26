@@ -216,7 +216,7 @@ const operations = {
       fax: organisation.fax || null,
       orgLogo: organisation.orgLogo || null,
       createdBy: authenticatedUser.id || null
-    }
+    };
     const orgContPerDetails = {
       firstName: organisation.contPerFname,
       lastName: organisation.contPerLname,
@@ -224,7 +224,7 @@ const operations = {
       phoneNo: organisation.contPerPhoneNo,
       createdBy: authenticatedUser.id,
       userTypeId: organisation.contPerTypeId,
-    }
+    };
     return sequelize.transaction()
       .then((t) => {
         return orgService
@@ -397,7 +397,7 @@ const operations = {
       phoneNo: organisation.phoneNo,
       fax: organisation.fax,
       orgLogo: organisation.orgLogo || null
-    }
+    };
     const orgContPerDetails = {
       id: organisation.contPerId,
       firstName: organisation.contPerFname,

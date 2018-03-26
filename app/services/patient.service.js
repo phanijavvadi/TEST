@@ -91,7 +91,11 @@ export function bulkCreate(patients, {transaction = null, ...options} = {}) {
  * @param patient object literal containing info about a patient
  **/
 export function update(patient, {transaction = null, ...options} = {}) {
-  return Patient.findById(patient.id).then((p) => {
+  return Patient.findById(patient.id, {
+    attributes: {
+      exclude: ['password'],
+    }
+  }).then((p) => {
     if (p) {
       return p.update(patient, {transaction});
     } else {

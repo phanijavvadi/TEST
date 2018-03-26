@@ -126,6 +126,11 @@ const operations = {
       }
       options.where['orgId'] = userOrgIds;
     }
+    options.include = [{
+      model: models.Organisation,
+      as: 'organisation',
+      attributes: ['name', 'address', 'address1', 'phoneNo', 'postcode', 'orgLogo']
+    }];
     return patientService.findById(id, options)
       .then((data) => {
         if (data) {

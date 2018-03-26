@@ -8,7 +8,7 @@ const validators = {
   getCareTeamListReqValidator: (req, resp, next) => {
     const body = req.query;
     let schema = {
-      provider_id: Joi.string().required(),
+      patient_id: Joi.string().required(),
       orgId: Joi.string().required(),
     };
     let result = Joi.validate(body, schema, {allowUnknown: true});
@@ -25,6 +25,7 @@ const validators = {
       id: Joi.string(),
       comments: Joi.string(),
       provider_id: Joi.string().required(),
+      provider_type_id: Joi.string().required(),
       orgId: Joi.string().required(),
       patient_id: Joi.string().required()
     };

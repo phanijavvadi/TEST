@@ -22,6 +22,10 @@ export default function (app) {
         userAccessValidator.validateUserHasOrgAccessById(orgId, req, resp, next);
       },
       patientCareTeamCtrl.getCareTeamList]);
+  patientRouter.route('/list')
+    .get([
+      patientCareTeamValidator.getCareTeamListReqValidator,
+      patientCareTeamCtrl.getCareTeamList]);
 
   router.route('/create')
     .post([
@@ -30,7 +34,13 @@ export default function (app) {
         const orgId = req.body.orgId;
         userAccessValidator.validateUserHasOrgAccessById(orgId, req, resp, next);
       },
-      patientCareTeamCtrl.create]);
+      (req, resp, next) => {
+        if (req.body.id) {
+          patientCareTeamCtrl.update(req, resp, next);
+        } else {
+          patientCareTeamCtrl.create(req, resp, next);
+        }
+      }]);
   router.route('/remove')
     .delete([
       patientCareTeamValidator.removeReqValidator,

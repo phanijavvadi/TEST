@@ -44,7 +44,12 @@ export default function (sequelize, DataTypes) {
       },
       as: 'userRoles'
     });
-
+    User.belongsTo(models.Attachment, {
+      foreignKey: {
+        name: 'profilePic',
+        allowNull: true,
+      }
+    });
     User.belongsTo(models.User, {
       foreignKey: {
         name: 'createdBy',

@@ -85,11 +85,72 @@ const operations = {
         });
       });
   },
+  getOrgUserOptions: (req, resp) => {
+    const {authenticatedUser} = req.locals;
+    const options = {};
+    options.where = {};
+    options.userRoles = {where: {}};
+    if (req.query.status) {
+      options.where.status = +req.query.status;
+    }
+    if (req.query.userTypeId) {
+      options.userRoles.where['userTypeId'] = req.query.userTypeId;
+      // options.where['$userRoles.userTypeId$'] = req.query.userTypeId;
+    }
+    if (authenticatedUser.userCategory.value === 'ORG_USER') {
+      let userOrgIds = _.map(authenticatedUser.userRoles, (role) => {
+        return role.orgId;
+      });
+      if (req.query.orgId && userOrgIds.indexOf(req.query.orgId) === -1) {
+        return resp.status(403).send({success: false, message: errorMessages.INVALID_ORG_ID});
+      }
+      options.userRoles.where['orgId'] = userOrgIds;
+    }
+
+    return models.User
+      .findAll({
+        where: options.where,
+        attributes: ['id', 'firstName', 'lastName'],
+        include: [{
+          model: models.UserRole,
+          as: 'userRoles',
+          required: true,
+          attributes: [],
+          where: {
+            ...(options.userRoles.where || {})
+          }
+        }],
+        raw: true
+      })
+      .then((data) => {
+        if (data) {
+          data.rows = _.map(data.rows, (row) => {
+            row = row.get({plain: true});
+            return row;
+          })
+          resp.status(200).json(data);
+        }
+      }).catch((err) => {
+        let message, status;
+        if (err && errorMessages[err.message]) {
+          status = 403;
+          message = errorMessages[err.message];
+        } else {
+          logger.error(err);
+          status = 500;
+          message = errorMessages.SERVER_ERROR;
+        }
+        resp.status(status).send({
+          success: false,
+          message
+        });
+      });
+  },
   get: (req, resp) => {
     const id = req.params.id;
     const {authenticatedUser} = req.locals;
     logger.info('About to get user ', id);
-    const options={};
+    const options = {};
     options.userRoles = {where: {}};
     /**
      * filter user by organisation id
@@ -135,9 +196,10 @@ const operations = {
       lastName: body.lastName,
       email: body.email,
       phoneNo: body.phoneNo,
+      profilePic: body.profilePic || null,
       userCategoryId: userCategory.id,
-      createdBy: authenticatedUser.id
-    }
+      createdBy: authenticatedUser.id,
+    };
     const userRoles = [];
     if (practitioner) {
       userRoles.push({
@@ -221,9 +283,10 @@ const operations = {
   updateOrgUser: (req, resp) => {
     const body = req.body;
     const userData = {
-      id:body.id,
+      id: body.id,
       firstName: body.firstName,
       lastName: body.lastName,
+      profilePic: body.profilePic || null,
       phoneNo: body.phoneNo,
     };
     logger.info('About to update  user', userData);
@@ -348,7 +411,20 @@ const operations = {
           message
         });
       });
-  }
+  },
+  updateProfilePic: (req, resp) => {
+    const data = req.body;
+    return userService
+      .update(data)
+      .then(() => {
+        resp.json({
+          success: true,
+          message: successMessages.PATIENT_UPDATED_SUCCESS
+        });
+      }).catch((err) => {
+        commonUtil.handleException(err, req, resp);
+      });
+  },
 }
 
 export default operations;
