@@ -72,7 +72,7 @@ const operations = {
         return patientNotificationService.create({
           patient_id: body.patient_id,
           message: body.message,
-          createdBy:authenticatedUser.id,
+          createdBy: authenticatedUser.id,
           type: 'IN_APP_MESSAGE'
         }, {transaction});
       })
@@ -147,16 +147,30 @@ const operations = {
       limit: Number(queryParams.limit || 25),
       offset: Number(queryParams.limit || 0),
       attributes: ['id', 'message', 'createdAt'],
+      include: [{
+        model: models.User,
+        as: 'fromUser',
+        attributes: ['firstName', 'lastName','id'],
+        required: false
+      }],
       order: [['updatedAt', 'DESC']],
       raw: true
+    }).then(data => {
+      data.rows = data.rows.map(a => {
+        const row = {
+          id: a.id,
+          message: a.message,
+          fromUser: {
+            firstName: a['fromUser.firstName'],
+            lastName: a['fromUser.lastName'],
+            id: a['fromUser.id'],
+          }
+        };
+        row.createdAt = moment(a.createdAt).format('YYYY-MM-DD HH:ss');
+        return row;
+      });
+      return resp.json(data);
     })
-      .then(data => {
-        data.rows = data.rows.map(a => {
-          a.createdAt = moment(a.createdAt).format('YYYY-MM-DD HH:ss');
-          return a;
-        });
-        return resp.json(data);
-      })
       .catch((err) => {
         commonUtil.handleException(err, req, resp, next);
       });

@@ -92,6 +92,62 @@ const operations = {
         commonUtil.handleException(err, req, resp);
       });
   },
+  getPatientHealthChecks: (req, resp, next) => {
+    let patient_id = req.query.patient_id;
+    const {authenticatedUser, tokenDecoded} = req.locals;
+    const options = {
+      where: {
+        patient_id: patient_id,
+        status: [1]
+      },
+      attributes: ['id'],
+      raw: true
+    };
+    if (tokenDecoded.context && tokenDecoded.context === constants.contexts.PATIENT) {
+      options.where['patient_id'] = tokenDecoded.id;
+    }
+    patientPreventiveHealthModel.findOne(options)
+      .then(res => {
+        if (!res) {
+          return [];
+        } else {
+          const options = {
+            where: {
+              ph_id: res.id
+            },
+            attributes: ['id', 'name'],
+            include: [{
+              model: models.PatientPreventiveHealthChecksData,
+              as: 'health_check_data',
+              attributes: ['id', 'due_date', 'checkup_date', 'hc_id'],
+              order: [['updatedAt', 'DESC']],
+              limit: 1,
+              separate: true
+            }],
+            // raw: true
+          };
+          return models.PatientPreventiveHealthChecks.findAll(options);
+        }
+      })
+      .then(res => {
+        res = res.map(a => {
+          a = a.get({plain: true});
+          a.health_check_data = a.health_check_data.map(b => {
+            if (b.due_date) {
+              b.due_date = moment(b.due_date).format('DD,MMM YYYY')
+            }
+            if (b.checkup_date) {
+              b.checkup_date = moment(b.checkup_date).format('DD,MMM YYYY')
+            }
+            return b;
+          });
+          return a;
+        });
+        return resp.json(res);
+      }).catch((err) => {
+      commonUtil.handleException(err, req, resp, next);
+    });
+  },
   getHealthChecks: (req, resp, next) => {
     const ph_id = req.params.ph_id;
     const {authenticatedUser, tokenDecoded} = req.locals;
@@ -112,7 +168,6 @@ const operations = {
     };
     models.PatientPreventiveHealthChecks.findAll(options)
       .then(res => {
-
         res = res.map(a => {
           a = a.get({plain: true});
           a.health_check_data = a.health_check_data.map(b => {

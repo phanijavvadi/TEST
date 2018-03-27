@@ -16,8 +16,8 @@ const Op = Sequelize.Op;
 const operations = {
   getOptions: (req, resp, next) => {
     const gender = [];
-    if (req.params.gender) {
-      gender.push(Number(req.params.gender));
+    if (req.query.gender) {
+      gender.push(Number(req.query.gender));
     }
     const where = {
       status: 1
@@ -450,7 +450,7 @@ const operations = {
     return models.PreventiveActivityMetricMaster
       .findAll({
         where: where,
-        attributes: ['id', 'name', 'status', 'frequency']
+        attributes: ['id', 'name', 'status', 'frequency','notes']
       })
       .then((data) => {
         if (data) {

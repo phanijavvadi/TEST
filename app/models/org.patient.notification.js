@@ -28,7 +28,8 @@ export default function (sequelize, DataTypes) {
       foreignKey: {
         name: 'createdBy',
         allowNull: true
-      }
+      },
+      as:'fromUser'
     });
   };
   return PatientNotification;

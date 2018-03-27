@@ -36,6 +36,18 @@ const validators = {
       }, req, resp, next);
     }
   },
+  getPatientHealthCheckDataValidator: (req, resp, next) => {
+    const body = req.query;
+    let schema = {
+      patient_id: Joi.string().required()
+    };
+    let result = Joi.validate(body, schema, {allowUnknown: true});
+    if (result && result.error) {
+      resp.status(403).send({errors: result.error.details, message: result.error.details[0].message});
+    } else {
+      next();
+    }
+  },
   saveHealthCheckDataValidator: (req, resp, next) => {
     const body = req.body;
     let schema = {

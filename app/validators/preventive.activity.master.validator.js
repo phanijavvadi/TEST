@@ -86,6 +86,7 @@ const validators = {
       id: Joi.string(),
       name: Joi.string().required(),
       frequency: Joi.string().required(),
+      notes: Joi.string(),
       status: Joi.number().required(),
       frequency_options_master: Joi.array().items(frequency_options_schema).min(0).unique((a, b) => {
         return a.name === b.name

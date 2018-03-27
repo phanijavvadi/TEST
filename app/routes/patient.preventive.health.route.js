@@ -21,9 +21,11 @@ export default function (app) {
     .get([
       patientPreventiveHealthCtrl.get]);
 
-  patientRouter.route('/:ph_id/health_checks')
+  patientRouter.route('/patient-health_checks/list')
     .get([
-      patientPreventiveHealthCtrl.getHealthChecks]);
+      patientPreventiveHealthValidator.getPatientHealthCheckDataValidator,
+      patientPreventiveHealthCtrl.getPatientHealthChecks]);
+
   router.route('/:ph_id/health_checks')
     .get([
       patientPreventiveHealthCtrl.getHealthChecks]);
